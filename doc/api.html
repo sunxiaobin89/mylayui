@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!-- saved from url=(0026)https://www.layui.com/doc/ -->
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <title>layuiTablePlug开发使用文档</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="stylesheet" href="../src/css/layui.css" media="all">
+<!--  <link rel="stylesheet" href="css/global.css" media="all">-->
+<!--  <link rel="stylesheet" href="css/main.css" media="all">-->
+</head>
+<body>
+<div class="layui-header header header-doc">
+  <div class="layui-main">
+    <a class="logo" href="">
+      <site>MyLayui</site>
+    </a>
+    <div class="layui-form component layui-hide" lay-filter="LAY-site-header-component">
+      <select lay-search="" lay-filter="component">
+        <option value="">搜索组件或模块</option>
+      </select>
+    </div>
+    <ul class="layui-nav" lay-filter="api_header"></ul>
+  </div>
+</div>
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+<!--[if lt IE 9]>
+<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<!--<div class="layui-layer layui-layer-page layui-layer-dir" id="layui-layer1" type="page" times="1" showtime="0"-->
+<!--     contype="object" style="z-index: 19891015; top: 346.5px; left: 1749px; margin-left: -15px;">-->
+<!--  <div class="layui-layer-title" style="cursor: move;">目录</div>-->
+<!--  <div id="" class="layui-layer-content">-->
+
+<!--  </div>-->
+<!--  <span class="layui-layer-setwin"><a class="layui-layer-ico layui-layer-close layui-layer-close1"-->
+<!--                                      href="javascript:;"></a></span><span class="layui-layer-resize"></span>-->
+<!--</div>-->
+<div class="layui-main site-inline">
+  <div class="site-tree">
+    <div class="layui-form" style="height: 38px; margin: 10px 13px 0 0;">
+      <select lay-filter="tabVersion">
+        <option value="new">2.5.4</option>
+      </select>
+    </div>
+    <ul class="layui-tree" lay-filter="api_menu_side"></ul>
+  </div>
+
+  <div class="site-content" id="app_api"></div>
+</div>
+<div class="site-tree-mobile layui-hide">
+  <i class="layui-icon"></i>
+</div>
+<div class="site-mobile-shade"></div>
+<script src="../src/layui.js" charset="utf-8"></script>
+<script>
+  layui.config({base: 'js/'}).use('api', function () {});
+</script>
+</body>
+</html>

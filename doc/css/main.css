@@ -1,0 +1,29 @@
+.header-doc {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  background-color: #007799;
+}
+
+.layui-main.site-inline {
+  top: 60px;
+}
+
+@media screen and (min-width: 750px) {
+  .site-content {
+    width: calc(100% - 250px);
+  }
+}
+
+.layui-layer.layui-layer-dir {
+  margin-left: -30px;
+}
+
+.logo site {
+  font-size: 24px;
+  color: #ffffff;
+}
+
+[lay-filter="api_menu_side"] li a {
+  cursor: pointer;
+}

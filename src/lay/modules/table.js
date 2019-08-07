@@ -6,9 +6,9 @@
     
  */
  
-layui.define(['laytpl', 'laypage', 'layer', 'form', 'util'], function(exports){
+layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
   "use strict";
-  
+  debugger;
   var $ = layui.$
   ,laytpl = layui.laytpl
   ,laypage = layui.laypage

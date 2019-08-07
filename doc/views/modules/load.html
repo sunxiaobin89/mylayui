@@ -1,0 +1,70 @@
+<h1 class="site-h1"><i class="layui-icon layui-icon-senior"></i>加载器文档 - layui.load</h1>
+<blockquote class="layui-elem-quote">
+  使用layui有一段时间的小伙伴一般都会有一个疑虑，就是怎么引入第三放的插件，特别是那些不是写成layui模块化格式的插件，比如echarts，ztree等，
+  通常的做法就是通过script引到页面中，那么如果也希望像layui一样模块化的引入，希望用layui.use去延迟加载一些模块的话，
+  原始的插件因为里面没有按照layui的标准声明成layui模块，那么是不能直接use的，所以一般来说可以给改造一下，让它实现了layui.define，
+  格式详见：<a href="https://www.layui.com/doc/base/modules.html" target="_blank" style="color: lightblue;">模块规范</a>。
+  但是如果能不修改他的代码的前提下去use，那就更加的方便更加优雅了。
+</blockquote>
+
+<blockquote class="layui-elem-quote layui-quote-nm">
+  原理实际也比较简单，就是将layui.define执行的地方从引入插件的文件里面给解放出来。
+</blockquote>
+
+<fieldset class="layui-elem-field layui-field-title">
+  <legend>快速使用</legend>
+</fieldset>
+
+<div class="site-text">
+  <p>layui.load是一个方法，用来无侵入的记载一些第三方插件，在实际引入之前根据需要设置插件对应的路径和一些其他的相关配置信息，如下所示：</p>
+</div>
+
+<pre class="layui-code" lay-title="JavaScript">
+var load = layui.load;
+load.config({
+  echarts: {
+    path: '{/}https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min',
+    then: function () {
+      // then 回调非必须的，一般用来引入一些对应的css或者用来返回layui[modelName] = 被引入的插件的某些特殊的变量可以在then回调返回相关的值
+      return window.echarts;
+    }
+  },
+  ztree: {
+    path: '{/}https://cdn.bootcss.com/zTree.v3/3.5.30/js/jquery.ztree.all',
+    then: function () {
+      layui.link('https://cdn.bootcss.com/zTree.v3/3.5.30/css/zTreeStyle/zTreeStyle.css', null, 'ztree');
+    }
+  },
+  'ztree.exhide': {
+    path: '{/}https://cdn.bootcss.com/zTree.v3/3.5.30/js/jquery.ztree.exhide.min',
+    extend: ['ztree']
+  },
+  fuzzysearch: {
+    path: 'js/fuzzysearch'
+  }
+});
+</pre>
+
+<script>
+  layui.use('code', function () {
+    var code = layui.code;
+    code();
+  })
+</script>
+
+<div class="site-text">
+  <p>load.config作用类似layui.extend主要用来配置被引入的插件对应的路径、继承的组件以及定义引入成功之后要给layui[插件名称]赋值什么值。</p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <b>参数：</b>option:Array 插件对应的配置数组其中key就是插件的名称，value对应就是配置信息。
+    <blockquote class="layui-elem-quote layui-quote-nm">
+      有几个关键配置：
+      <ul>
+        <li><i>path</i>:String<em>指定插件文件所在的路劲信息，配置规则跟layui.extend中的规则一致，
+          详见：<a href="https://www.layui.com/doc/base/modules.html#extend" target="_blank" style="color: lightblue;">扩展一个 layui 模块</a></em></li>
+        <li><i>extend</i>:String/Array</li>
+        <li><i>then</i>:Function</li>
+      </ul>
+    </blockquote>
+    <b>返回：</b>无
+  </blockquote>
+</div>
