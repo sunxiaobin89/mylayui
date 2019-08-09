@@ -16,7 +16,7 @@
 </fieldset>
 
 <div class="site-text">
-  <p>layui.load是一个方法，用来无侵入的记载一些第三方插件，在实际引入之前根据需要设置插件对应的路径和一些其他的相关配置信息，如下所示：</p>
+  <p>layui.load，目的是用来无侵入的记载一些第三方插件，在实际引入之前根据需要设置插件对应的路径和一些其他的相关配置信息，如下所示：</p>
 </div>
 
 <pre class="layui-code" lay-title="JavaScript">
@@ -45,26 +45,85 @@ load.config({
 });
 </pre>
 
+<div class="site-text">
+  <p>load.config作用类似layui.extend主要用来配置被引入的插件对应的路径、继承的组件以及定义引入成功之后要给layui[插件名称]赋值。</p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <b>参数：</b>option:Array 插件对应的配置数组其中key就是插件的名称，value对应就是配置信息。
+    <blockquote class="layui-elem-quote layui-quote-nm">
+      有几个关键配置：
+      <ul>
+        <li><b><i>path</i></b>:String<em>指定插件文件所在的路劲信息，配置规则跟layui.extend中的规则一致，
+          详见：<a href="https://www.layui.com/doc/base/modules.html#extend" target="_blank" style="color: lightblue;">扩展一个
+            layui 模块</a>，简单的总结一下就是{/}开头的就是指定不相对layui的base的路径，可以是一个项目中的资源，也可以是一个远程的路径，不以{/}开头的就是相对layui的base的路径，在引入的时候会加上.js的后缀，所以路径设置到文件名称即可不要加上后缀</em>
+        </li>
+        <li><b><i>extend</i></b>:String/Array<em>设置插件的依赖（前置插件）</em></li>
+        <li><b><i>then</i></b>:Function<em>插件初次加载完毕之后，进去回调之前执行的回调，可以利用这个回调加载该插件需要的一些css，也可以通过在then回调返回，用来设置layui[插件名称]对应的值</em>
+        </li>
+      </ul>
+    </blockquote>
+    <b>返回：</b>无
+  </blockquote>
+</div>
+
+<div class="site-text">
+  <p>layui.load本身是一个function，也是模块的核心，用法类似layui.use但是有区别。</p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <b>参数：</b>
+    <ul>
+      <li><b><i>name</i></b>: String/Array <em>加载一个或者多个模块</em></li>
+      <li><b><i>done</i></b>: Function (没有参数) <em>模块加载完毕之后的回调</em></li>
+    </ul>
+  </blockquote>
+  <pre class="layui-code" lay-title="layui.load使用示例">
+load('echarts', function () {
+  var echarts = layui.echarts;
+  console.log('echarts.version', echarts.version);
+  // 引入echarts之后实际会有一个全局变量echarts，后面基本echarts怎么用就怎么用，没啥分别，
+  // 如果在then回调里面返回了对应的变量给了layui.echarts了也可以使用layui.echarts去替换全局变量echarts使用，看个人喜好。
+  var chartIns = echarts.init(document.getElementById('chart1'));
+  chartIns.setOption({
+    xAxis: {
+      type: 'category',
+      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    },
+    yAxis: {
+      type: 'value'
+    },
+    series: [{
+      data: [820, 932, 901, 934, 1290, 1330, 1320],
+      type: 'line'
+    }]
+  });
+});
+
+
+// load(['form', 'ztree', 'ztree.exhide'], function () { // 与下面的代码等效
+load(['ztree.exhide'], function () { // ztree.exhide依赖了ztree所以只要load进来ztree.exhide就可以用ztree的基础功能了
+  var setting = {
+      view: {
+        selectedMulti: false
+      }
+    },
+    zTreeNodes = [
+      {
+        "name": "网站导航", open: true, children: [
+          {"name": "google", "url": "http://g.cn", "target": "_blank"},
+          {"name": "baidu", "url": "http://baidu.com", "target": "_blank"},
+          {"name": "sina", "url": "http://www.sina.com.cn", "target": "_blank"}
+        ]
+      }
+    ];
+  var zTreeObj = $.fn.zTree.init($("#tree"), setting, zTreeNodes);
+  load('fuzzysearch', function () {
+    fuzzySearch('tree', '#search', null, true); //初始化模糊搜索方法
+  })
+});
+  </pre>
+</div>
+
 <script>
   layui.use('code', function () {
     var code = layui.code;
     code();
   })
 </script>
-
-<div class="site-text">
-  <p>load.config作用类似layui.extend主要用来配置被引入的插件对应的路径、继承的组件以及定义引入成功之后要给layui[插件名称]赋值什么值。</p>
-  <blockquote class="layui-elem-quote layui-quote-nm">
-    <b>参数：</b>option:Array 插件对应的配置数组其中key就是插件的名称，value对应就是配置信息。
-    <blockquote class="layui-elem-quote layui-quote-nm">
-      有几个关键配置：
-      <ul>
-        <li><i>path</i>:String<em>指定插件文件所在的路劲信息，配置规则跟layui.extend中的规则一致，
-          详见：<a href="https://www.layui.com/doc/base/modules.html#extend" target="_blank" style="color: lightblue;">扩展一个 layui 模块</a></em></li>
-        <li><i>extend</i>:String/Array</li>
-        <li><i>then</i>:Function</li>
-      </ul>
-    </blockquote>
-    <b>返回：</b>无
-  </blockquote>
-</div>

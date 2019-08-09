@@ -327,8 +327,8 @@ layui.define('layer' , function(exports){
         }
       }
       
-      //上传前的回调
-      options.before && options.before(args);
+      //上传前的回调 [mod] 让before回调具备拦截文件提交请求发出的能力
+      if (options.before && options.before(args) === false) {return;}
 
       //IE兼容处理
       if(device.ie){
@@ -506,13 +506,14 @@ layui.define('layer' , function(exports){
     options.bindAction.off('upload.action').on('upload.action', function(){
       that.upload();
     });
+
+    // [mod] 修复upload.render如果elem找到的节点之前已经被render过，再次render之后选择文件无法触发change事件以及后续的请求提交的bug
+    that.elemFile.off('change').on('change', function(){
+      $(this).trigger('upload.change');
+    });
     
     //防止事件重复绑定
     if(options.elem.data('haveEvents')) return;
-    
-    that.elemFile.on('change', function(){
-      $(this).trigger('upload.change');
-    });
     
     options.elem.on('click', function(){
       if(that.isFile()) return;
