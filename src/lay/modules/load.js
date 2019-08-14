@@ -8,7 +8,7 @@
 layui.define(['jquery'], function (exports) {
   "use strict";
   var modelName = 'load';
-  var version = '0.0.1';
+  var version = '0.0.2';
   // 适配一些常见的需要依赖jquery的第三方库
   window.$ = window.jQuery = window.jQuery || layui.$;
 
@@ -37,6 +37,8 @@ layui.define(['jquery'], function (exports) {
         // 设置路径
         layui.extend(extend);
       }
+      // 添加为非异步加载
+      layui.cache.notAsync[modelOne] = true;
 
       // 定义成layui的模块
       layui.define(option.extend || [], function (exports) {
@@ -49,9 +51,9 @@ layui.define(['jquery'], function (exports) {
     var option = config.option[modelOne];
 
     if (option && !option.ready) {
-      // layui.each(option.extend, function (index) {
-      //   then(option.extend[index]);
-      // });
+      layui.each(option.extend, function (index) {
+        then(option.extend[index]);
+      });
 
       // 可以在then回调中返回layui[modelName] 对应的值
       layui[modelOne] = typeof option.then === 'function' ? option.then() : layui[modelOne];
@@ -73,15 +75,15 @@ layui.define(['jquery'], function (exports) {
     return modelList.concat(name);
   };
 
-  var uniArr = function (data) {
-    var arrTemp = [];
-    layui.each(data, function (index, dataTemp) {
-      if (arrTemp.indexOf(dataTemp) === -1) {
-        arrTemp.push(dataTemp);
-      }
-    });
-    return arrTemp;
-  };
+  // var uniArr = function (data) {
+  //   var arrTemp = [];
+  //   layui.each(data, function (index, dataTemp) {
+  //     if (arrTemp.indexOf(dataTemp) === -1) {
+  //       arrTemp.push(dataTemp);
+  //     }
+  //   });
+  //   return arrTemp;
+  // };
 
   // 核心的方法
   var load = function (name, done) {
@@ -91,15 +93,17 @@ layui.define(['jquery'], function (exports) {
     });
 
     // 初始化use
-    var listTemp = uniArr(getModelList(name));
-    // layui.use(name, function () {
-    layui.use(listTemp, function () {
-      layui.each(listTemp, function (index, modelOne) {
-        // 执行then回调
-        then(modelOne);
-      });
+    // var listTemp = uniArr(getModelList(name));
+    // console.log('user list:', listTemp);
+    layui.use(name, function () {
+      var that = this;
+      // layui.each(listTemp, function (index, modelOne) {
+      //   // 执行then回调
+      //   then(modelOne);
+      // });
+      then(name);
 
-      typeof done === 'function' && done();
+      typeof done === 'function' && done.call(that);
     });
   };
 

@@ -16,10 +16,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/sentsin/layui.git"
+    "url": "git+ssh://git@github.com/sunxiaobin89/mylayui.git"
   },
   "author": [
-    "sentsin <xu@sentsin.com>"
+    "sentsin <xu@sentsin.com>",
+    "sunxiaobin <>"
   ],
   "homepage": "https://www.layui.com",
   "devDependencies": {
@@ -47,7 +48,7 @@
     "sinon-chai": "^2.13.0"
   },
   "bugs": {
-    "url": "https://github.com/sentsin/layui/issues"
+    "url": "https://github.com/sunxiaobin89/mylayui/issues"
   },
   "directories": {
     "doc": "doc",
@@ -59,6 +60,7 @@
   },
   "keywords": [
     "layui",
+    "mylayui",
     "ui",
     "JavaScript Framework",
     "toolkit",

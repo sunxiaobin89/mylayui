@@ -17,11 +17,12 @@
     ,status: {} //记录模块加载状态
     ,timeout: 10 //符合规范的模块请求最长等待秒数
     ,event: {} //记录模块自定义事件
+    ,notAsync: {} //记录非异步加载的模块
   }
 
   ,Layui = function(){
     this.v = '2.5.4'; //版本号
-    this.mylayui = this.v + ' mod-0.0.1'; // mylayui版本号
+    this.mylayui = this.v + ' mod-0.0.2'; // mylayui版本号
   }
 
   //获取layui所在目录
@@ -179,8 +180,9 @@
       ) + (that.modules[item] || item) + '.js';
       
       url = url.replace(/^\{\/\}/, '');
-      
-      node.async = true;
+
+      // node.async = true;
+      node.async = !config.notAsync[item]; // [mod]让use支持非异步的加载js
       node.charset = 'utf-8';
       node.src = url + function(){
         var version = config.version === true 

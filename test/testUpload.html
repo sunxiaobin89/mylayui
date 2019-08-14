@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>mylayui-测试上传组件</title>
+  <link rel="stylesheet" href="../src/css/layui.css" media="all">
+  <style>
+    .layui-upload-img {
+      width: 92px;
+      height: 92px;
+      margin: 0 10px 10px 0;
+    }
+  </style>
+</head>
+<body>
+<div class="layui-container">
+  <div class="layui-row layui-col-space10">
+    <div class="layui-col-xs12" style="margin-top: 10px;">
+      <blockquote class="layui-elem-quote">为节省服务器开销，以下示例均未配置真实上传接口，所以每次上传都会报提示：请求上传接口出现异常，这属于正常现象。</blockquote>
+
+      <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+        <legend>常规使用：普通图片上传（测试before回调return false来拦截请求的提交）</legend>
+      </fieldset>
+
+      <div class="layui-upload">
+        <button type="button" class="layui-btn" id="test1">上传图片</button>
+        <div class="layui-upload-list">
+          <img class="layui-upload-img" id="demo1">
+          <p id="demoText"></p>
+        </div>
+      </div>
+
+      <fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+        <legend>测试通过重新render一个节点来修改他的config</legend>
+      </fieldset>
+
+      <div class="layui-form">
+        <div class="layui-inline">
+          <button type="button" class="layui-btn" id="test2">上传文件</button>
+
+        </div>
+        <div class="layui-inline">
+          <select name="fileType" lay-filter="fileType">
+            <option value="file">压缩文件</option>
+            <option value="images">图片</option>
+            <option value="audio">音频</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="../src/layui.js"></script>
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+<!--[if lt IE 9]>
+<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+<script>
+  layui.use(['upload', 'form'], function () {
+    var $ = layui.$;
+    var layer = layui.layer;
+    var upload = layui.upload;
+    var form = layui.form;
+
+    //普通图片上传
+    var uploadInst = upload.render({
+      elem: '#test1'
+      , url: '/upload/'
+      , before: function (obj) {
+        var that = this;
+        //预读本地文件示例，不支持ie8
+        obj.preview(function (index, file, result) {
+          $('#demo1').prop('src', result); //图片链接（base64）
+        });
+        if (!that.confirm) {
+          layer.confirm('图片提交之后将不可撤回，您是否确认要提交？', function () {
+            // 询问通过，将询问状态设置成true
+            that.confirm = true;
+            uploadInst.upload();
+          }, function () {
+            that.confirm = false;
+            var demoText = $('#demoText');
+            demoText.html('<span style="color: #ffa372;">图片未提交</span> <a class="layui-btn layui-btn-xs demo-reload">提交</a>');
+            demoText.find('.demo-reload').on('click', function () {
+              uploadInst.upload();
+            });
+          });
+          // layer.confirm 它不是阻塞的，如果要询问，必须阻止本次提交，后面再确认之后可以再次触发提交请求
+          return false;
+        }
+      }
+      , done: function (res) {
+        //如果上传失败
+        if (res.code > 0) {
+          return layer.msg('上传失败');
+        }
+        //上传成功
+      }
+      , error: function () {
+        //演示失败状态，并实现重传
+        var demoText = $('#demoText');
+        demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+        demoText.find('.demo-reload').on('click', function () {
+          uploadInst.upload();
+        });
+      }
+    });
+
+    // upload.render({ //允许上传的文件后缀
+    //   elem: '#test4'
+    //   , url: '/upload/'
+    //   , accept: 'file' //普通文件
+    //   , exts: 'zip|rar|7z' //只允许上传压缩文件
+    //   , done: function (res) {
+    //     console.log(res)
+    //   }
+    // });
+    // upload.render({
+    //   elem: '#test5'
+    //   , url: '/upload/'
+    //   , accept: 'video' //视频
+    //   , done: function (res) {
+    //     console.log(res)
+    //   }
+    // });
+    // upload.render({
+    //   elem: '#test6'
+    //   , url: '/upload/'
+    //   , accept: 'audio' //音频
+    //   , done: function (res) {
+    //     console.log(res)
+    //   }
+    // });
+
+    // 初始化render
+    upload.render({
+      elem: '#test2'
+      , url: '/upload/file'
+      , accept: 'file' //普通文件
+      , exts: 'zip|rar|7z' //只允许上传压缩文件
+    });
+
+    // 监听类型切换重新render
+    form.on('select(fileType)', function (obj) {
+      var options = {
+        file: {
+          accept: 'file', //普通文件
+          exts: 'zip|rar|7z' //只允许上传压缩文件
+        },
+        images: {
+          accept: 'images'
+        },
+        audio: {
+          accept: 'audio'
+        }
+      };
+      upload.render($.extend({
+        elem: '#test2'
+        , url: '/upload/' + obj.value
+      }, options[obj.value] || {}));
+    })
+
+  })
+</script>
+
+</body>
+</html>
