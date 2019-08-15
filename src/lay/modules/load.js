@@ -52,9 +52,9 @@ layui.define(['jquery'], function (exports) {
     var option = config.option[modelOne];
 
     if (option && !option.ready) {
-      layui.each(option.extend, function (index) {
-        then(option.extend[index]);
-      });
+      // layui.each(option.extend, function (index) {
+      //   then(option.extend[index]);
+      // });
 
       // 可以在then回调中返回layui[modelName] 对应的值
       layui[modelOne] = typeof option.then === 'function' ? option.then() : layui[modelOne];
@@ -98,7 +98,7 @@ layui.define(['jquery'], function (exports) {
     // console.log('user list:', listTemp);
     layui.use(listTemp, function () {
       var that = this;
-      layui.each(name, function (index, modelOne) {
+      layui.each(listTemp, function (index, modelOne) {
         // 执行then回调
         then(modelOne);
       });
