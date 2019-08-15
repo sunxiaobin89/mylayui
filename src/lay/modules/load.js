@@ -38,10 +38,11 @@ layui.define(['jquery'], function (exports) {
         layui.extend(extend);
       }
       // 添加为非异步加载
-      layui.cache.notAsync[modelOne] = true;
+      // layui.cache.notAsync[modelOne] = true;
 
-      // 定义成layui的模块
-      layui.define(option.extend || [], function (exports) {
+      // 定义成layui的模块 [mod] 换了一种实现的方式，不再define里面设置依赖，而是将组件的信息解析成一个use队列
+      // layui.define(option.extend || [], function (exports) {
+      layui.define(function (exports) {
         exports(modelOne, {});
       });
     }
@@ -75,15 +76,15 @@ layui.define(['jquery'], function (exports) {
     return modelList.concat(name);
   };
 
-  // var uniArr = function (data) {
-  //   var arrTemp = [];
-  //   layui.each(data, function (index, dataTemp) {
-  //     if (arrTemp.indexOf(dataTemp) === -1) {
-  //       arrTemp.push(dataTemp);
-  //     }
-  //   });
-  //   return arrTemp;
-  // };
+  var uniArr = function (data) {
+    var arrTemp = [];
+    layui.each(data, function (index, dataTemp) {
+      if (arrTemp.indexOf(dataTemp) === -1) {
+        arrTemp.push(dataTemp);
+      }
+    });
+    return arrTemp;
+  };
 
   // 核心的方法
   var load = function (name, done) {
@@ -93,15 +94,14 @@ layui.define(['jquery'], function (exports) {
     });
 
     // 初始化use
-    // var listTemp = uniArr(getModelList(name));
+    var listTemp = uniArr(getModelList(name));
     // console.log('user list:', listTemp);
-    layui.use(name, function () {
+    layui.use(listTemp, function () {
       var that = this;
-      // layui.each(listTemp, function (index, modelOne) {
-      //   // 执行then回调
-      //   then(modelOne);
-      // });
-      then(name);
+      layui.each(name, function (index, modelOne) {
+        // 执行then回调
+        then(modelOne);
+      });
 
       typeof done === 'function' && done.call(that);
     });
