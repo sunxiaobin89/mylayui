@@ -72,6 +72,9 @@
     ,jquery: 'modules/jquery' //DOM库（第三方）
     ,load: 'modules/load' //加载其他的js（mylayui）
 
+    ,tablePlug: 'modules/ex/tablePlug' //table功能加强扩展插件
+    ,optimizeSelectOption: 'modules/ex/optimizeSelectOption' //table功能加强扩展插件
+
     ,mobile: 'modules/mobile' //移动大模块 | 若当前为开发目录，则为移动模块入口，否则为移动模块集合
     ,'layui.all': '../layui.all' //PC模块合并版
   };
@@ -546,6 +549,6 @@
   };
 
   win.layui = new Layui();
-  
+
 }(window);
 

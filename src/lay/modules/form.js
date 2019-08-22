@@ -101,7 +101,7 @@ layui.define('layer', function(exports){
     form.render(null, filter);
   };
   
-  //表单控件渲染
+  //表单控件渲染 [mod] 让form.render支持单节点渲染
   Form.prototype.render = function(type, filter){
     var that = this
     ,elemForm = $(ELEM + function(){
@@ -110,10 +110,10 @@ layui.define('layer', function(exports){
     ,items = {
       
       //下拉选择框
-      select: function(){
+      select: function(elem){
         var TIPS = '请选择', CLASS = 'layui-form-select', TITLE = 'layui-select-title'
         ,NONE = 'layui-select-none', initValue = '', thatInput
-        ,selects = elemForm.find('select')
+        ,selects = elem || elemForm.find('select')
         
         //隐藏 select
         ,hide = function(e, clear){
@@ -437,12 +437,12 @@ layui.define('layer', function(exports){
       }
       
       //复选框/开关
-      ,checkbox: function(){
+      ,checkbox: function(elem){
         var CLASS = {
           checkbox: ['layui-form-checkbox', 'layui-form-checked', 'checkbox']
           ,_switch: ['layui-form-switch', 'layui-form-onswitch', 'switch']
         }
-        ,checks = elemForm.find('input[type=checkbox]')
+        ,checks = elem || elemForm.find('input[type=checkbox]')
         
         ,events = function(reElem, RE_CLASS){
           var check = $(this);
@@ -509,9 +509,9 @@ layui.define('layer', function(exports){
       }
       
       //单选框
-      ,radio: function(){
+      ,radio: function(elem){
         var CLASS = 'layui-form-radio', ICON = ['&#xe643;', '&#xe63f;']
-        ,radios = elemForm.find('input[type=radio]')
+        ,radios = elem || elemForm.find('input[type=radio]')
         
         ,events = function(reElem){
           var radio = $(this), ANIM = 'layui-anim-scaleSpring';
@@ -568,11 +568,26 @@ layui.define('layer', function(exports){
         });
       }
     };
-    type ? (
-      items[type] ? items[type]() : hint.error('不支持的'+ type + '表单渲染')
-    ) : layui.each(items, function(index, item){
-      item();
-    });
+    if (!type || typeof type === 'string') {
+      type ? (
+        items[type] ? items[type]() : hint.error('不支持的'+ type + '表单渲染')
+      ) : layui.each(items, function(index, item){
+        item();
+      });
+    } else {
+      // jquery对象
+      layui.each(type, function (index, item) {
+        if (item.tagName === 'SELECT') {
+          items['select']($(item));
+        } else if (item.tagName === 'INPUT') {
+          if (item.type === 'checkbox') {
+            items['checkbox']($(item));
+          } else if (item.type === 'radio') {
+            items['radio']($(item));
+          }
+        }
+      })
+    }
     return that;
   };
   

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>table功能测试(mylayui)</title>
+  <link rel="stylesheet" href="../src/css/layui.css" media="all">
+  <style>
+    body {
+      margin: 10px;
+      /*border: 4px solid green;*/
+    }
+  </style>
+</head>
+<!--<body class="layui-container">-->
+<body>
+<div class="layui-container">
+  <form class="layui-form" lay-filter="form1" action="">
+    <div class="layui-form-item">
+      <label class="layui-form-label">输入框</label>
+      <div class="layui-input-block">
+        <input type="text" name="title" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">密码框</label>
+      <div class="layui-input-inline">
+        <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+      </div>
+      <div class="layui-form-mid layui-word-aux">辅助文字</div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">选择框</label>
+      <div class="layui-input-block">
+        <select class="test" name="city" lay-verify="required">
+          <option value=""></option>
+          <option value="0">北京</option>
+          <option value="1">上海</option>
+          <option value="2">广州</option>
+          <option value="3">深圳</option>
+          <option value="4">杭州</option>
+        </select>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">定时刷新</label>
+      <div class="layui-input-inline">
+        <select name="joke" id="select1">
+          <option value=""></option>
+          <option value="0">北京</option>
+          <option value="1">上海</option>
+          <option value="2">广州</option>
+          <option value="3">深圳</option>
+          <option value="4">杭州</option>
+        </select>
+      </div>
+      <div class="layui-form-mid layui-word-aux">我是一个调皮的select，我<input type="checkbox" name="trouble" lay-skin="switch" lay-text="不捣乱|捣乱" checked></div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">复选框</label>
+      <div class="layui-input-block">
+        <input class="test" type="checkbox" name="like[write]" title="写作">
+        <input class="test" type="checkbox" name="like[read]" title="阅读" checked>
+        <input class="test" type="checkbox" name="like[dai]" title="发呆">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">开关</label>
+      <div class="layui-input-block">
+        <input type="checkbox" name="switch" lay-skin="switch">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">单选框</label>
+      <div class="layui-input-block">
+        <input class="test" type="radio" name="sex" value="男" title="男" >
+        <input class="test" type="radio" name="sex" value="女" title="女" checked>
+      </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+      <label class="layui-form-label">文本域</label>
+      <div class="layui-input-block">
+        <textarea name="desc" placeholder="请输入内容" class="layui-textarea"></textarea>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script src="../src/layui.js"></script>
+<!--<script src="layui/release/zip/layui-v2.4.5/layui/layui.all.js"></script>-->
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+<!--[if lt IE 9]>
+<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<script>
+  layui.config({base: 'js/'})
+    .use(['form'], function () {
+      var $ = layui.$,
+        form = layui.form;
+      
+      form.on('submit(formDemo)', function (data) {
+        return false;
+      });
+
+      $('select.test').append('<option value="火星">火星</option>');
+      // $('.test').last().attr('lay-ignore', true);
+      $('.test:checkbox').last().prop('checked', true);
+      $('.test:radio').first().prop('checked', true);
+      // form.render();
+      form.render($('.test'));
+
+      setInterval(function () {
+        if ($('input[name="trouble"]').prop('checked')) {
+          // 只刷新当前的节点，不会影响其他的表单元素
+          form.render($('#select1'));
+        } else {
+          form.render('select', 'form1');
+        }
+      }, 500);
+    });
+</script>
+</body>
+</html>

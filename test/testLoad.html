@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <title>mylayui-测试load加载</title>
+  <title>load加载测试(mylayui)</title>
   <link rel="stylesheet" href="../src/css/layui.css" media="all">
   <!--  <link rel="stylesheet" href="../dist/css/layui.css" media="all">-->
 </head>
@@ -24,6 +24,7 @@
       </fieldset>
       <input class="layui-input" id="search" placeholder="请输入关键字搜索" autofocus>
       <div id="tree" class="ztree"></div>
+      <div id="selected"></div>
     </div>
   </div>
 </div>
@@ -51,9 +52,10 @@
       },
       ztree: {
         // path: '{/}https://cdn.bootcss.com/zTree.v3/3.5.30/js/jquery.ztree.all',
-        path: 'js/ztree/js/jquery.ztree.core.min',
+        path: 'js/ztree/js/jquery.ztree.all.min',
         then: function () {
           layui.link('js/ztree/css/zTreeStyle/zTreeStyle.css', null, 'ztree');
+          // layui.link('js/ztree/css/zTreeStyle/zTreeStyle.css', null, 'ztree');
         }
       },
       'ztree.exhide': {

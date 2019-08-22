@@ -8,7 +8,6 @@
  
 layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
   "use strict";
-  debugger;
   var $ = layui.$
   ,laytpl = layui.laytpl
   ,laypage = layui.laypage
@@ -232,6 +231,756 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     that.config = $.extend({}, that.config, table.config, options);
     that.render();
   };
+
+  // tablePlug相关 start
+
+  //添加数组IndexOf方法
+  if (!Array.prototype.indexOf){
+    Array.prototype.indexOf = function(elt , from){
+      return $.inArray(elt, this, from);
+    };
+  }
+  //添加数组map方法
+  if (!Array.prototype.map){
+    Array.prototype.map = function(callback){
+      return $.map(this, callback);
+    };
+  }
+
+  var isArray = function (obj) {
+    // 判断一个变量是不是数组
+    return Object.prototype.toString.call(obj) === '[object Array]';
+  },
+    // 缓存table.render返回的实例对象
+    tableIns = {},
+    CHECK_TYPE_ADDITIONAL = 'additional',  // 新增的
+    CHECK_TYPE_REMOVED = 'removed',  // 删除的
+    CHECK_TYPE_ORIGINAL = 'original', // 原有的
+    CHECK_TYPE_DISABLED = 'disabled', // 不可选的
+    FIXED_SCROLL = 'layui-table-fixed-scroll',
+    COLGROUP = 'colGroup', // 列合并标志
+    tableSpacialColType = ['numbers', 'checkbox', 'radio'], // 表格的特殊类型字段// 获得table的config
+    getConfig = function (tableId) {
+      return thisTable.config[tableId] || (tableIns[tableId] && tableIns[tableId].config) || {};
+      // return getIns(tableId).config;
+    },
+    // 获得表格实例
+    getIns = function (id) {
+      return id ? thisTable.that[id] : thisTable.that;
+    },
+    // 关于表格复选状态记录的封装
+    tableCheck = function () {
+      var checked = {};
+      return {
+        // 检验是否可用，是否初始化过
+        check: function (tableId) {
+          return !!checked[tableId];
+        },
+        reset: function (tableId) {
+          if (!checked[tableId]) {
+            checked[tableId] = {};
+            checked[tableId][CHECK_TYPE_ORIGINAL] = [];
+            checked[tableId][CHECK_TYPE_ADDITIONAL] = [];
+            checked[tableId][CHECK_TYPE_REMOVED] = [];
+            checked[tableId][CHECK_TYPE_DISABLED] = [];
+          } else {
+            this.set(tableId, CHECK_TYPE_ADDITIONAL, []);    // 新增的
+            this.set(tableId, CHECK_TYPE_REMOVED, []);       // 删除的
+          }
+        },
+        init: function (tableId, data, primaryKey) {
+          this.reset(tableId);
+          var ids = [];
+          if (data && data.length && typeof data[0] === 'object') {
+            // 如果data是对象数组
+            ids = addCacheData(tableId, data, primaryKey);
+          } else {
+            ids = data;
+          }
+          this.set(tableId, CHECK_TYPE_ORIGINAL, ids);
+        },
+        // 设置部分记录不可选
+        disabled: function (tableId, data) {
+          if (!checked[tableId]) {
+            this.reset(tableId);
+          }
+          this.set(tableId, CHECK_TYPE_DISABLED, data);
+        },
+        checkDisabled: function (tableId, value) {
+          return this.get(tableId, CHECK_TYPE_DISABLED).indexOf(value) !== -1;
+        },
+        // 获得当前选中的，不区分状态
+        getChecked: function (tableId) {
+          var delArr = this.get(tableId, CHECK_TYPE_REMOVED);
+
+          var retTemp = this.get(tableId, CHECK_TYPE_ORIGINAL).concat(this.get(tableId, CHECK_TYPE_ADDITIONAL));
+          var ret = [];
+          layui.each(retTemp, function (index, data) {
+            if (delArr.indexOf(data) === -1 && ret.indexOf(data) === -1) {
+              ret.push(data);
+            }
+          });
+          return ret;
+        },
+        get: function (tableId, type) {
+          if (type === CHECK_TYPE_ADDITIONAL
+            || type === CHECK_TYPE_REMOVED
+            || type === CHECK_TYPE_ORIGINAL
+            || type === CHECK_TYPE_DISABLED) {
+            return checked[tableId] ? (checked[tableId][type] || []) : [];
+          } else {
+            return checked[tableId];
+          }
+        },
+        set: function (tableId, type, data) {
+          if (type !== CHECK_TYPE_ORIGINAL
+            && type !== CHECK_TYPE_ADDITIONAL
+            && type !== CHECK_TYPE_REMOVED
+            && type !== CHECK_TYPE_DISABLED) {
+            return;
+          }
+          checked[tableId][type] = (!data || !isArray(data)) ? [] : data;
+        },
+        update: function (tableId, id, checkedStatus, isRadio) {
+          var _original = checked[tableId][CHECK_TYPE_ORIGINAL];
+          var _additional = checked[tableId][CHECK_TYPE_ADDITIONAL];
+          var _removed = checked[tableId][CHECK_TYPE_REMOVED];
+          if (checkedStatus) {
+            // 单选的时候不管什么时候都将新增的记录给去掉
+            isRadio && _additional.splice(0, 1);
+            // 勾选
+            if (_original.indexOf(id) === -1) {
+              // 不在原来的集合中
+              if (_additional.indexOf(id) === -1) {
+                _additional.push(id);
+              }
+            } else {
+              // 在原来的集合中，意味着之前有去掉勾选的操作
+              if (!isRadio && _removed.indexOf(id) !== -1) {
+                _removed.splice(_removed.indexOf(id), 1);
+              }
+            }
+          } else {
+            // 取消勾选
+            if (_original.indexOf(id) === -1) {
+              // 不在原来的集合中，意味着以前曾经添加过
+              if (_additional.indexOf(id) !== -1) {
+                _additional.splice(_additional.indexOf(id), 1);
+              }
+            } else {
+              // 在原来的集合中
+              if (_removed.indexOf(id) === -1) {
+                _removed.push(id);
+              }
+            }
+          }
+        }
+      }
+    }(),
+    // 获得表格的主键字段配置信息
+    getPrimaryKey = function (config) {
+      if (typeof config === 'string') {
+        config = getConfig(config);
+      }
+      if (config.primaryKey) {
+        return config.primaryKey;
+      }
+      var keyStatus = config.checkStatus && config.checkStatus.primaryKey,
+        keyDisabled = config.checkDisabled && config.checkDisabled.primaryKey;
+      if (keyStatus && keyDisabled && keyStatus !== keyDisabled) {
+        layui.hint().error('注意：当前表格(' + config.id + ')中checkStatus和checkDisabled都配置了primaryKey,但是他们不是同一个字段，必须保持表格配置中主键是唯一的，建议直接设置在顶层配置中就可以了！')
+      }
+      return keyDisabled || keyStatus || 'id';
+    },
+    // 针对表格中是否选中的数据处理
+    dataRenderChecked = function (data, tableId, config) {
+      if (!data || !tableId) {
+        return;
+      }
+      config = config || getConfig(tableId);
+      if (!config || !config.checkStatus) {
+        return;
+      }
+      var nodeSelected = tableCheck.getChecked(tableId);
+      for (var i = 0; i < data.length; i++) {
+        data[i][table.config.checkName] = nodeSelected.indexOf(data[i][getPrimaryKey(config)]) !== -1;
+      }
+    },
+    // 同步表格不可点击的checkbox
+    disabledCheck = function (tableId, syncConfig) {
+      // tableId 这个参数有可能传入table的id也可以直接传入table的实例
+      // syncConfig是否需要同步config
+      var config;
+      if (typeof tableId === 'string') {
+        config = getConfig(tableId);
+      } else {
+        config = tableId.config;
+        tableId = config ? config.id : '';
+      }
+
+      if (!config) {
+        return;
+      }
+      var tableView = config.elem.next();
+
+      if (syncConfig) {
+        config.checkDisabled = config.checkDisabled || {};
+        config.checkDisabled.enabled = config.checkDisabled.enabled || true;
+        config.checkDisabled.data = tableCheck.get(tableId, CHECK_TYPE_DISABLED) || [];
+      }
+      if (config.checkDisabled && config.checkDisabled.enabled) {
+        layui.each(table.cache[tableId], function (index, data) {
+          tableView.find('.layui-table-body')
+            .find('tr[data-index="' + index + '"]')
+            .find('input[name="layTableCheckbox"],[lay-type="layTableRadio"]')
+            .prop('disabled', tableCheck.checkDisabled(tableId, data[getPrimaryKey(config)]));
+        });
+      } else {
+        tableCheck.set(tableId, CHECK_TYPE_DISABLED, []);
+      }
+
+      tableView.find('input[lay-filter="layTableAllChoose"]').prop('checked', table.checkStatus(tableId).isAll);
+      form.render('checkbox', tableView.attr('lay-filter'));
+      form.render('radio', tableView.attr('lay-filter'));
+    },
+    // 同步表格不可点击的checkbox
+    renderDone = function (scroll) {
+      var that = this;
+      var options = that.config;
+      scroll && (that.layBody.scrollTop(0), that.layBody.scrollLeft(0));
+      // 同步不可选的状态
+      disabledCheck(that);
+      // 添加筛选的功能
+      // addFieldFilter.call(that);
+
+      // if (!that.layMain.find('.' + NONE).length) {
+      //   that.layTotal.removeClass(HIDE);
+      //   that.layFixLeft.removeClass(HIDE);
+      // }
+
+      // 初始化临时数据区
+      layui.each(that.tempData, function (index, data) {
+        that.addTemp(index + 1, data, null, true);
+      });
+
+      // 同步反转状态
+      // reverseTable(that.key, !!that.config.reversal);
+      options.reversal === true && that.reverse();
+
+      // 动态给checkbox添加lay-filter方便加form的监听处理
+      that.layBody.find('input[type="checkbox"][name="layTableCheckbox"]').attr('lay-filter', 'layTableCheckbox');
+      // 更新统计行的数据
+      // renderTotal(that.config.id);
+      renderTotal(that);
+
+      // 将数据同步到缓存数据中
+      addCacheData(options);
+    },
+    // 跨页面存储的缓存数据
+    cacheData = {},
+    // 将当前页的数据加入到缓存数据中
+    addCacheData = function (tableId, data, primaryKey) {
+      var options = typeof tableId === 'string' ? getConfig(tableId) : tableId;
+      // 如果是url模式并且设置了复选框跨页状态存储就把当前的data给缓存起来
+      primaryKey = primaryKey || getPrimaryKey(options);
+      if (options.checkStatus && primaryKey) {
+        cacheData[options.id] = cacheData[options.id] || {};
+        layui.each(data || table.cache[options.id] || [], function (index, data) {
+          cacheData[options.id][data[primaryKey]] = data;
+        });
+      }
+      return (data || table.cache[options.id] || []).map(function (value) {
+        return value[primaryKey]
+      });
+    },
+    // 渲染统计行
+    renderTotal = function (tableId, field, value) {
+      var that = this;
+      if (!tableId) {
+        console.warn('tableId不能为空');
+        return that;
+      }
+      var tableObj;
+      if (typeof tableId === 'string') {
+        tableObj = getIns(tableId);
+      } else {
+        tableObj = tableId;
+        tableId = tableObj.key || (tableObj.config ? tableObj.config.id : '');
+      }
+
+      if (!tableObj || !tableId) {
+        console.warn('找不到id为', tableId, '的实例');
+        return that;
+      }
+      var options = tableObj.config;
+      if (!options.totalRow) {
+        return that;
+      }
+
+      var totalElem = tableObj.layTotal;
+      if (field) {
+        totalElem.find('td[data-field="' + field + '"] div.layui-table-cell').html(value || '');
+        return that;
+      }
+      table.eachCols(tableId, function (index, item) {
+        if (item.totalRow && !item.totalRowText && item.field) {
+          var fieldTemp = item.field;
+          var totalFormat = item.totalFormat || 'sum';
+          var dataTemp = $.extend([], table.cache[tableId]);
+          var res;
+          if (typeof totalFormat === 'function') {
+            res = totalFormat.call(options, tableId, dataTemp, fieldTemp);
+          } else {
+            res = 0;
+            switch (totalFormat) {
+              case 'sum':
+                layui.each(dataTemp, function (index, data) {
+                  res += parseFloat(data[fieldTemp]) || 0;
+                });
+                break;
+            }
+          }
+          res && totalElem.find('td[data-field="' + fieldTemp + '"] div.layui-table-cell').html(res || '');
+        }
+      });
+    },
+    // 表格筛选列的状态记录的封装
+    colFilterRecord = (function () {
+      var recodeStoreName = 'tablePlug_col_filter_record';
+      var getStoreType = function (recordType) {
+        return recordType === 'local' ? 'data' : 'sessionData';
+      };
+      return {
+        // 记录
+        set: function (tableId, key, checked, recordType) {
+          if (!tableId || !key) {
+            return;
+          }
+          // 默认用sessionStore
+          var storeType = getStoreType(recordType);
+          var dataTemp = this.get(tableId, recordType);
+          dataTemp[key] = !checked;
+          layui[storeType](recodeStoreName, {
+            key: tableId,
+            value: dataTemp
+          })
+        },
+        get: function (tableId, recordType) {
+          return layui[getStoreType(recordType)](recodeStoreName)[tableId] || {};
+        },
+        clear: function (tableId) {
+          $.each(['data', 'sessionData'], function (index, type) {
+            layui[type](recodeStoreName, {
+              key: tableId,
+              remove: true
+            });
+          });
+        }
+      };
+    })(),
+    queryParams = (function () {
+      // 查询模式的白名单
+      var params = ['url', 'method', 'where', 'contentType', 'headers', 'parseData', 'request', 'response', 'data', 'page', 'initSort', 'autoSort', 'reversal'];
+      // 查询模式的黑名单
+      var params_blacklist = ['id', 'elem', 'cols', 'width', 'height'];
+      return {
+        // 获得查询的属性
+        getParams: function () {
+          return $.extend(true, [], params);
+        },
+        getParamsBlacklist: function () {
+          return $.extend(true, [], params_blacklist);
+        },
+        registerBlacklist: function () {
+          // 将一些属性加入黑名单
+          console.warn('registerBlacklist:不建议自己调用改方法将参数加入查询参数的黑名单，除非是在非常了解该功能的前提下');
+          var that = this;
+          layui.each(arguments, function (i, value) {
+            if (isArray(value)) {
+              that.registerBlacklist.apply(that, value);
+            } else {
+              if (typeof value === 'string' && params_blacklist.indexOf(value) === -1) {
+                params_blacklist.push(value);
+              }
+            }
+          });
+        }
+      }
+    })(),
+    updateCheckStatus = function (tableId, value, checked, isRadio) {
+      // if (!tableCheck.checkDisabled(tableId, value)) {
+      //   tableCheck.update(tableId, value, checked, isRadio);
+      // } else {
+      //   // 操作了不可选的
+      //   return false;
+      // }
+    }
+
+    ;
+
+  // 对外提供添加临时数据的接口
+  table.addTemp = function (id, data, callback) {
+    var ins = getIns(id);
+    if (typeof data === 'function') {
+      callback = data;
+      data = {};
+    }
+    ins && ins.addTemp(table.getTemp(id).numbers, (data && typeof data === 'object') ? data : {}, callback);
+  };
+
+  // 获得临时数据
+  table.getTemp = function (id) {
+    var data = table.cache[id] || [];
+    var dataTemp = [], i = 1;
+    for (; ; i++) {
+      if (data[-i]) {
+        if (isArray(data[-i])) {
+          // 无效的数据
+        } else {
+          dataTemp.push(data[-i]);
+        }
+      } else {
+        break;
+      }
+    }
+    return {
+      data: dataTemp,
+      numbers: i
+    }
+  };
+
+  // 清空临时数据
+  table.cleanTemp = function (id, index) {
+    var ins = getIns(id);
+    var dataTemp = table.getTemp(id);
+    var data = table.cache[id] || [];
+    if (dataTemp.data.length) {
+      var numbers = dataTemp.numbers;
+      for (var i = 1; i < numbers; i++) {
+        if (data[-i] && (index ? -i === index : true)) {
+          data[-i] = [];
+          if (index) {
+            break;
+          }
+        }
+      }
+    }
+    // 删除节点
+    $('div.layui-table-view[lay-id="' + id + '"]').removeClass('has-data-temp-warn')
+      .find('tr.layui-tablePlug-data-temp[data-index' + (index ? '="' + index + '"' : '') + ']').remove();
+    table.resize(id);
+    ins.layBody.scrollTop(ins.layBody[0].scrollHeight);
+  };
+
+  // 添加临时数据的dom方法
+  Class.prototype.addTemp = function (numbers, data, callback, notScroll) {
+    var that = this;
+    var tds_fixed = [], tds_fixed_r = [], tds = [];
+    var options = that.config, item1 = data || {};
+    numbers = -numbers;
+    if (that.layBody.find('tr[data-index="' + numbers + '"]').length) {
+      // 已经存在
+      return;
+    }
+    table.cache[that.key][numbers] = item1;
+    that.eachCols(function (i3, item3) {
+      var field = item3.field || i3
+        , key = options.index + '-' + item3.key
+        , content = item1[field];
+
+      if (content === undefined || content === null) content = '';
+      if (item3.colGroup) return;
+
+      //td内容
+      var td = ['<td data-field="' + field + '" data-key="' + key + '" ' + function () { //追加各种属性
+        var attr = [];
+        if (item3.type === 'normal' && item3.edit !== false) attr.push('data-edit="text"'); //是否允许单元格编辑
+        if (item3.align) attr.push('align="' + item3.align + '"'); //对齐方式
+        if (item3.templet) attr.push('data-content="' + content + '"'); //自定义模板
+        // if (item3.toolbar) attr.push('data-off="true"'); //行工具列关闭单元格事件
+        if (item3.event) attr.push('lay-event="' + item3.event + '"'); //自定义事件
+        if (item3.style) attr.push('style="' + item3.style + '"'); //自定义样式
+        if (item3.minWidth) attr.push('data-minwidth="' + item3.minWidth + '"'); //单元格最小宽度
+        return attr.join(' ');
+      }() + ' class="' + function () { //追加样式
+        var classNames = [];
+        if (item3.hide) classNames.push(HIDE); //插入隐藏列样式
+        if (!item3.field) classNames.push('layui-table-col-special'); //插入特殊列样式
+        return classNames.join(' ');
+      }() + '">'
+        , '<div class="layui-table-cell laytable-cell-' + function () { //返回对应的CSS类标识
+          return item3.type === 'normal' ? key
+            : (key + ' laytable-cell-' + item3.type);
+        }() + '">' + function () {
+          var tplData = $.extend(true, {
+            LAY_INDEX: numbers
+          }, item1);
+
+          //渲染不同风格的列
+          switch (item3.type) {
+            case 'checkbox':
+            case 'radio':
+            case 'numbers':
+              return '';
+              break;
+          }
+
+          //解析工具列模板
+          if (item3.toolbar) {
+            return '';
+          }
+          // return item3.templet ? function () {
+          //   return typeof item3.templet === 'function'
+          //     ? item3.templet(tplData)
+          //     : laytpl($(item3.templet).html() || String(content)).render(tplData)
+          // }() : content;
+          return parseTempData(item3, content, tplData);
+        }()
+        , '</div></td>'].join('');
+
+      tds.push(td);
+      if (item3.fixed && item3.fixed !== 'right') tds_fixed.push(td);
+      if (item3.fixed === 'right') tds_fixed_r.push(td);
+    });
+
+    that.layMain.find('.' + NONE).remove();
+    that.elem.removeClass('layui-table-none-overflow');
+    // 追加到最后
+    that.layMain.find('tbody').append('<tr class="layui-tablePlug-data-temp" data-index="' + numbers + '">' + tds.join('') + '</tr>');
+    that.layFixLeft.removeClass(HIDE).find('tbody').append('<tr class="layui-tablePlug-data-temp" data-index="' + numbers + '">' + tds_fixed.join('') + '</tr>');
+    that.layFixRight.find('tbody').append('<tr class="layui-tablePlug-data-temp" data-index="' + numbers + '">' + tds_fixed_r.join('') + '</tr>');
+    that.renderForm();
+    that.resize();
+    // 滚动到底部
+    notScroll || that.layBody.scrollTop(that.layBody[0].scrollHeight);
+
+    that.layBody.find('tr.layui-tablePlug-data-temp[data-index="' + numbers + '"]')
+      .find('td:first-child')
+      .append('<div class="close_temp"></div>');
+
+    that.layFixRight.find('.close_temp').remove();
+
+    // 执行回调，传过去两个参数，第一个是当前的table的config,第二个是新增的这个临时的tr的jquery对象
+    typeof callback === 'function' && callback.call(that.config, that.layBody.find('tr[data-index="' + numbers + '"]'));
+  };
+
+  // 监听临时数据中的删除按钮点击
+  _DOC.on('click', '.layui-table-view tr.layui-table-hover.layui-tablePlug-data-temp div.close_temp', function (event) {
+    layui.stope(event);
+    var btnElem = $(this);
+    var trElem = btnElem.closest('tr');
+    var tableId = trElem.closest('.layui-table-view').attr('lay-id');
+    table.cleanTemp(tableId, trElem.data('index'));
+  });
+
+  // 表格反转
+  Class.prototype.reverse = function () {
+    var that = this;
+    var config = that.config;
+    var isVertical = config.reversal;
+
+    that.elem[isVertical ? 'addClass' : 'removeClass']('vertical');
+    setTimeout(function () {
+      that.layTotal.css({top: isVertical ? that.layTool.outerHeight() - 1 + 'px' : 0});
+      that.layMain.css({
+        marginLeft: isVertical ? that.layHeader.width() + 'px' : 0,
+        marginRight: (isVertical && config.totalRow) ? that.layTotal.width() + 'px' : 0
+      });
+      isVertical || that.layHeader.scrollLeft(that.layMain.scrollLeft());
+    }, 0);
+    return that;
+  };
+  
+  // 表格行列转换，如果没有传reversal, 默认就是按照当前的状态取反更新一下，如果有传入，则以传入的为准
+  table.reverse = function (tableId, reversal, tableIns) {
+    if (!tableId) {
+      layui.each(getIns(), function (key, obj) {
+        table.reverse(key, reversal, obj);
+      });
+    } else {
+      var insTemp = tableIns || table.getIns(tableId);
+      var config = insTemp.config;
+
+      if (typeof reversal !== 'boolean') {
+        // 如果不是true/false; 默认就是将当前的状态给重新渲染一下
+        reversal = !config.reversal;
+      }
+
+      // 设置状态
+      config.reversal = reversal;
+      // 调用反转方法
+      insTemp.reverse();
+      // 处理360急速模式下出现的异常问题(临时处理方式)
+      insTemp.resize();
+    }
+  };
+
+  table.disabledCheck = function (tableId, data) {  // 同步表格中的某些不可点击的节点
+    var that = this;
+    tableCheck.disabled(tableId, data || []);
+    disabledCheck(tableId, true);
+  };
+
+  // 给弹出的详情里面的按钮添加监听级联的触发原始table的按钮的点击事件
+  _DOC.off('click', '.layui-table-tips-main [lay-event]')
+    .on('click', '.layui-table-tips-main [lay-event]', function (event) {
+      var elem = $(this);
+      var tableTrCurr = table._tableTdCurr;
+      if (!tableTrCurr) {
+        return;
+      }
+      var layerIndex = elem.closest('.layui-table-tips').attr('times');
+      // 关闭当前的这个显示更多的tip
+      layer.close(layerIndex);
+      // 找到记录的当前操作的那个按钮
+      // table._tableTdCurr.find('[lay-event="' + elem.attr('lay-event') + '"]').first().click();
+      table._tableTdCurr.find('[lay-event]:eq(' + elem.index() + ')').click();
+    });
+
+
+  // 是否让固定列支持鼠标滚动
+  var enableTableFixedScroll = function (enabled) {
+    enabled = !!enabled;
+
+    _DOC.off('mouseenter', '.' + ELEM_VIEW + ' ' + ELEM_FIXR + ' ' + ELEM_BODY)
+      .off('mouseleave', '.' + ELEM_VIEW + ' ' + ELEM_FIXR + ' ' + ELEM_BODY)
+      .off('mouseenter', '.' + ELEM_VIEW + ' ' + ELEM_FIXL + ' ' + ELEM_BODY)
+      .off('mouseleave', '.' + ELEM_VIEW + ' ' + ELEM_FIXL + ' ' + ELEM_BODY)
+      .off('mouseenter', '.' + ELEM_VIEW + ' ' + ELEM_FIXED + ' ' + ELEM_HEADER);
+
+    if (enabled) {
+      // 给固定列添加一些鼠标的事件监听，用于支持固定列滚动
+      _DOC.on('mouseenter', '.' + ELEM_VIEW + ' ' + ELEM_FIXR + ' ' + ELEM_BODY, function (event) {
+        // 处理鼠标移入右侧
+        var elem = $(this);
+        var elemFixedR = elem.closest(ELEM_FIXR);
+        if (elemFixedR.css('right') !== '-1px') {
+          // 如果有滚动条的话
+          elemFixedR.addClass(FIXED_SCROLL);
+        } else {
+          setTimeout(function () {
+            if (elemFixedR.css('right') !== '-1px') {
+              console.log('出现了一开始还没有打滚动条补丁的时候就触发的情况');
+              elemFixedR.addClass(FIXED_SCROLL);
+            }
+          }, 50);
+        }
+      }).on('mouseleave', '.' + ELEM_VIEW + ' ' + ELEM_FIXR + ' ' + ELEM_BODY, function (event) {
+        // 处理鼠标移出右侧
+        $(this).closest(ELEM_FIXR).removeClass(FIXED_SCROLL);
+      }).on('mouseenter', '.' + ELEM_VIEW + ' ' + ELEM_FIXL + ' ' + ELEM_BODY, function (event) {
+        // 处理鼠标移入左侧
+        var elem = $(this);
+        var elemFixedL = elem.closest(ELEM_FIXL);
+        elemFixedL.addClass(FIXED_SCROLL);
+        var widthOut = elemFixedL.find(ELEM_HEADER).find('table').width();
+        var widthIn = elemFixedL.find(ELEM_HEADER).width() + 1;
+        elemFixedL.css({width: widthOut + 'px'}).find(ELEM_BODY).css({width: widthIn + 'px'});
+      }).on('mouseleave', '.' + ELEM_VIEW + ' ' + ELEM_FIXL + ' ' + ELEM_BODY, function (event) {
+        // 处理鼠标移出左侧
+        $(this).css({width: 'auto'}).closest(ELEM_FIXL).css({width: 'auto'}).removeClass(FIXED_SCROLL);
+      }).on('mouseenter', '.' + ELEM_VIEW + ' ' + ELEM_FIXED + ' ' + ELEM_HEADER, function (event) {
+        var elem = $(this);
+        elem.closest(ELEM_FIXED).removeClass(FIXED_SCROLL);
+      });
+    }
+  };
+
+  // 默认开启固定列滚动监听的支持
+  enableTableFixedScroll(true);
+
+  // 定时刷新某个表格
+  var refresh = function (tableId, time) {
+    var that = this;
+    var timer = refresh.timer;
+    if (tableId === false) {
+      // 取消所有的定时刷新
+      layui.each(timer, function (_id, _timer) {
+        // clearInterval(_timer);
+        refresh.clear(_id);
+      });
+      // refresh.timer = {};
+      return that;
+    }
+    if (!tableId) {
+      console.warn('tableId不能为空');
+      return that;
+    }
+    var tableObj;
+    if (typeof tableId === 'string') {
+      tableObj = getIns(tableId);
+    } else {
+      tableObj = tableId;
+    }
+    if (!tableObj) {
+      console.warn('找不到id为', tableId, '的实例');
+      return that;
+    }
+    tableId = options.id;
+    var options = tableObj.config;
+
+    if (time === false) {
+      // 清除当前表格的定时刷新
+      // clearInterval(timer[tableId]);
+      // delete timer[tableId];
+      refresh.clear(tableId);
+      return that;
+    }
+
+    if (!time && time !== 0) {
+      // 单次刷新
+      tableObj.pullData(tableObj.page, true);
+      return that;
+    }
+
+    if (time === true || time < 50) {
+      time = 50; // 默认最高频率为50毫秒一次
+    }
+
+    // clearInterval(timer[tableId]);
+    refresh.clear(tableId);
+    timer[tableId] = {
+      time: time,
+      index: setInterval(function () {
+        if (!$(document).find(options.elem).length) {
+          // 如果当前表格已经不存在
+          refresh.call(that, tableId, false);
+        } else {
+          // tableObj.pullData(tableObj.page, true)
+          refresh(tableId);
+        }
+      }, time)
+    };
+
+  };
+  refresh.timer = {};
+  refresh.clear = function (tableId) {
+    if (refresh.timer[tableId]) {
+      clearInterval(refresh.timer[tableId].index);
+      var time = refresh.timer[tableId].time;
+      delete refresh.timer[tableId];
+      return time;
+    }
+  };
+  refresh.reset = function (tableId, config) {
+    refresh(config || tableId, refresh.clear(tableId));
+  };
+  table.refresh = refresh;
+
+  table.renderTotal = renderTotal;
+  table.getPrimaryKey = getPrimaryKey;
+  table.getIns = getIns;
+  table.getTableIns = function (tableId) {
+    return tableIns[tableId];
+  };
+  table.check = tableCheck;
+
+  // 暴露核心
+  table.Class = Class;
+  // table.thisTable = thisTable;
+
+  // tablePlug相关 end
+
   
   //默认配置
   Class.prototype.config = {
@@ -245,7 +994,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     }
   };
 
-  //表格渲染
+  //表格渲染 [mod]
   Class.prototype.render = function(){
     var that = this
     ,options = that.config;
@@ -324,7 +1073,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     
     //让表格平铺
     that.fullSize();
-    
+
     //如果多级表头，则填补表头高度
     if(options.cols.length > 1){
       //补全高度
@@ -362,7 +1111,8 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
   Class.prototype.setInit = function(type){
     var that = this
     ,options = that.config;
-    
+    var tableId = options.id;
+
     options.clientWidth = options.width || function(){ //获取容器宽度
       //如果父元素宽度为0（一般为隐藏元素），则继续查找上层元素，直到找到真实宽度为止
       var getWidth = function(parent){
@@ -380,39 +1130,127 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     
     if(type === 'width') return options.clientWidth;
 
+    // 去掉之前的记录
+    delete thisTable.cols[tableId];
+
+    if (!tableCheck.check(tableId)) {
+      // 如果render的时候设置了checkStatus或者全局设置了默认跨页保存那么重置选中状态
+      tableCheck.init(tableId, options.checkStatus ? (options.checkStatus['default'] || []) : []);
+    } else {
+      if (options.checkStatus && options.checkStatus['default']) {
+        // 如果在option里面设置了默认选中的数据
+        tableCheck.set(tableId, CHECK_TYPE_ORIGINAL, options.checkStatus['default']);
+      }
+    }
+
+    if (options.checkDisabled && isArray(options.checkDisabled.data) && options.checkDisabled.data.length) {
+      tableCheck.disabled(tableId, isArray(options.checkDisabled.data) ? options.checkDisabled.data : []);
+    }
+
+    var record;
+    // 如果配置了字段筛选的记忆需要更新字段的hide设置
+    if (options.colFilterRecord) {
+      record = colFilterRecord.get(tableId, options.colFilterRecord);
+      // 把修改hide的逻辑挪到下面做减少遍历
+    } else {
+      colFilterRecord.clear(tableId);
+    }
+
+    // 封装对col的配置处理
+    var initCols = function (i1, item1, i2, item2) {
+      //如果列参数为空，则移除
+      if (!item2) {
+        item1.splice(i2, 1);
+        return;
+      }
+
+      item2.key = i1 + '-' + i2;
+      item2.hide = item2.hide || false;
+      item2.colspan = item2.colspan || 1;
+      item2.rowspan = item2.rowspan || 1;
+
+      //根据列类型，定制化参数
+      that.initOpts(item2);
+
+      // 如果配置了字段筛选的记忆需要更新字段的hide设置
+      item2.hide = (record && item2.type === "normal" && item2.field && typeof record[item2.field] === 'boolean') ? record[item2.field] : item2.hide;
+
+
+      // plug修改，根据配置信息确定是否合并列
+      if (!item2.field && !item2.toolbar && (!item2.colspan || item2.colspan === 1) && (tableSpacialColType.indexOf(item2.type) === -1)) {
+        item2[COLGROUP] = true;
+      } else if (item2[COLGROUP] && !(item2.colspan > 1)) {
+        // 如果有乱用colGroup的，明明是一个字段列还给它添加上这个属性的会在这里KO掉，
+        item2[COLGROUP] = false;
+      }
+
+      //设置列的父列索引
+      //如果是组合列，则捕获对应的子列
+      if (item2[COLGROUP] || item2.colspan > 1) {
+        var childIndex = 0;
+        // #### 源码修改 #### 修复复杂表头数据与表头错开的bug
+        var indexChild = i1 + (parseInt(item2.rowspan) || 1);
+        layui.each(options.cols[indexChild], function (i22, item22) {
+          //如果子列已经被标注为{HAS_PARENT}，或者子列累计 colspan 数等于父列定义的 colspan，则跳出当前子列循环
+          if (item22.HAS_PARENT || (childIndex >= 1 && childIndex == (item2.colspan || 1))) return;
+
+          item22.HAS_PARENT = true;
+          item22.parentKey = i1 + '-' + i2;
+          childIndex = childIndex + parseInt(item22.colspan > 1 ? item22.colspan : 1);
+          initCols(indexChild, options.cols[indexChild], i22, item22);
+        });
+        item2[COLGROUP] = true; //标注是组合列
+      }
+
+      // //根据列类型，定制化参数
+      // that.initOpts(item2);
+    };
+
+
     //初始化列参数
-    layui.each(options.cols, function(i1, item1){
-      layui.each(item1, function(i2, item2){
-        
-        //如果列参数为空，则移除
-        if(!item2){
-          item1.splice(i2, 1);
-          return;
-        }
-        
-        item2.key = i1 + '-' + i2;
-        item2.hide = item2.hide || false;
-
-        //设置列的父列索引
-        //如果是组合列，则捕获对应的子列
-        if(item2.colGroup || item2.colspan > 1){
-          var childIndex = 0;
-          layui.each(options.cols[i1 + 1], function(i22, item22){
-            //如果子列已经被标注为{HAS_PARENT}，或者子列累计 colspan 数等于父列定义的 colspan，则跳出当前子列循环
-            if(item22.HAS_PARENT || (childIndex > 1 && childIndex == item2.colspan)) return;
-            
-            item22.HAS_PARENT = true;
-            item22.parentKey = i1 + '-' + i2;
-
-            childIndex = childIndex + parseInt(item22.colspan > 1 ? item22.colspan : 1);
-          });
-          item2.colGroup = true; //标注是组合列
-        }
-
-        //根据列类型，定制化参数
-        that.initOpts(item2);
+    layui.each(options.cols, function (i1, item1) {
+      if (i1 > 0) {
+        return true
+      }
+      layui.each(item1, function (i2, item2) {
+        // 调用解析cols
+        initCols(i1, item1, i2, item2);
       });
     });
+
+    // //初始化列参数
+    // layui.each(options.cols, function(i1, item1){
+    //   layui.each(item1, function(i2, item2){
+    //
+    //     //如果列参数为空，则移除
+    //     if(!item2){
+    //       item1.splice(i2, 1);
+    //       return;
+    //     }
+    //
+    //     item2.key = i1 + '-' + i2;
+    //     item2.hide = item2.hide || false;
+    //
+    //     //设置列的父列索引
+    //     //如果是组合列，则捕获对应的子列
+    //     if(item2.colGroup || item2.colspan > 1){
+    //       var childIndex = 0;
+    //       layui.each(options.cols[i1 + 1], function(i22, item22){
+    //         //如果子列已经被标注为{HAS_PARENT}，或者子列累计 colspan 数等于父列定义的 colspan，则跳出当前子列循环
+    //         if(item22.HAS_PARENT || (childIndex > 1 && childIndex == item2.colspan)) return;
+    //
+    //         item22.HAS_PARENT = true;
+    //         item22.parentKey = i1 + '-' + i2;
+    //
+    //         childIndex = childIndex + parseInt(item22.colspan > 1 ? item22.colspan : 1);
+    //       });
+    //       item2.colGroup = true; //标注是组合列
+    //     }
+    //
+    //     //根据列类型，定制化参数
+    //     that.initOpts(item2);
+    //   });
+    // });
     
   };
   
@@ -626,6 +1464,38 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     }
     
     that.loading(!0);
+
+    var noneElem = that.layMain.find('.'+ NONE);
+    // 如果没有数据的时候表头内容的宽度超过容器的宽度
+    that.elem[noneElem.length && (that.layHeader.first().find('.layui-table').width() - 1) > that.layHeader.first().width() ? 'addClass' : 'removeClass']('layui-table-none-overflow');
+
+    //如果多级表头，重新填补填补表头高度
+    if (options.cols.length > 1) {
+      //补全高度
+      // var th = that.layFixed.find(ELEM_HEADER).find('th');
+      // 只有有头部的高度的时候计算才有意义
+      // var heightTemp = that.layHeader.height();
+      // heightTemp = heightTemp / options.cols.length; // 每一个原子tr的高度
+      var colsNum = options.cols.length;
+      var thBox = that.layBox.find(ELEM_HEADER);
+      var thElem = that.layFixed.find(ELEM_HEADER + ' th');
+      var matchFlag = false;
+      thElem.each(function (index, thCurr) {
+        thCurr = $(thCurr);
+        var rowspan = parseInt(thCurr.attr('rowspan') || '1');
+        // var _thH = heightTemp * (parseInt(thCurr.attr('rowspan') || 1))
+        //   - 1 - parseFloat(thCurr.css('padding-top')) - parseFloat(thCurr.css('padding-bottom'));
+        // 找到原始的box里面的th的高度,只有行合并小于最大合并数的才需要设置高度
+        if (rowspan < colsNum) {
+          thCurr.height(thBox.find('th[data-key="' + thCurr.attr('data-key') + '"]').height());
+          matchFlag = true;
+        }
+      });
+      if (matchFlag) {
+        // 修复ie浏览器下因为全行合并的高度导致后面的一些高度异常的问题
+        that.layFixed.find('>' + ELEM_HEADER + ' th[rowspan="' + colsNum + '"]').height('auto');
+      }
+    }
   };
   
   //重置表格尺寸/结构
@@ -637,7 +1507,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
   };
   
   //表格重载
-  Class.prototype.reload = function(options){
+  Class.prototype.insReload = function(options){
     var that = this;
     
     options = options || {};
@@ -647,6 +1517,12 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     that.config = $.extend(true, {}, that.config, options);
     
     that.render();
+  };
+
+  // [mod] 调用table.reload达到智能判断是否重载
+  Class.prototype.reload = function(options){
+    var that = this;
+    table.reload(that.config.id, options, true);
   };
   
   //异常提示
@@ -664,6 +1540,9 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     that.layMain.find('tbody').html('');
     
     that.layMain.append(that.layNone = layNone);
+    // [mod] 补充异常情况下对page和total的内容处理
+    that.layPage && that.layPage.addClass(HIDE).find('>div').html('');
+    that.layTotal && that.layTotal.addClass(HIDE).find('tbody').html('');
     
     table.cache[that.key] = []; //格式化缓存数据
   };
@@ -671,8 +1550,8 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
   //页码
   Class.prototype.page = 1;
   
-  //获得数据
-  Class.prototype.pullData = function(curr){
+  //获得数据 [mod] 添加refresh模式
+  Class.prototype.pullData = function(curr, refresh){
     var that = this
     ,options = that.config
     ,request = options.request
@@ -692,6 +1571,10 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       
       //参数
       var data = $.extend(params, options.where);
+      // [mod] 请求前对ajax的data进行修改的回调
+      if (typeof options.parseRequest === 'function') {
+        data = options.parseRequest(data) || data;
+      }
       if(options.contentType && options.contentType.indexOf("application/json") == 0){ //提交 json 格式
         data = JSON.stringify(data);
       }
@@ -718,17 +1601,17 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
               ('返回的数据不符合规范，正确的成功状态码应为："'+ response.statusName +'": '+ response.statusCode)
             );
           } else {
-            that.renderData(res, curr, res[response.countName]), sort();
+            that.renderData(res, curr, res[response.countName],false, refresh && (options.page ? options.page.count === res[response.countName] : true)), sort();
             options.time = (new Date().getTime() - that.startTime) + ' ms'; //耗时（接口请求+视图渲染）
           }
-          that.setColsWidth();
+          refresh ? that.loading(true) : that.setColsWidth();
           typeof options.done === 'function' && options.done(res, curr, res[response.countName]);
         }
         ,error: function(e, m){
           that.errorView('数据接口请求异常：'+ m);
 
           that.renderForm();
-          that.setColsWidth();
+          refresh ? that.loading(true) : that.setColsWidth();
         }
       });
     } else if(options.data && options.data.constructor === Array){ //已知数据
@@ -738,21 +1621,22 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       res[response.dataName] = options.data.concat().splice(startLimit, options.limit);
       res[response.countName] = options.data.length;
 
-      that.renderData(res, curr, res[response.countName]), sort();
-      that.setColsWidth();
+      that.renderData(res, curr, res[response.countName], false,refresh && (options.page ? options.page.count === options.data.length : true)), sort();
+      refresh ? that.loading(true) : that.setColsWidth();
       typeof options.done === 'function' && options.done(res, curr, res[response.countName]);
     }
   };
   
-  //遍历表头
+  //遍历表头 [mod]
   Class.prototype.eachCols = function(callback){
     var that = this;
-    table.eachCols(null, callback, that.config.cols);
+    // table.eachCols(null, callback, that.config.cols);
+    table.eachCols(that.config.id, callback, that.config.cols);
     return that;
   };
 
-  //数据渲染
-  Class.prototype.renderData = function(res, curr, count, sort){
+  //数据渲染 [mod] 新增refresh模式处理
+  Class.prototype.renderData = function(res, curr, count, sort, refresh){
     var that = this
     ,options = that.config
     ,data = res[options.response.dataName] || []
@@ -789,7 +1673,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
             if(item3.edit) attr.push('data-edit="'+ item3.edit +'"'); //是否允许单元格编辑
             if(item3.align) attr.push('align="'+ item3.align +'"'); //对齐方式
             if(item3.templet) attr.push('data-content="'+ content +'"'); //自定义模板
-            if(item3.toolbar) attr.push('data-off="true"'); //行工具列关闭单元格事件
+            // if(item3.toolbar) attr.push('data-off="true"'); //行工具列关闭单元格事件 [mod] 让工具列也能有相关事件处理
             if(item3.event) attr.push('lay-event="'+ item3.event +'"'); //自定义事件
             if(item3.style) attr.push('style="'+ item3.style +'"'); //自定义样式
             if(item3.minWidth) attr.push('data-minwidth="'+ item3.minWidth +'"'); //单元格最小宽度
@@ -851,7 +1735,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
         trs_fixed_r.push('<tr data-index="'+ i1 +'">'+ tds_fixed_r.join('') + '</tr>');
       });
 
-      that.layBody.scrollTop(0);
+      refresh || that.layBody.scrollTop(0);
       that.layMain.find('.'+ NONE).remove();
       that.layMain.find('tbody').html(trs.join(''));
       that.layFixLeft.find('tbody').html(trs_fixed.join(''));
@@ -873,26 +1757,37 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       options.HAS_SET_COLS_PATCH || that.setColsPatch();
       options.HAS_SET_COLS_PATCH = true;
     };
+
+    // 初始化选中的数据
+    dataRenderChecked(data, options.id, options);
+
+    var dataTemp = table.getTemp(that.key);
+    // 存储临时数据
+    that.tempData = dataTemp.data;
     
     table.cache[that.key] = data; //记录数据
     
     //显示隐藏分页栏
     that.layPage[(count == 0 || (data.length === 0 && curr == 1)) ? 'addClass' : 'removeClass'](HIDE);
-    
-    //排序
-    if(sort){
-      return render();
-    }
-    
+
     if(data.length === 0){
       that.renderForm();
-      return that.errorView(options.text.none);
+      return that.errorView(options.text.none), renderDone.call(that, true);
     } else {
       that.layFixed.removeClass(HIDE);
     }
+
+    //排序
+    if(sort){
+      return render(), renderDone.call(that);
+    }
     
     render(); //渲染数据
+    if (refresh) {
+      return renderDone.call(that);
+    }
     that.renderTotal(data); //数据合计
+    that.layTotal && that.layTotal.removeClass(HIDE);
 
     //同步分页状态
     if(options.page){
@@ -919,6 +1814,8 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       options.page.count = count; //更新总条数
       laypage.render(options.page);
     }
+    // 渲染完毕做一些处理
+    renderDone.call(that, true);
   };
   
   //数据合计行
@@ -1093,6 +1990,11 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     if(!thisData[index]) return;
     if(thisData[index].constructor === Array) return;
     thisData[index][options.checkName] = checked;
+    // [mod] 设置了状态记忆
+    if (tableCheck.check(that.key)) {
+      var primaryKey = getPrimaryKey(options);
+      tableCheck.update(that.key, thisData[index][primaryKey], checked);
+    }
   };
   
   //同步全选按钮状态
@@ -1274,7 +2176,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       layer.close(that.tipsIndex);
       
       switch(events){
-        case 'LAYTABLE_COLS': //筛选列
+        case 'LAYTABLE_COLS': //筛选列 [mod]
           openPanel({
             list: function(){
               var lis = [];
@@ -1312,6 +2214,12 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
                     }
                   });
                 });
+
+                if (options.colFilterRecord) {
+                  colFilterRecord.set(options.id, othis.attr('name'), checked, options.colFilterRecord);
+                } else {
+                  colFilterRecord.clear(options.id)
+                }
               });
             }
           });
@@ -1494,10 +2402,11 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       }, sets);
     };
     
-    //复选框选择
-    that.elem.on('click', 'input[name="layTableCheckbox"]+', function(){ //替代元素的 click 事件
+    //复选框选择 [mod] 只监听可操作性的节点的点击事件
+    that.elem.on('click', 'input[name="layTableCheckbox"]:not([disabled])+', function(e){ //替代元素的 click 事件
       var checkbox = $(this).prev()
-      ,childs = that.layBody.find('input[name="layTableCheckbox"]')
+      // ,childs = that.layBody.find('input[name="layTableCheckbox"]:not([disabled])')
+      ,childs = that.layMain.find('input[name="layTableCheckbox"]:not([disabled])')
       ,index = checkbox.parents('tr').eq(0).data('index')
       ,checked = checkbox[0].checked
       ,isAll = checkbox.attr('lay-filter') === 'layTableAllChoose';
@@ -1505,8 +2414,11 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       //全选
       if(isAll){
         childs.each(function(i, item){
-          item.checked = checked;
-          that.setCheckData(i, checked);
+          // item.checked = checked;
+          // that.setCheckData(i, checked);
+          var index = $(item).closest('tr').data('index');
+          that.layBody.find('tr[data-index="'+index+'"] input[name="layTableCheckbox"]').prop('checked', checked);
+          that.setCheckData($(item).closest('tr').data('index'), checked);
         });
         that.syncCheckAll();
         that.renderForm('checkbox');
@@ -1519,10 +2431,12 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
         checked: checked
         ,type: isAll ? 'all' : 'one'
       }));
+
+      layui.stope(e);
     });
     
     //单选框选择
-    that.elem.on('click', 'input[lay-type="layTableRadio"]+', function(){
+    that.elem.on('click', 'input[lay-type="layTableRadio"]+', function(e){
       var radio = $(this).prev()
       ,checked = radio[0].checked
       ,thisData = table.cache[that.key]
@@ -1532,6 +2446,10 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       layui.each(thisData, function(i, item){
         if(index === i){
           item.LAY_CHECKED = true;
+          if (tableCheck.check(that.key)) {
+            var primaryKey = getPrimaryKey(that.config);
+            tableCheck.update(that.key, item[primaryKey], true, true);
+          }
         } else {
           delete item.LAY_CHECKED;
         }
@@ -1541,6 +2459,8 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       layui.event.call(this, MOD_NAME, 'radio('+ filter +')', commonMember.call(this, {
         checked: checked
       }));
+
+      layui.stope(e);
     });
     
     //行事件
@@ -1647,7 +2567,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       }
     };
     
-    //单元格展开事件
+    //单元格展开事件 [mod]
     that.layBody.on('click', '.'+ ELEM_GRID_DOWN, function(e){
       var othis = $(this)
       ,td = othis.parent()
@@ -1679,18 +2599,24 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
           });
         }
       });
+
+      // 记录当前操作的td对象
+      table._tableTdCurr = $(this).closest('td');
       
       layui.stope(e);
     });
     
-    //行工具条操作事件
-    that.layBody.on('click', '*[lay-event]', function(){
+    //行工具条操作事件 [mod]
+    that.layBody.on('click', '*[lay-event]', function(e){
       var othis = $(this)
       ,index = othis.parents('tr').eq(0).data('index');
       layui.event.call(this, MOD_NAME, 'tool('+ filter +')', commonMember.call(this, {
         event: othis.attr('lay-event')
       }));
       that.setThisRowChecked(index);
+
+      // 阻止冒泡
+      layui.stope(e);
     });
     
     //同步滚动条
@@ -1701,11 +2627,23 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
       
       that.layHeader.scrollLeft(scrollLeft);
       that.layTotal.scrollLeft(scrollLeft);
-      that.layFixed.find(ELEM_BODY).scrollTop(scrollTop);
-      
+      // 过滤掉鼠标滚动fixed区域而联动滚动main的情况
+      that.layFixed.find(ELEM_BODY + ':not(:hover)').scrollTop(scrollTop);
+
       layer.close(that.tipsIndex);
     });
-    
+
+    // 监听ELEM_BODY的滚动
+    that.layFixed.find(ELEM_BODY).on('scroll', function () {
+      var elemBody = $(this);
+      if (elemBody.is(':hover')) {  // 只有当前鼠标的fixed区域才需要处理
+        // 同步两个fixed的滚动
+        that.layFixed.find(ELEM_BODY + ':not(:hover)').scrollTop(elemBody.scrollTop());
+        // 联动main的滚动
+        that.layMain.scrollTop(elemBody.scrollTop());
+      }
+    });
+
     //全局点击
     _DOC.on('click', function(){
       _DOC.trigger('table.remove.tool.panel');
@@ -1720,6 +2658,12 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     _WIN.on('resize', function(){
       that.resize();
     });
+
+    // todo 待测试
+    if (refresh.timer[options.id]) {
+      // 存在定时刷新
+      refresh.reset(options.id);
+    }
   };
   
   //初始化
@@ -1800,43 +2744,73 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
   //记录所有实例
   thisTable.that = {}; //记录所有实例对象
   thisTable.config = {}; //记录所有实例配置项
-  
+  thisTable.cols = {}; // [mod] 缓存表格的经过处理的cols
+
+  // [mod] eachCols遍历规则修改核心之一
+  var asyncChild = function (index, cols, i1, item2) {
+    //如果是组合列，则捕获对应的子列
+    // if (!item2.CHILD_COLS && item2.colGroup) {
+    if (item2.colGroup) {
+      var childIndex = 0;
+      index++;
+      item2.CHILD_COLS = [];
+      // 找到它的子列所在cols的下标
+      var i2 = i1 + (parseInt(item2.rowspan) || 1);
+      layui.each(cols[i2], function (i22, item22) {
+        //如果子列已经被标注为{PARENT_COL_INDEX}，或者子列累计 colspan 数等于父列定义的 colspan，则跳出当前子列循环
+        if (item22.PARENT_COL_INDEX || (childIndex >= 1 && childIndex == (item2.colspan || 1))) return;
+        item22.PARENT_COL_INDEX = index;
+
+        item2.CHILD_COLS.push(item22);
+        childIndex = childIndex + parseInt(item22.colspan > 1 ? item22.colspan : 1);
+        asyncChild(index, cols, i2, item22);
+      });
+    }
+  };
+
   //遍历表头
   table.eachCols = function(id, callback, cols){
     var config = thisTable.config[id] || {}
-    ,arrs = [], index = 0;
-    
+    // ,arrs = [], index = 0;
+      , arrs = config.cols ? (thisTable.cols[id] || []) : [], index = 0, cacheFlag;
     cols = $.extend(true, [], cols || config.cols);
 
-    //重新整理表头结构
-    layui.each(cols, function(i1, item1){
-      layui.each(item1, function(i2, item2){
-        
-        //如果是组合列，则捕获对应的子列
-        if(item2.colGroup){
-          var childIndex = 0;
-          index++
-          item2.CHILD_COLS = [];
-          
-          layui.each(cols[i1 + 1], function(i22, item22){
-            //如果子列已经被标注为{PARENT_COL_INDEX}，或者子列累计 colspan 数等于父列定义的 colspan，则跳出当前子列循环
-            if(item22.PARENT_COL_INDEX || (childIndex > 1 && childIndex == item2.colspan)) return;
-            
-            item22.PARENT_COL_INDEX = index;
-            
-            item2.CHILD_COLS.push(item22);
-            childIndex = childIndex + parseInt(item22.colspan > 1 ? item22.colspan : 1);
-          });
+    if (!arrs.length) {
+      //重新整理表头结构
+      layui.each(cols, function (i1, item1) {
+        if (i1 > 0) {
+          return true;
         }
-        
-        if(item2.PARENT_COL_INDEX) return; //如果是子列，则不进行追加，因为已经存储在父列中
-        arrs.push(item2)
+        layui.each(item1, function (i2, item2) {
+
+          asyncChild(index, cols, i1, item2);
+
+          if (item2.PARENT_COL_INDEX) return; //如果是子列，则不进行追加，因为已经存储在父列中
+          arrs.push(item2);
+
+          // thisTable.cols[id] = arrs;
+        });
+        thisTable.cols[id] = arrs;
       });
-    });
+    } else {
+      // console.log('命中缓存!!');
+      cacheFlag = true;
+    }
 
     //重新遍历列，如果有子列，则进入递归
     var eachArrs = function(obj){
       layui.each(obj || arrs, function(i, item){
+        var key = item.key.split('-');
+
+        // 因为加了缓存需要同步他的hide信息
+        if (cacheFlag) {
+          // 将缓存中的hide跟cols的hide同步
+          item.hide = cols[key[0]][key[1]].hide;
+          // 将之前设置的选中状态去掉
+          item[table.config.checkName] = false;
+          // 如果没有设置width默认成自动分配宽度列
+          item.width = item.width || 0;
+        }
         if(item.CHILD_COLS) return eachArrs(item.CHILD_COLS);
         typeof callback === 'function' && callback(i, item);
       });
@@ -1845,8 +2819,8 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     eachArrs();
   };
   
-  //表格选中状态
-  table.checkStatus = function(id){
+  //表格选中状态 [mod]
+  table.checkStatus = function(id, getCacheData){
     var nums = 0
     ,invalidNum = 0
     ,arr = []
@@ -1862,10 +2836,47 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
         arr.push(table.clearCacheKey(item));
       }
     });
-    return {
+    var status = {
       data: arr //选中的数据
       ,isAll: data.length ? (nums === (data.length - invalidNum)) : false //是否全选
     };
+
+    var config = getConfig(id);
+    if (config && config.checkStatus) {
+      // 状态记忆
+      status.status = tableCheck.get(id);
+      if (getCacheData) {
+        status.dataCache = [];
+        var cacheDataTemp = cacheData[config.id];
+        layui.each($.extend(true, [], tableCheck.getChecked(id)), function (_index, _id) {
+          // 如果没有查看过的数据会有什么现象todo
+          cacheDataTemp[_id] && status.dataCache.push(table.clearCacheKey(cacheDataTemp[_id]));
+        });
+      }
+    }
+
+    if (config && config.checkDisabled) {
+      // 存在不可选的记录
+      var checkDisabledTemp = config.checkDisabled;
+      if (typeof checkDisabledTemp === 'object' && checkDisabledTemp.enabled !== false) {
+        var num1 = 0; //可选的数量
+        var num2 = 0; //最终选中的数量
+        var primaryKey = getPrimaryKey(config);
+        var disabledTemp = tableCheck.get(id, CHECK_TYPE_DISABLED);
+        layui.each(table.cache[id], function (index, data) {
+          var primaryValue = data[primaryKey];
+          if (disabledTemp.indexOf(primaryValue) === -1) {
+            num1++;
+            if (data[table.config.checkName]) {
+              num2++;
+            }
+          }
+        });
+        status.isAll = (num2 > 0 && num1 === num2);
+      }
+    }
+
+    return status;
   };
   
   //表格导出
@@ -1930,17 +2941,73 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
   };
   
   //表格重载
-  table.reload = function(id, options){
+  table.reload = function(id, options, shallowCopy){
+    // var config = getThisTableConfig(id); //获取当前实例配置项
+    // if(!config) return;
+    //
+    // var that = thisTable.that[id];
+    // that.reload(options);
+    //
+    // return thisTable.call(that);
+
     var config = getThisTableConfig(id); //获取当前实例配置项
     if(!config) return;
-    
+
     var that = thisTable.that[id];
-    that.reload(options);
-    
-    return thisTable.call(that);
+
+    var configTemp = $.extend(true, {}, getConfig(id), options);
+    // 如果不记录状态的话就重置目前的选中记录
+    if (!configTemp.checkStatus) {
+      tableCheck.reset(id);
+    }
+    // 默认存在智能重载模式，不可关闭也不可部分表格要部分表格不要
+    var reloadModel = false;
+    if (!!configTemp.page !== !!config.page) {
+      // 如果是否分页发生了改变
+      reloadModel = true;
+    }
+    if (!reloadModel) {
+      // 黑名单的校验
+      var dataParamsTemp = queryParams.getParamsBlacklist();
+
+      layui.each(options, function (_key, _value) {
+        var indexTemp = dataParamsTemp.indexOf(_key);
+        if (indexTemp !== -1) {
+          // 匹配到一个就跳出
+          return reloadModel = true, false;
+        }
+      });
+    }
+    if (!reloadModel) {
+
+      if (typeof options.page === 'object') {
+        options.page.curr && (that.page = options.page.curr);
+        delete options.elem;
+        delete options.jump;
+      }
+      if(options.data && options.data.constructor === Array) delete that.config.data;
+      shallowCopy ? $.extend(that.config, options) : $.extend(true, that.config, options);
+      if (!that.config.page) {
+        that.page = 1;
+      }
+      that.loading();
+      that.pullData(that.page);
+      if (!shallowCopy) {
+        return thisTable.call(that);
+      }
+    } else {
+      // 如果是重载
+      if (shallowCopy) {
+        that.insReload(options);
+        tableIns[id].config = that.config;
+      } else {
+        that.reload(options);
+        return tableIns[id] = thisTable.call(that);
+      }
+    }
   };
  
-  //核心入口
+  //核心入口 [mod]
   table.render = function(options){
     var inst = new Class(options);
     return thisTable.call(inst);
@@ -1953,7 +3020,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     delete data[table.config.indexName];
     return data;
   };
-  
+
   //自动完成渲染
   table.init();
   

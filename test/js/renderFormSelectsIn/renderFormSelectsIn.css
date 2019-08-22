@@ -1,0 +1,33 @@
+/* 将表格中的formSelect移到layer中显示的样式 -- start */
+.layui-formSelects-layer .xm-select-parent .xm-form-select dl {
+  position: relative;
+  top: 0 !important;
+  margin-top: 3px;
+}
+
+.layui-layer.layui-formSelects-layer {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.layui-layer.layui-formSelects-layer .layui-layer-content {
+  overflow: hidden;
+}
+
+.layui-formSelects-layer .xm-select-parent .xm-form-select .xm-select-title {
+  background-color: #ffffff;
+}
+
+/*css*/
+.layui-layer.layer-top {
+  background-color: yellow;
+  box-shadow: none;
+  border: none;
+}
+
+.layui-layer.layer-top .layui-layer-content {
+  padding: 6px;
+  text-align: center;
+}
+
+/* 将表格中的formSelect移到layer中显示的样式 -- end */

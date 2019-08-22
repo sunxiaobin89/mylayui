@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <title>mylayui-测试上传组件</title>
+  <title>上传组件测试(mylayui)</title>
   <link rel="stylesheet" href="../src/css/layui.css" media="all">
   <style>
     .layui-upload-img {
@@ -72,6 +72,7 @@
     var uploadInst = upload.render({
       elem: '#test1'
       , url: '/upload/'
+      // , url: 'json/data.json'
       , before: function (obj) {
         var that = this;
         //预读本地文件示例，不支持ie8
@@ -79,8 +80,9 @@
           $('#demo1').prop('src', result); //图片链接（base64）
         });
         if (!that.confirm) {
-          layer.confirm('图片提交之后将不可撤回，您是否确认要提交？', function () {
+          layer.confirm('图片提交之后将不可撤回，您是否确认要提交？', function (index) {
             // 询问通过，将询问状态设置成true
+            layer.close(index);
             that.confirm = true;
             uploadInst.upload();
           }, function () {
@@ -98,7 +100,9 @@
       , done: function (res) {
         //如果上传失败
         if (res.code > 0) {
-          return layer.msg('上传失败');
+          layer.msg('上传失败');
+        } else {
+          layer.msg('上传成功');
         }
         //上传成功
       }
@@ -111,32 +115,6 @@
         });
       }
     });
-
-    // upload.render({ //允许上传的文件后缀
-    //   elem: '#test4'
-    //   , url: '/upload/'
-    //   , accept: 'file' //普通文件
-    //   , exts: 'zip|rar|7z' //只允许上传压缩文件
-    //   , done: function (res) {
-    //     console.log(res)
-    //   }
-    // });
-    // upload.render({
-    //   elem: '#test5'
-    //   , url: '/upload/'
-    //   , accept: 'video' //视频
-    //   , done: function (res) {
-    //     console.log(res)
-    //   }
-    // });
-    // upload.render({
-    //   elem: '#test6'
-    //   , url: '/upload/'
-    //   , accept: 'audio' //音频
-    //   , done: function (res) {
-    //     console.log(res)
-    //   }
-    // });
 
     // 初始化render
     upload.render({
@@ -164,10 +142,8 @@
         elem: '#test2'
         , url: '/upload/' + obj.value
       }, options[obj.value] || {}));
-    })
-
+    });
   })
 </script>
-
 </body>
 </html>
