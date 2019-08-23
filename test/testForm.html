@@ -20,13 +20,15 @@
     <div class="layui-form-item">
       <label class="layui-form-label">输入框</label>
       <div class="layui-input-block">
-        <input type="text" name="title" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+        <input type="text" name="title" required lay-verify="required" placeholder="请输入标题" autocomplete="off"
+               class="layui-input">
       </div>
     </div>
     <div class="layui-form-item">
       <label class="layui-form-label">密码框</label>
       <div class="layui-input-inline">
-        <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+        <input type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off"
+               class="layui-input">
       </div>
       <div class="layui-form-mid layui-word-aux">辅助文字</div>
     </div>
@@ -48,14 +50,15 @@
       <div class="layui-input-inline">
         <select name="joke" id="select1">
           <option value=""></option>
-          <option value="0">北京</option>
+          <option value="0" selected>北京</option>
           <option value="1">上海</option>
           <option value="2">广州</option>
           <option value="3">深圳</option>
           <option value="4">杭州</option>
         </select>
       </div>
-      <div class="layui-form-mid layui-word-aux">我是一个调皮的select，我<input type="checkbox" name="trouble" lay-skin="switch" lay-text="不捣乱|捣乱" checked></div>
+      <div class="layui-form-mid layui-word-aux">我是一个调皮的select，我<input type="checkbox" name="trouble" lay-skin="switch"
+                                                                       lay-text="不捣乱|捣乱" checked></div>
     </div>
     <div class="layui-form-item">
       <label class="layui-form-label">复选框</label>
@@ -74,7 +77,7 @@
     <div class="layui-form-item">
       <label class="layui-form-label">单选框</label>
       <div class="layui-input-block">
-        <input class="test" type="radio" name="sex" value="男" title="男" >
+        <input class="test" type="radio" name="sex" value="男" title="男">
         <input class="test" type="radio" name="sex" value="女" title="女" checked>
       </div>
     </div>
@@ -91,6 +94,14 @@
       </div>
     </div>
   </form>
+  <select class="test" name="city" lay-verify="required">
+    <option value=""></option>
+    <option value="0">北京</option>
+    <option value="1">上海</option>
+    <option value="2">广州</option>
+    <option value="3">深圳</option>
+    <option value="4">杭州</option>
+  </select>
 </div>
 
 <script src="../src/layui.js"></script>
@@ -102,29 +113,31 @@
 <![endif]-->
 <script>
   layui.config({base: 'js/'})
-    .use(['form'], function () {
+    .use(['form', 'common'], function () {
       var $ = layui.$,
         form = layui.form;
-      
+
       form.on('submit(formDemo)', function (data) {
         return false;
       });
 
       $('select.test').append('<option value="火星">火星</option>');
-      // $('.test').last().attr('lay-ignore', true);
       $('.test:checkbox').last().prop('checked', true);
       $('.test:radio').first().prop('checked', true);
       // form.render();
       form.render($('.test'));
 
       setInterval(function () {
+        var elemTrouble = $('#select1');
+        // debugger;
+        elemTrouble.val((elemTrouble.val() - -1) % 5);
         if ($('input[name="trouble"]').prop('checked')) {
           // 只刷新当前的节点，不会影响其他的表单元素
-          form.render($('#select1'));
+          form.render(elemTrouble);
         } else {
           form.render('select', 'form1');
         }
-      }, 500);
+      }, 1000);
     });
 </script>
 </body>

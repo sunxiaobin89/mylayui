@@ -62,7 +62,8 @@
 <![endif]-->
 
 <script>
-  layui.use(['upload', 'form'], function () {
+  layui.config({base: 'js/'})
+    .use(['upload', 'form', 'common'], function () {
     var $ = layui.$;
     var layer = layui.layer;
     var upload = layui.upload;

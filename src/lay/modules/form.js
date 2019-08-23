@@ -576,17 +576,22 @@ layui.define('layer', function(exports){
       });
     } else {
       // jquery对象
-      layui.each(type, function (index, item) {
+      type.each(function (index, item) {
+        var elem = $(item);
+        if (!elem.closest(ELEM).length) {
+          // 如果不是存在layui-form中的直接跳过
+          return;
+        }
         if (item.tagName === 'SELECT') {
-          items['select']($(item));
+          items['select'](elem);
         } else if (item.tagName === 'INPUT') {
           if (item.type === 'checkbox') {
-            items['checkbox']($(item));
+            items['checkbox'](elem);
           } else if (item.type === 'radio') {
-            items['radio']($(item));
+            items['radio'](elem);
           }
         }
-      })
+      });
     }
     return that;
   };

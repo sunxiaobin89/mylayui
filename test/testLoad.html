@@ -40,7 +40,8 @@
 <![endif]-->
 
 <script>
-  layui.use('load', function () {
+  layui.config({base: 'js/'})
+    .use(['load', 'common'], function () {
     var load = layui.load;
     load.config({
       echarts: {
@@ -52,18 +53,18 @@
       },
       ztree: {
         // path: '{/}https://cdn.bootcss.com/zTree.v3/3.5.30/js/jquery.ztree.all',
-        path: 'js/ztree/js/jquery.ztree.all.min',
+        path: 'ztree/js/jquery.ztree.all.min',
         then: function () {
           layui.link('js/ztree/css/zTreeStyle/zTreeStyle.css', null, 'ztree');
-          // layui.link('js/ztree/css/zTreeStyle/zTreeStyle.css', null, 'ztree');
+          // layui.link('ztree/css/zTreeStyle/zTreeStyle.css', null, 'ztree');
         }
       },
       'ztree.exhide': {
-        path: 'js/ztree/js/jquery.ztree.exhide.min',
+        path: 'ztree/js/jquery.ztree.exhide.min',
         extend: ['ztree']
       },
       fuzzysearch: {
-        path: 'js/ztree/fuzzysearch'
+        path: 'ztree/fuzzysearch'
       }
     });
 

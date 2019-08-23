@@ -37,7 +37,7 @@ layui.define(['element', 'code', 'layer', 'form'], function (exports) {
     }
     $('#app_api').load('views/modules/' + href + '.html', function (ret, msg, xhr) {
       if (xhr.status === 404) {
-        layer.msg('找不到资源', {anim: 6});
+        layer.alert('页面开发中');
         return;
       }
       document.location.hash = '#/modules/' + href;

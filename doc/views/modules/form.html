@@ -1,0 +1,34 @@
+<h1 class="site-h1"><i class="layui-icon layui-icon-form"></i> 表单模块文档 - layui.form</h1>
+<blockquote class="layui-elem-quote">
+  针对form组件使用的过程遇到的问题对其进行的几处修改
+</blockquote>
+
+<fieldset class="layui-elem-field layui-field-title">
+  <legend>功能加强</legend>
+</fieldset>
+
+<div class="site-text">
+  <p>1. 让form.render具备更细粒度的渲染能力。</p>
+
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>目前form.render有两个参数：第一个是类型type，支持单独渲染某种类型的，第二个参数是filter，也就是要渲染的是哪些表单里面的节点。</p>
+    <p>所以目前基本上最小的粒度就是渲染某个表单内的某种类型的表单元素，那么如果有一些节点比如下拉他的选项是异步获取的，那么回来之后如何只渲染这个节点而不会影响到这个表单的其他元素，原始的form.render不好处理，有个比较可以实现的方法就是给每个表单元素的容器都加上layui-form并且每个都有自己独特的lay-filter，但是这样是十分不建议的，会出现表单嵌套，而且也是巨麻烦，之前写tablePlug的时候也用过一个处理，就是取巧的修改form.render的源码新增一个第三参数，传入要渲染的jquery对象，内部实现就是给要渲染的对象的父容器临时的加上class:lay-form和属性lay-filter,再调用原始的form.render去渲染，渲染完成之后去掉之前临时添加的class和属性，初步的实现了更细粒度的更新，但是缺点就是如果被渲染的表单元素有其他的兄弟节点，一样会被影响到，所以还是没有完全的达到“指哪打哪”。</p>
+  </blockquote>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>那么mylayui如何实现？</p>
+    <p>目前的策略是：将第一个参数新增一个jquery对象的支持，原始的参数type一般就是字符串，指定渲染某种类型，或者null，渲染全部的类型，目前除了这两种之外新增一种就是可传入一个jquery对象，后面会遍历这个对象，判断节点的类型，找到对应的渲染逻辑逐个渲染，那么这种情况下是不需要第二个参数filter的，因为已经都定位到特定的要渲染的节点了，form的filter加上是没有意义的，当然加上不会出错，只不过这种情况下参数会被无视。</p>
+  </blockquote>
+  <pre class="layui-code" lay-title="html" lay-encode="true">
+// 对某个节点修改之后重新渲染
+$('select#address').html('<option value="Mars">火星</option><option value="Earth">地球</option>');
+form.render($('select#address'));
+// 修改一批特定的节点
+form.render($('.test'))</pre>
+</div>
+
+<script>
+  layui.use('code', function () {
+    var code = layui.code;
+    code();
+  })
+</script>
