@@ -32,3 +32,25 @@ form.render($('.test'))</pre>
     code();
   })
 </script>
+
+<div class="site-text">
+  <p>2. 让form.val功能更全面。（取值）</p>
+
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>目前form.val一般是用来赋值的，虽然layui官网称之为初始赋值，但是个人的看法是这个方法不能称之为初始赋值，初始给人的感觉就是点击重置可以回到这个状态，这样子的赋值才能称之为初始，比如修改一条table的记录，表单初始赋值之后，用户操作了一些信息，之后发现忘了修改了什么了不确定是否真的要提交，想回到原始的填写之前的状态，那么利用form的reset的功能希望回到之前初始的状态，那么form.val是否真的能做到，这个大家自己尝试，所以真的叫做初始赋值是否合适这个就见仁见智了，但是最起码的称之为赋值这个是没什么意义的估计。</p>
+    <p>那么希望像jquery对象一样可以直接$(selector).val()来取值一样的使用form.val()？或者有没有其他办法在不需要点击lay-submit的情况下，不需要经过表单校验，就能够取到数据呢？这里提供一种实现方式，就是改造form.val，将submit的取值逻辑搬到form.val中去做。</p>
+  </blockquote>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>如何使用？</p>
+    <p>实际这个jquery对象的val很想，具备两面手，有参数就是赋值没有参数就是取值，惬意~</p>
+  </blockquote>
+  <pre class="layui-code" lay-title="JavaScript" lay-encode="true">
+util.event('lay-active', {
+  getValue: function(){
+    var elem = $(this);
+    // var data = form.val(elem.next('form')); // 可以是一个jqueyr对象
+    var data = form.val(elem.next('form').attr('lay-filter')); // 也可以是一个lay-filter的值
+    layer.alert('data: ' + JSON.stringify(data));
+  }
+});</pre>
+</div>

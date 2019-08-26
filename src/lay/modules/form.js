@@ -70,35 +70,64 @@ layui.define('layer', function(exports){
     return layui.onevent.call(this, MOD_NAME, events, callback);
   };
   
-  //初始赋值
+  //初始赋值 [mod]
   Form.prototype.val = function(filter, object){
-    var that = this
-    ,formElem = $(ELEM + '[lay-filter="' + filter +'"]');
-    formElem.each(function(index, item){
-      var itemFrom = $(this);
-      layui.each(object, function(key, value){
-        var itemElem = itemFrom.find('[name="'+ key +'"]')
-        ,type;
-        
-        //如果对应的表单不存在，则不执行
-        if(!itemElem[0]) return;
-        type = itemElem[0].type;
-        
-        //如果为复选框
-        if(type === 'checkbox'){
-          itemElem[0].checked = value;
-        } else if(type === 'radio') { //如果为单选框
-          itemElem.each(function(){
-            if(this.value == value ){
-              this.checked = true
-            }     
-          });
-        } else { //其它类型的表单
-          itemElem.val(value);
-        }
+    var that = this;
+    if (object) {
+      var formElem = $(ELEM + '[lay-filter="' + filter +'"]');
+      // 赋值
+      formElem.each(function(index, item){
+        var itemFrom = $(this);
+        layui.each(object, function(key, value){
+          var itemElem = itemFrom.find('[name="'+ key +'"]')
+            ,type;
+
+          //如果对应的表单不存在，则不执行
+          if(!itemElem[0]) return;
+          type = itemElem[0].type;
+
+          //如果为复选框
+          if(type === 'checkbox'){
+            itemElem[0].checked = value;
+          } else if(type === 'radio') { //如果为单选框
+            itemElem.each(function(){
+              if(this.value == value ){
+                this.checked = true
+              }
+            });
+          } else { //其它类型的表单
+            itemElem.val(value);
+          }
+        });
       });
-    });
-    form.render(null, filter);
+      form.render(null, filter);
+    } else {
+      // 取值
+      formElem = typeof filter === 'string' ? $(ELEM + '[lay-filter="' + filter +'"]') : filter;
+      if (formElem && formElem.length) {
+        var nameIndex = {} //数组 name 索引
+          ,field = {}
+          ,fieldElem = formElem.first().find('input,select,textarea') //获取所有表单域
+
+        layui.each(fieldElem, function(_, item){
+          item.name = (item.name || '').replace(/^\s*|\s*&/, '');
+
+          if(!item.name) return;
+
+          //用于支持数组 name
+          if(/^.*\[\]$/.test(item.name)){
+            var key = item.name.match(/^(.*)\[\]$/g)[0];
+            nameIndex[key] = nameIndex[key] | 0;
+            item.name = item.name.replace(/^(.*)\[\]$/, '$1['+ (nameIndex[key]++) +']');
+          }
+
+          if(/^checkbox|radio$/.test(item.type) && !item.checked) return;
+          field[item.name] = item.value;
+        });
+
+        return field;
+      }
+    }
   };
   
   //表单控件渲染 [mod] 让form.render支持单节点渲染
@@ -596,14 +625,13 @@ layui.define('layer', function(exports){
     return that;
   };
   
-  //表单提交校验
+  //表单提交校验 [mod]
   var submit = function(){
     var button = $(this), verify = form.config.verify, stop = null
-    ,DANGER = 'layui-form-danger', field = {} ,elem = button.parents(ELEM)
+    ,DANGER = 'layui-form-danger', field = {} ,elem = button.closest(ELEM) //只取到最近的.layui-form
     
     ,verifyElem = elem.find('*[lay-verify]') //获取需要校验的元素
     ,formElem = button.parents('form')[0] //获取当前所在的form元素，如果存在的话
-    ,fieldElem = elem.find('input,select,textarea') //获取所有表单域
     ,filter = button.attr('lay-filter'); //获取过滤器
    
     
@@ -663,24 +691,9 @@ layui.define('layer', function(exports){
     });
     
     if(stop) return false;
-    
-    var nameIndex = {}; //数组 name 索引
-    layui.each(fieldElem, function(_, item){
-      item.name = (item.name || '').replace(/^\s*|\s*&/, '');
-      
-      if(!item.name) return;
-      
-      //用于支持数组 name
-      if(/^.*\[\]$/.test(item.name)){
-        var key = item.name.match(/^(.*)\[\]$/g)[0];
-        nameIndex[key] = nameIndex[key] | 0;
-        item.name = item.name.replace(/^(.*)\[\]$/, '$1['+ (nameIndex[key]++) +']');
-      }
-      
-      if(/^checkbox|radio$/.test(item.type) && !item.checked) return;      
-      field[item.name] = item.value;
-    });
- 
+
+    field = form.val(elem);
+
     //获取字段
     return layui.event.call(this, MOD_NAME, 'submit('+ filter +')', {
       elem: this

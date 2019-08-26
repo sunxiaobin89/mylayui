@@ -21,7 +21,7 @@
 
   ,Layui = function(){
     this.v = '2.5.4'; //版本号
-    this.mylayui = this.v + ' mod-0.0.2'; // mylayui版本号
+    this.mylayui = this.v + ' mod-0.0.3'; // mylayui版本号
   }
 
   //获取layui所在目录

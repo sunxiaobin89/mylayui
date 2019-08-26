@@ -172,10 +172,11 @@ layui.define('jquery', function(exports){
       .replace(/'/g, '&#39;').replace(/"/g, '&quot;');
     }
     
-    //批量事件
+    //批量事件 [mod] 修复多次执行util.event的时候事件出现多次绑定的问题
     ,event: function(attr, obj, eventType){
       obj = util.event[attr] = $.extend(true, util.event[attr], obj) || {};
-      $('body').on(eventType || 'click', '*['+ attr +']', function(){
+      $('body').off(eventType || 'click', '*['+ attr +']')
+        .on(eventType || 'click', '*['+ attr +']', function(){
         var othis = $(this)
         ,key = othis.attr(attr);
         obj[key] && obj[key].call(this, othis);
