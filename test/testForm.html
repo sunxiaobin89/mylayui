@@ -36,7 +36,7 @@
     <div class="layui-form-item">
       <label class="layui-form-label">选择框</label>
       <div class="layui-input-block">
-        <select class="test" name="city" lay-verify="required">
+        <select class="test" name="city" lay-verify="required" onchange="alert('我是节点上的事件')">
           <option value=""></option>
           <option value="0">北京</option>
           <option value="1">上海</option>
@@ -150,6 +150,18 @@
           var data = form.val(elem.next('form').attr('lay-filter')); // 也可以是一个lay-filter的值
           layer.alert('data: ' + JSON.stringify(data));
         }
+      });
+
+      $('select[name="city"]').change(function () {
+        alert('修改了城市');
+      });
+
+      $('input:radio').change(function () {
+        alert('单选切换了: ' + this.value);
+      });
+
+      $('input:checkbox').change(function () {
+        alert('多选/开关切换了: ' + this.checked + '，值：' + this.value + '，标题：' + this.title);
       });
     });
 </script>

@@ -383,7 +383,7 @@ layui.define('layer', function(exports){
             });
           }
 
-          //选择
+          //选择 [mod] select选择的时候如果值发生了变化，触发select的change回调
           dds.on('click', function(){
             var othis = $(this), value = othis.attr('lay-value');
             var filter = select.attr('lay-filter'); //获取过滤器
@@ -398,7 +398,8 @@ layui.define('layer', function(exports){
             }
 
             othis.siblings().removeClass(THIS);
-            select.val(value).removeClass('layui-form-danger')
+            var valueTemp = select.val(); // 记录修改之前的值
+            select.val(value).removeClass('layui-form-danger');
             layui.event.call(this, MOD_NAME, 'select('+ filter +')', {
               elem: select[0]
               ,value: value
@@ -406,6 +407,9 @@ layui.define('layer', function(exports){
             });
 
             hideDown(true);
+            if (valueTemp !== value) { // 对比修改前后的值，如果发生了改变
+              select.trigger('change');
+            }
             return false;
           });
           
@@ -465,7 +469,7 @@ layui.define('layer', function(exports){
         });
       }
       
-      //复选框/开关
+      //复选框/开关 [mod]
       ,checkbox: function(elem){
         var CLASS = {
           checkbox: ['layui-form-checkbox', 'layui-form-checked', 'checkbox']
@@ -496,6 +500,7 @@ layui.define('layer', function(exports){
               ,value: check[0].value
               ,othis: reElem
             });
+            check.trigger('change');
           });
         }
         
@@ -537,7 +542,7 @@ layui.define('layer', function(exports){
         });
       }
       
-      //单选框
+      //单选框 [mod]
       ,radio: function(elem){
         var CLASS = 'layui-form-radio', ICON = ['&#xe643;', '&#xe63f;']
         ,radios = elem || elemForm.find('input[type=radio]')
@@ -551,14 +556,15 @@ layui.define('layer', function(exports){
             var sameRadio = forms.find('input[name='+ name.replace(/(\.|#|\[|\])/g, '\\$1') +']'); //找到相同name的兄弟
             
             if(radio[0].disabled) return;
-            
+            var checkedTemp = radio[0].checked;
+
             layui.each(sameRadio, function(){
               var next = $(this).next('.'+CLASS);
               this.checked = false;
               next.removeClass(CLASS+'ed');
               next.find('.layui-icon').removeClass(ANIM).html(ICON[1]);
             });
-            
+
             radio[0].checked = true;
             reElem.addClass(CLASS+'ed');
             reElem.find('.layui-icon').addClass(ANIM).html(ICON[0]);
@@ -568,6 +574,9 @@ layui.define('layer', function(exports){
               ,value: radio[0].value
               ,othis: reElem
             });
+            if (!checkedTemp) {
+              radio.trigger('change')
+            }
           });
         };
         
