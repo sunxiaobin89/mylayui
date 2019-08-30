@@ -29,7 +29,25 @@ layui.define(['element', 'code', 'layer', 'form'], function (exports) {
   });
 
 
-  $('[lay-filter="api_menu_side"]').on('click', 'a', function (event) {
+  // $('[lay-filter="api_menu_side"]').on('click', 'a', function (event) {
+  //   var elemA = $(this);
+  //   var href = elemA.attr('mylayui-href');
+  //   if (!href) {
+  //     return;
+  //   }
+  //   $('#app_api').load('views/modules/' + href + '.html', function (ret, msg, xhr) {
+  //     if (xhr.status === 404) {
+  //       layer.alert('页面开发中');
+  //       return;
+  //     }
+  //     document.location.hash = '#/modules/' + href;
+  //     elemA.parent('li').addClass('layui-this').siblings('li').removeClass('layui-this');
+  //   });
+  //
+  //   // layer.msg('开发中', {anim: 6});
+  // });
+
+  $(document).on('click', '*[mylayui-href]', function (event) {
     var elemA = $(this);
     var href = elemA.attr('mylayui-href');
     if (!href) {
@@ -41,10 +59,10 @@ layui.define(['element', 'code', 'layer', 'form'], function (exports) {
         return;
       }
       document.location.hash = '#/modules/' + href;
-      elemA.parent('li').addClass('layui-this').siblings('li').removeClass('layui-this');
+      $('[lay-filter="api_menu_side"]').find('li.layui-this').removeClass('layui-this');
+      $('[lay-filter="api_menu_side"]').find('a[mylayui-href="'+href+'"]').parent('li').addClass('layui-this');
+      // elemA.parent('li').addClass('layui-this').siblings('li').removeClass('layui-this');
     });
-
-    // layer.msg('开发中', {anim: 6});
   });
 
   exports('api', {});

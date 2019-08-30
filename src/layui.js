@@ -510,7 +510,7 @@
     return Layui.event(modName, events, null, callback);
   };
 
-  //执行自定义模块事件
+  //执行自定义模块事件 [mod]
   Layui.prototype.event = Layui.event = function(modName, events, params, fn){
     var that = this
     ,result = null
@@ -518,8 +518,10 @@
     ,eventName = (modName + '.'+ events).replace(filter[0], '') //获取事件名称，如：form.select
     ,filterName = filter[1] || '' //获取过滤器名称,，如：xxx
     ,callback = function(_, item){
+      // result = item && item.call(that, params);
       var res = item && item.call(that, params);
-      res === false && result === null && (result = false);
+      res !== undefined && (result = res);
+      // res === false && result === null && (result = false);
     };
     
     //添加事件
@@ -531,21 +533,22 @@
       config.event[eventName][filterName] = [fn];
       return this;
     }
-    
+
     //执行事件回调
-    layui.each(config.event[eventName], function(key, item){
+    if(filterName === '{*}'){
       //执行当前模块的全部事件
-      if(filterName === '{*}'){
+      layui.each(config.event[eventName], function(key, item) {
         layui.each(item, callback);
-        return;
-      }
-      
+      });
+    } else {
       //执行指定事件
-      key === '' && layui.each(item, callback);
-      (filterName && key === filterName) && layui.each(item, callback);
-    });
-    
-    return result;
+      var itemP = config.event[eventName]['']
+        ,itemC = config.event[eventName][filterName];
+      itemP && layui.each(itemP, callback); // 执行父事件
+      // 如果父事件中已经返回了false了就不再继续执行子事件
+      result !== false && itemC && layui.each(itemC, callback); // 执行子事件
+      return result;
+    }
   };
 
   win.layui = new Layui();

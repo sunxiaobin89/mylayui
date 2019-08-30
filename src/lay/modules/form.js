@@ -486,6 +486,18 @@ layui.define('layer', function(exports){
             ,text = (check.attr('lay-text')||'').split('|');
 
             if(check[0].disabled) return;
+
+            // 检测是否有beforeSwitch回调
+            if (RE_CLASS[2] === 'switch') {
+              // 开关
+              if (layui.event.call(check[0], MOD_NAME, 'beforeSwitch('+ filter +')', {
+                elem: check[0]
+                ,value: check[0].value
+                ,othis: reElem
+              }) === false) {
+                return;
+              }
+            }
             
             check[0].checked ? (
               check[0].checked = false

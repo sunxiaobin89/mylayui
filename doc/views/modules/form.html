@@ -103,15 +103,59 @@ dds.on('click', function(){
   </blockquote>
 </div>
 
+<div class="site-text">
+  <p>4. 开关新增beforeSwitch监听</p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    顾名思义，beforeSwitch就是为了在操作一个开关的时候可以有回调去判断是否可以打开或者关闭，目前的开关，只要一点击，如果是可以操作的，点击了就切换状态了，如果是disabled的本身就不能操作，点击了也不变化，那么如果一个开关一开始没有设置是否可以操作的，在点击之后想要在状态变化之前判断当前的场景下是否可以操作，那么目前的做法一般是在switch回调中再去判断，如果不行的话还要将当前的开关的状态取反，因为进入switch的时候实际状态已经变了，那么如果不满足的话还得给调整回去，然后重新render一下当前这个节点，这个就需要一个过程，开了又关或者关了又开，体验上来说是不太好的，加入这个监听的初衷就是为了解决这个体验的问题。
+  </blockquote>
+  <form class="layui-form" lay-filter="form2" action="">
+    <div class="layui-form-item">
+      <label class="layui-form-label">开关</label>
+      <div class="layui-input-inline">
+        <input type="checkbox" name="switch" lay-skin="switch" lay-filter="switchDemo">
+      </div>
+      <div class="layui-form-mid layui-word-aux">操作先confirm,确定之后还有随机数概率阻止</div>
+    </div>
+  </form>
+  <pre class="layui-code" lay-title="form.js" >
+// 在beforeSwitch中返回false可以阻止当次操作
+form.on('beforeSwitch(switchDemo)', function (data) {
+  if (Math.random() > 0.5) {
+    layer.msg('随机数大于0.5，取消当前的开关操作!', {anim: 6, time: 1500});
+    return false;
+  }
+});
+
+form.on('beforeSwitch()', function (data) {
+  // 每个开关都会进入的事件，而且如果存在母(父)事件，会先调用，在调用对应的子事件
+  return confirm('确定' + (this.checked ? '关掉' : '打开') + '这个开关');
+});</pre>
+  <blockquote class="layui-elem-quote">
+    做这个修改的时候顺带的优化了layui.event的底层实现逻辑，包括事件的“父子/母子”关系在调用时候的顺序，以及通过返回值去判断是否需要进入“子监听”等细节处理，比较底层的支撑修改，如果有兴趣可以进一步查看<a mylayui-href="base">底层方法</a>，简单的运用就是在beforeSwitch中返回false可以阻止当次操作。
+  </blockquote>
+</div>
+
 <script>
   layui.use(['code', 'form'], function () {
     var code = layui.code;
     var $ = layui.$;
     var form = layui.form;
     code();
-    form.render(null, 'form1');
+    form.render();
     $('select[name="city"]').change(function () {
       alert('修改了城市：' + this.value);
+    });
+
+    form.on('beforeSwitch()', function (data) {
+      // 每个开关都会进入的事件，而且如果存在母(父)事件，会先调用，在调用对应的子事件
+      return confirm('确定' + (this.checked ? '关掉' : '打开') + '这个开关');
+    });
+
+    form.on('beforeSwitch(switchDemo)', function (data) {
+      if (Math.random() > 0.5) {
+        layer.msg('随机数大于0.5，取消当前的开关操作!', {anim: 6, time: 1500});
+        return false;
+      }
     });
   })
 </script>

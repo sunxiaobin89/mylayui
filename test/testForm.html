@@ -72,7 +72,7 @@
     <div class="layui-form-item">
       <label class="layui-form-label">开关</label>
       <div class="layui-input-block">
-        <input type="checkbox" name="switch" lay-skin="switch">
+        <input type="checkbox" name="switch" lay-skin="switch" lay-filter="switchDemo">
       </div>
     </div>
     <div class="layui-form-item">
@@ -135,7 +135,7 @@
 
       //处理属性 为 lay-active 的所有元素事件
       util.event('lay-active', {
-        getValue: function(){
+        getValue: function () {
           alert('测试直接取form的值'); // 顺带测试了一下util.event, 发现目前版本有个bug: 多次执行util.event会导致事件多次绑定（已在util模块修复）
         },
         test: function () {
@@ -144,7 +144,7 @@
       });
 
       util.event('lay-active', {
-        getValue: function(){
+        getValue: function () {
           var elem = $(this);
           // var data = form.val(elem.next('form')); // 可以是一个jqueyr对象
           var data = form.val(elem.next('form').attr('lay-filter')); // 也可以是一个lay-filter的值
@@ -163,6 +163,20 @@
       $('input:checkbox').change(function () {
         alert('多选/开关切换了: ' + this.checked + '，值：' + this.value + '，标题：' + this.title);
       });
+
+      // 在beforeSwitch中返回false可以阻止当次操作
+      form.on('beforeSwitch(switchDemo)', function (data) {
+        if (Math.random() > 0.5) {
+          layer.msg('随机数大于0.5，取消当前的开关操作!', {anim: 6, time: 1500});
+          return false;
+        }
+      });
+
+      form.on('beforeSwitch()', function (data) {
+        // 每个开关都会进入的事件，而且如果存在母(父)事件，会先调用，在调用对应的子事件
+        return confirm('确定' + (this.checked ? '关掉' : '打开') + '这个开关');
+      });
+
     });
 </script>
 </body>
