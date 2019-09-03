@@ -105,6 +105,8 @@ layui.define(['jquery'], function (exports) {
 
       typeof done === 'function' && done.call(that);
     });
+
+    return layui;
   };
 
   load.version = version;

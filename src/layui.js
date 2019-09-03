@@ -542,8 +542,8 @@
       });
     } else {
       //执行指定事件
-      var itemP = config.event[eventName]['']
-        ,itemC = config.event[eventName][filterName];
+      var itemP = config.event[eventName] && config.event[eventName]['']
+        ,itemC = config.event[eventName] && config.event[eventName][filterName];
       itemP && layui.each(itemP, callback); // 执行父事件
       // 如果父事件中已经返回了false了就不再继续执行子事件
       result !== false && itemC && layui.each(itemC, callback); // 执行子事件

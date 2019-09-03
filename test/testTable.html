@@ -12,7 +12,7 @@
   <!--  <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>-->
   <style>
     body {
-      margin: 10px;
+      /*margin: 10px;*/
       /*border: 4px solid green;*/
     }
 
@@ -67,23 +67,259 @@
 <div class="layui-container">
   <div class="layui-row layui-col-space10">
     <div class="layui-col-xs12" style="margin-top: 10px;">
-      <div class="layui-form">
-        <div class="layui-form-item">
-          <label class="layui-form-label">是否跨页记录</label>
-          <div class="layui-input-inline">
-            <input type="checkbox" name="status" lay-skin="switch" checked="checked" lay-filter="statusSwitch">
+      <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+        <ul class="layui-tab-title">
+          <li lay-id="tab_main">综合功能测试</li>
+          <li lay-id="tab_complexHeader">复杂表头</li>
+        </ul>
+        <div class="layui-tab-content">
+          <div class="layui-tab-item">
+            <div class="layui-form">
+              <div class="layui-form-item">
+                <label class="layui-form-label">是否跨页记录</label>
+                <div class="layui-input-inline">
+                  <input type="checkbox" name="status" lay-skin="switch" checked="checked" lay-filter="statusSwitch">
+                </div>
+                <label class="layui-form-label">固定列滚动支持</label>
+                <div class="layui-input-inline">
+                  <input type="checkbox" lay-skin="switch" checked="checked" lay-filter="tableFixedScrollSwitch"
+                         lay-text="开启|关闭" disabled>
+                </div>
+              </div>
+            </div>
+            <table id="demo1" class="table_th_search" lay-filter="test"></table>
           </div>
-<!--          <div class="layui-input-inline">-->
-<!--            <span class="layui-btn layui-btn-sm layui-btn-danger" onclick="resetCheckboxStatus(this)" data-id="demo">重置选中状态</span>-->
-<!--          </div>-->
-          <label class="layui-form-label">固定列滚动支持</label>
-          <div class="layui-input-inline">
-            <input type="checkbox" lay-skin="switch" checked="checked" lay-filter="tableFixedScrollSwitch"
-                   lay-text="开启|关闭" disabled>
+          <div class="layui-tab-item">
+            <fieldset class="layui-elem-field layui-field-title">
+              <legend>复杂的复杂表头</legend>
+            </fieldset>
+            <table class="layui-table" id="demo2" lay-data="{cellMinWidth: 130, height:360, limit:2, page:true}" lay-filter="demo2">
+              <thead>
+              <tr>
+                <th lay-data="{type:'checkbox', field:'checkbox', fixed: true}" rowspan="4"></th>
+                <th lay-data="{align:'center',field:'id', fixed: true, colGroup: true, width: 70}" rowspan="4">序号</th>
+                <th lay-data="{align:'center',field:'f2', fixed: true, colGroup: true, width: 114}" rowspan="4">工程项目名称</th>
+                <th lay-data="{align:'center',field:'f3', fixed: true, colGroup: true, width: 80}" rowspan="4">工程量</th>
+                <th lay-data="{align:'center',field:'f4', fixed: true, width: 60}" rowspan="4">单位</th>
+                <th lay-data="{align:'center', fixed: true}" colspan="5" rowspan="2">自营项目价格(元)</th>
+                <th lay-data="{align:'center',field:'f5', width: 80}" rowspan="4">合计1</th>
+                <th lay-data="{align:'center'}" colspan="13">主材价格及参考消耗量</th>
+                <th lay-data="{align:'center'}">人工</th>
+                <th lay-data="{align:'center'}" colspan="4">机械</th>
+              </tr>
+              <tr>
+                <th lay-data="{align:'center'}">柴油(元/kg)</th>
+                <th lay-data="{align:'center'}">炸药(元/kg)</th>
+                <th lay-data="{align:'center'}">非电雷管(元/发)</th>
+                <th lay-data="{align:'center'}">铜片止水(元/kg)</th>
+                <th lay-data="{align:'center'}">高抗水泥(元/t)</th>
+                <th lay-data="{align:'center'}">水泥42.5(元/t)</th>
+                <th lay-data="{align:'center'}">粉煤灰(元/kg)</th>
+                <th lay-data="{align:'center'}">砂(元/m3)</th>
+                <th lay-data="{align:'center'}">石(元/m3)</th>
+                <th lay-data="{align:'center'}">水(元/m3)</th>
+                <th lay-data="{align:'center'}">外加剂(元/T)</th>
+                <th lay-data="{align:'center'}">沥青(元/kg)</th>
+                <th lay-data="{align:'center'}">钢筋(元/kg)</th>
+                <th lay-data="{align:'center'}">单价(元/工时)</th>
+                <th lay-data="{align:'center',field:'f6'}" rowspan="3">备注</th>
+                <th lay-data="{align:'center'}">Φ64～127</th>
+                <th lay-data="{align:'center'}">自卸汽车20</th>
+                <th lay-data="{align:'center'}">挖掘机液压2m³</th>
+              </tr>
+              <tr>
+                <th lay-data="{align:'center',field:'f7', fixed: true, width: 60}" rowspan="2">主材</th>
+                <th lay-data="{align:'center',field:'f8', fixed: true, width: 60}" rowspan="2">人工</th>
+                <th lay-data="{align:'center',field:'f9', fixed: true, width: 60}" rowspan="2">机械</th>
+                <th lay-data="{align:'center',field:'f10', fixed: true, width: 60}" rowspan="2">其他</th>
+                <th lay-data="{align:'center',field:'f11', fixed: true, width: 66}" rowspan="2">合计2</th>
+                <th lay-data="{align:'center'}">7.5</th>
+                <th lay-data="{align:'center'}">18.415</th>
+                <th lay-data="{align:'center'}">10</th>
+                <th lay-data="{align:'center'}">65</th>
+                <th lay-data="{align:'center'}">850</th>
+                <th lay-data="{align:'center'}">560</th>
+                <th lay-data="{align:'center'}">0.48</th>
+                <th lay-data="{align:'center'}">66</th>
+                <th lay-data="{align:'center'}">50</th>
+                <th lay-data="{align:'center'}">1.2</th>
+                <th lay-data="{align:'center'}">6500</th>
+                <th lay-data="{align:'center'}">5.8</th>
+                <th lay-data="{align:'center'}">2.85</th>
+                <th lay-data="{align:'center'}">20</th>
+                <th lay-data="{align:'center'}">250</th>
+                <th lay-data="{align:'center'}">120</th>
+                <th lay-data="{align:'center'}">220</th>
+              </tr>
+              <tr>
+                <th lay-data="{align:'center',field:'f12'}">1耗量(kg)</th>
+                <th lay-data="{align:'center',field:'f13'}">2耗量(kg)</th>
+                <th lay-data="{align:'center',field:'f14'}">3耗量(发)</th>
+                <th lay-data="{align:'center',field:'f15'}">4耗量(kg)</th>
+                <th lay-data="{align:'center',field:'f16'}">5耗量(kg)</th>
+                <th lay-data="{align:'center',field:'f17'}">6耗量(kg)</th>
+                <th lay-data="{align:'center',field:'f18'}">7耗量(kg)</th>
+                <th lay-data="{align:'center',field:'f19'}">8耗量(m3)</th>
+                <th lay-data="{align:'center',field:'f20'}">9耗量(m3)</th>
+                <th lay-data="{align:'center',field:'f21'}">10耗量(m3)</th>
+                <th lay-data="{align:'center',field:'f22'}">11耗量(m3)</th>
+                <th lay-data="{align:'center',field:'f23'}">12耗量(m3)</th>
+                <th lay-data="{align:'center',field:'f24'}">13耗量(kg)</th>
+                <th lay-data="{align:'center',field:'f25'}">14数量(工时)</th>
+                <th lay-data="{align:'center',field:'f26'}">15台时</th>
+                <th lay-data="{align:'center',field:'f27'}">16台时</th>
+                <th lay-data="{align:'center',field:'f28'}">17台时</th>
+              </tr>
+              </thead>
+              <!--<tbody>
+              <tr>
+                <td></td>
+                <td>10002</td>
+                <td>工程项目名称</td>
+                <td >工程量</td>
+                <td >单位</td>
+                <td >主材</td>
+                <td >人工</td>
+                <td >机械</td>
+                <td >其他</td>
+                <td >合计2</td>
+                <td >合计1</td>
+                <td >1耗量(kg)</td>
+                <td >2耗量(kg)</td>
+                <td >3耗量(发)</td>
+                <td >4耗量(kg)</td>
+                <td >5耗量(kg)</td>
+                <td >6耗量(kg)</td>
+                <td >7耗量(kg)</td>
+                <td >8耗量(m3)</td>
+                <td >9耗量(m3)</td>
+                <td >10耗量(m3)</td>
+                <td >11耗量(m3)</td>
+                <td >12耗量(m3)</td>
+                <td >13耗量(kg)</td>
+                <td >14数量(工时)</td>
+                <td >备注</td>
+                <td >15台时</td>
+                <td >16台时</td>
+                <td >17台时</td>
+              </tr>
+              </tbody>-->
+            </table>
+
+            <table class="layui-hide" id="demo3"></table>
+
+            <fieldset class="layui-elem-field layui-field-title">
+              <legend>让单列合并的时候字段配置更加灵活</legend>
+            </fieldset>
+            <table id="demo4" class="layui-table layui-hide" lay-filter="demo4">
+              <thead>
+              <tr>
+                <th lay-data="{align:'center',field:'id'}" rowspan="4">序号</th>
+                <th lay-data="{align:'center',field:'f2'}" rowspan="4">区块</th>
+                <th lay-data="{align:'center',field:'f3'}" rowspan="4">井号</th>
+                <th lay-data="{align:'center',field:'f4'}" rowspan="4">层位</th>
+                <th lay-data="{align:'center',field:'f41'}" rowspan="4">投产日期</th>
+                <th lay-data="{align:'center',field:'f51'}" rowspan="3">月产液</th>
+                <th lay-data="{align:'center',field:'f52'}" rowspan="3">月产油</th>
+                <th lay-data="{align:'center',field:'f53'}" rowspan="3">月产水</th>
+                <th lay-data="{align:'center',field:'f54'}" rowspan="3">含水</th>
+                <th lay-data="{align:'center',field:'f55'}" rowspan="3">油层中深</th>
+                <th lay-data="{align:'center',field:'f56'}" rowspan="3">泵挂</th>
+                <th lay-data="{align:'center',field:'f57'}" rowspan="3">动液面</th>
+                <th lay-data="{align:'center',field:'f58'}" rowspan="3">沉没度</th>
+                <th lay-data="{align:'center',field:'f59'}" rowspan="3">冲程</th>
+                <th lay-data="{align:'center',field:'f510'}" rowspan="3">冲数</th>
+                <th lay-data="{align:'center',field:'f511'}" rowspan="3">泵径</th>
+                <th lay-data="{align:'center'}" colspan="5">泵效</th>
+                <th lay-data="{align:'center',field:'f512'}" rowspan="3">流压</th>
+                <th lay-data="{align:'center'}" colspan="20">采油时率分析</th>
+                <th lay-data="{align:'center'}" colspan="3">检泵周期</th>
+                <th lay-data="{align:'center',field:'f515'}" rowspan="4">备注</th>
+              </tr>
+              <tr>
+                <th lay-data="{align:'center',field:'f516'}">日均</th>
+                <th lay-data="{align:'center',field:'f517'}">日均</th>
+                <th lay-data="{align:'center',field:'f22'}" rowspan="3">间开制度</th>
+                <th lay-data="{align:'center',field:'f518'}">日理论</th>
+                <th lay-data="{align:'center',field:'f519'}" rowspan="2">泵效</th>
+                <th lay-data="{align:'center',field:'f520'}">日历</th>
+                <th lay-data="{align:'center',field:'f521'}">生产</th>
+                <th lay-data="{align:'center'}" colspan="7">正常停井</th>
+                <th lay-data="{align:'center'}" colspan="10">非正常停井</th>
+                <th lay-data="{align:'center',field:'f524'}" rowspan="2">时率</th>
+                <th lay-data="{align:'center',field:'f525'}" rowspan="3">倒数第二次检泵周期</th>
+                <th lay-data="{align:'center',field:'f526'}" rowspan="3">倒数第一次检泵周期</th>
+                <th lay-data="{align:'center',field:'f527'}" rowspan="2">检泵周期</th>
+              </tr>
+              <tr>
+                <th lay-data="{align:'center'}">产液</th>
+                <th lay-data="{align:'center'}">产油</th>
+                <th lay-data="{align:'center'}">产液</th>
+                <th lay-data="{align:'center'}">时间</th>
+                <th lay-data="{align:'center'}">时间</th>
+                <th lay-data="{align:'center',field:'f6'}">措施</th>
+                <th lay-data="{align:'center',field:'f7'}">测压</th>
+                <th lay-data="{align:'center',field:'f8'}">小修</th>
+                <th lay-data="{align:'center',field:'f9'}">丛式井作业干扰</th>
+                <th lay-data="{align:'center',field:'f10'}">保养</th>
+                <th lay-data="{align:'center',field:'f11'}">大修</th>
+                <th lay-data="{align:'center',field:'f12'}">其它</th>
+                <th lay-data="{align:'center',field:'f18'}">待修</th>
+                <th lay-data="{align:'center',field:'f17'}">停电</th>
+                <th lay-data="{align:'center',field:'f16'}">小修返工</th>
+                <th lay-data="{align:'center',field:'f15'}">机械故障</th>
+                <th lay-data="{align:'center',field:'f14'}">出油管线破</th>
+                <th lay-data="{align:'center',field:'f106'}">出油管线堵</th>
+                <th lay-data="{align:'center',field:'f107'}">集输管线堵</th>
+                <th lay-data="{align:'center',field:'f108'}">集输管线破</th>
+                <th lay-data="{align:'center',field:'f109'}">憋罐</th>
+                <th lay-data="{align:'center',field:'f13'}">其它</th>
+              </tr>
+              <tr>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+                <th lay-data="{align:'center'}">m3</th>
+              </tr>
+              </thead>
+            </table>
           </div>
         </div>
       </div>
-      <table id="demo" class="table_th_search" lay-filter="test"></table>
+
     </div>
   </div>
 </div>
@@ -134,19 +370,17 @@
 <![endif]-->
 <script>
   layui.config({base: 'js/'})
-    .use(['testTablePlug', 'laydate', 'common'], function () {
+    .use(['testTablePlug', 'laydate', 'element', 'common'], function () {
       var $ = layui.jquery
         , layer = layui.layer //弹层
         , form = layui.form //弹层
         , table = layui.table //表格
+        , element = layui.element
         , laydate = layui.laydate //日期控件
         , tablePlug = layui.tablePlug //表格插件
         , testTablePlug = layui.testTablePlug // 测试js模块
         , renderFormSelectsIn = layui.renderFormSelectsIn // 针对form在特定场合下的渲染的封装
         , formSelects = layui.formSelects; //多选下拉插件
-
-      // 当前这个测试页面测试的重点不是智能重载，所以关掉该功能，实际上该功能也是默认关闭的，可以不执行下面这句代码，也可以强制指定。
-      // tablePlug.smartReload.enable(true); // 默认就是打开的状态
 
       // 处理操作列
       var fn1 = function (field) {
@@ -228,183 +462,6 @@
 
       });
 
-      formSelects.opened(function (id) {
-        alert('打开了...1');
-      }).closed(function (id) {
-        alert('关闭了...1');
-      });
-
-      // 新增init的时候针对后台返回的默认选中是一个对象集合的处理，init之后会将默认选中的data也存起来，后面获得选中数据的时候getCache也能获得默认选中的数据，
-      tablePlug.tableCheck.init('demo',
-        [{
-          "id": 10000,
-          "username": "user-0",
-          "sex": "女",
-          "city": "北京",
-          "sign": "签名-0",
-          "experience": 0,
-          "logins": 24,
-          "birthday": "1989/01/01",
-          "wealth": 82830700,
-          "classify": "作家",
-          "like": "write,read",
-          "score": 57
-        }, {
-          "id": 10001
-        }],
-        'id' // 第三个参数，主键名称，如果表格的主键名不是'id'那么这个参数必须制定，以为一般来说init会在render之前执行，
-        // 所以如果不指定，他找不到表格配置信息，也就不知道里面配合的主键名称是什么，导致变成默认的'id'后面render出来就没有效果了
-      );
-
-      table.render({
-        elem: '#demo'
-        // , height: 'full-135'
-        , height: 720
-        , size: 'lg'
-        , url: 'json/data11.json' //数据接口
-        // , data: [{}]
-        , title: '用户表'
-        , even: true
-        , page: {} //开启分页
-        , headers: {
-          pageCompute: true
-        }
-        , loading: true
-        , toolbar: '#toolbarDemo' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
-        , totalRow: true //开启合计行
-        , cellMinWidth: 90
-        // 是否开启字段筛选的记忆功能，支持true/false/'local'/'session'/其他 开启的情况下默认是session，除非显式的指定为'local'
-        , colFilterRecord: true
-        // 开启智能重载
-        , smartReloadModel: true
-        // 默认反转
-        // , reversal: true
-        // 设置开启部分选项不可选
-        // 设置表格的主键（主要用在记录选中状态还有不可操作记录的时候用
-        , primaryKey: 'id'
-        , checkDisabled: {
-          enabled: true,
-          data: [10000, 10001, 10002, 10003, 10004, 10005, 10009]
-        }
-        // , pageLanguage: 'zh-TW' // 需要自己定义对应的文本
-        // , pageLanguage: 'en' // tablePlug里面已经定义了，如果觉得不满意可以用tablePlug.set去更新默认的配置;
-        // , pageLanguage: true // 无效的设置方式，只支持字符串或者对象的
-        // 也可以针对某个表格有特殊的配置如下面对象的设置方法,但是如果没有必要单独的自定义建议使用直接赋值成语言名称的字符串形式
-        , pageLanguage: {
-          lan: 'en',
-          // 可自定义text,lan为en的情况下
-          text: {
-            // jumpTo: 'jump to', // 到第
-            // page: 'page', // 页
-            // go: 'go', // 确定
-            // total: 'total', // 共
-            unit: 'item' // 条（单位，一般也可以不填）
-            // optionText: 'limit each page' // 条/页
-          }
-        }
-        , done: function (res, curr, count) {
-          var tableView = this.elem.next();
-          var tableId = this.id;
-
-          // 针对表格中的多选下拉的处理
-          renderFormSelectsIn(tableView, {}, 'layuiTable');
-
-          // 初始化laydate
-          layui.each(tableView.find('td[data-field="birthday"]'), function (index, tdElem) {
-            tdElem.onclick = function (event) {
-              layui.stope(event)
-            };
-            laydate.render({
-              elem: tdElem.children[0],
-              // closeStop: tdElem,
-              format: 'yyyy/MM/dd',
-              done: function (value, date) {
-                var trElem = $(this.elem[0]).closest('tr');
-                table.cache.demo[trElem.data('index')]['birthday'] = value;
-              }
-            })
-          });
-        },
-        parseData: function (ret) {
-          return {
-            code: ret.code,
-            msg: ret.msg,
-            count: ret.data ? (ret.data.total || 0) : 0,
-            data: ret.data ? (ret.data.list || []) : []
-          }
-        }
-        , checkStatus: {}
-        // , headers: {token: '12345'}
-        // , autoSort: false
-        // , initSort: {
-        //   field: 'id' //排序字段，对应 cols 设定的各字段名
-        //   , type: 'asc' //排序方式  asc: 升序、desc: 降序、null: 默认排序
-        // }
-        , cols: [
-          [
-            // {type: 'radio', fixed: 'left', rowspan: 2, totalRowText: '共计:'/*, hide: true*/},
-            {type: 'checkbox', fixed: 'left', rowspan: 2, totalRowText: '共计:'/*, hide: true*/},
-            {type: 'numbers', fixed: 'left', rowspan: 2},
-            {
-              field: 'id',
-              title: 'ID',
-              filter: true,
-              width: 80,
-              sort: true,
-              fixed: 'left',
-              // totalRowText: '平均:',
-              rowspan: 2
-            },
-            {title: '基本信息', colspan: 3, align: 'center'},
-            {title: '详细信息', colspan: 7, align: 'center'},
-            {
-              fixed: 'right',
-              type: 'toolbar',
-              field: 'toolbar_move',
-              title: '',
-              width: 150,
-              align: 'center',
-              toolbar: '#moveBar',
-              rowspan: 2
-            },
-            {
-              fixed: 'right',
-              type: 'toolbar',
-              // hide: true,
-              field: 'toolbar_common',
-              title: '操作',
-              width: 90,
-              align: 'center',
-              toolbar: '#barDemo',
-              rowspan: 2
-            }
-          ]
-          , [ //表头
-            {field: 'username', title: '姓名', hideable: false/*, hide: true*/}
-            , {field: 'sex', title: '性别', width: 90, filter: true, sort: true}
-            , {field: 'birthday', title: '生日', edit: false, width: 120}
-            , {field: 'experience', title: '积分', width: 90, sort: true, totalRow: true}
-            , {field: 'score', title: '评分', edit: true, event: 'editField', width: 90, sort: true, totalRow: true}
-            , {field: 'city', title: '城市', search: true, edit: false, width: 150, type: 'normal', templet: fn1('city')}
-            , {
-              field: 'sign',
-              title: '签名',
-              width: 200,
-              edit: true
-              // templet: function (d) {
-              //   // return d['sign'];
-              //   return d[this.field];
-              // }
-              // templet: '<div><input type="radio" lay-ignore="" name="sign" value="1">原始效果<input type="radio" name="sign"  title="美化效果" value="2"><input type="radio" name="sign" title="美化效果" value="3"><input type="radio" name="sign" title="美化效果" value="4"></div>'
-            }
-            , {field: 'classify', title: '职业', filter: true, width: 100}
-            , {field: 'like', title: '爱好', width: 240, edit: false, templet: fnLike}
-            , {field: 'wealth', title: '财富', width: 135, filter: true, sort: true, totalRow: true}
-          ]
-        ]
-      });
-
-
       // 监听表格中的下拉选择将数据同步到table.cache中
       form.on('select(city_select)', function (data) {
         var selectElem = $(data.elem);
@@ -412,25 +469,6 @@
         var trElem = tdElem.closest('tr');
         var tableView = trElem.closest('.layui-table-view');
         table.cache[tableView.attr('lay-id')][trElem.data('index')][tdElem.data('field')] = data.value;
-      });
-
-      //监听排序事件
-      table.on('sort(test)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
-        // console.log(obj.field); //当前排序的字段名
-        // console.log(obj.type); //当前排序类型：desc（降序）、asc（升序）、null（空对象，默认排序）
-        // console.log(this); //当前排序的 th 对象
-
-        //尽管我们的 table 自带排序功能，但并没有请求服务端。
-        //有些时候，你可能需要根据当前排序的字段，重新向服务端发送请求，从而实现服务端排序，如：
-        // table.reload('demo', {
-        //   initSort: obj //记录初始排序，如果不设的话，将无法标记表头的排序状态。
-        //   , where: { //请求参数（注意：这里面的参数可任意定义，并非下面固定的格式）
-        //     field: obj.field //排序字段
-        //     , order: obj.type //排序方式
-        //   }
-        // });
-
-        // layer.msg('服务端排序。order by '+ obj.field + ' ' + obj.type);
       });
 
       // 监听编辑如果评分负数给回滚到修改之前并且弹出提示信息并且重新获得焦点等待输入
@@ -458,12 +496,12 @@
       });
 
       // tr点击触发复选列点击
-      // $(document).on('click', '.layui-table-view tbody tr', function (event) {
-      //   var elemTemp = $(this);
-      //   var tableView = elemTemp.closest('.layui-table-view');
-      //   var trIndex = elemTemp.data('index');
-      //   tableView.find('tr[data-index="' + trIndex + '"]').find('[name="layTableCheckbox"]+').last().click();
-      // });
+      $(document).on('click', '.layui-table-view tbody tr', function (event) {
+        var elemTemp = $(this);
+        var tableView = elemTemp.closest('.layui-table-view');
+        var trIndex = elemTemp.data('index');
+        tableView.find('tr[data-index="' + trIndex + '"]').find('[name="layTableCheckbox"]:not(:disabled)+').last().click();
+      });
 
       // $(document).on('focus', '.layui-table-edit', function (event) {
       //   $(this).autocomplete({
@@ -475,6 +513,504 @@
       // form.on('switch(tableFixedScrollSwitch)', function (obj) {
       //   tablePlug.enableTableFixedScroll(obj.elem.checked);
       // });
+
+      var initPage = function (pageName) {
+        switch (pageName) {
+          case 'tab_main':
+            // 新增init的时候针对后台返回的默认选中是一个对象集合的处理，init之后会将默认选中的data也存起来，后面获得选中数据的时候getCache也能获得默认选中的数据，
+            tablePlug.tableCheck.init('demo1',
+              [{
+                "id": 10000,
+                "username": "user-0",
+                "sex": "女",
+                "city": "北京",
+                "sign": "签名-0",
+                "experience": 0,
+                "logins": 24,
+                "birthday": "1989/01/01",
+                "wealth": 82830700,
+                "classify": "作家",
+                "like": "write,read",
+                "score": 57
+              }, {
+                "id": 10001
+              }],
+              'id' // 第三个参数，主键名称，如果表格的主键名不是'id'那么这个参数必须制定，以为一般来说init会在render之前执行，
+              // 所以如果不指定，他找不到表格配置信息，也就不知道里面配合的主键名称是什么，导致变成默认的'id'后面render出来就没有效果了
+            );
+
+            table.render({
+              elem: '#demo1'
+              // , height: 'full-135'
+              , height: 720
+              , size: 'lg'
+              , url: 'json/data11.json' //数据接口
+              // , data: [{}]
+              , title: '用户表'
+              , even: true
+              , page: {} //开启分页
+              , headers: {
+                pageCompute: true
+              }
+              , loading: true
+              , toolbar: '#toolbarDemo' //开启工具栏，此处显示默认图标，可以自定义模板，详见文档
+              , totalRow: true //开启合计行
+              , cellMinWidth: 90
+              // 是否开启字段筛选的记忆功能，支持true/false/'local'/'session'/其他 开启的情况下默认是session，除非显式的指定为'local'
+              , colFilterRecord: true
+              // 开启智能重载
+              , smartReloadModel: true
+              // 默认反转
+              // , reversal: true
+              // 设置开启部分选项不可选
+              // 设置表格的主键（主要用在记录选中状态还有不可操作记录的时候用
+              , primaryKey: 'id'
+              , checkDisabled: {
+                enabled: true,
+                data: [10000, 10001, 10002, 10003, 10004, 10005, 10009]
+              }
+              // , pageLanguage: 'zh-TW' // 需要自己定义对应的文本
+              // , pageLanguage: 'en' // tablePlug里面已经定义了，如果觉得不满意可以用tablePlug.set去更新默认的配置;
+              // , pageLanguage: true // 无效的设置方式，只支持字符串或者对象的
+              // 也可以针对某个表格有特殊的配置如下面对象的设置方法,但是如果没有必要单独的自定义建议使用直接赋值成语言名称的字符串形式
+              , pageLanguage: {
+                lan: 'en',
+                // 可自定义text,lan为en的情况下
+                text: {
+                  // jumpTo: 'jump to', // 到第
+                  // page: 'page', // 页
+                  // go: 'go', // 确定
+                  // total: 'total', // 共
+                  unit: 'item' // 条（单位，一般也可以不填）
+                  // optionText: 'limit each page' // 条/页
+                }
+              }
+              , done: function (res, curr, count) {
+                var tableView = this.elem.next();
+                var tableId = this.id;
+
+                // 针对表格中的多选下拉的处理
+                renderFormSelectsIn(tableView, {}, 'layuiTable');
+
+                // 初始化laydate
+                layui.each(tableView.find('td[data-field="birthday"]'), function (index, tdElem) {
+                  tdElem.onclick = function (event) {
+                    layui.stope(event)
+                  };
+                  laydate.render({
+                    elem: tdElem.children[0],
+                    // closeStop: tdElem,
+                    format: 'yyyy/MM/dd',
+                    done: function (value, date) {
+                      var trElem = $(this.elem[0]).closest('tr');
+                      table.cache[tableId][trElem.data('index')]['birthday'] = value;
+                    }
+                  })
+                });
+              },
+              parseData: function (ret) {
+                return {
+                  code: ret.code,
+                  msg: ret.msg,
+                  count: ret.data ? (ret.data.total || 0) : 0,
+                  data: ret.data ? (ret.data.list || []) : []
+                }
+              }
+              , checkStatus: {}
+              // , headers: {token: '12345'}
+              // , autoSort: false
+              // , initSort: {
+              //   field: 'id' //排序字段，对应 cols 设定的各字段名
+              //   , type: 'asc' //排序方式  asc: 升序、desc: 降序、null: 默认排序
+              // }
+              , cols: [
+                [
+                  // {type: 'radio', fixed: 'left', rowspan: 2, totalRowText: '共计:'/*, hide: true*/},
+                  {type: 'checkbox', fixed: 'left', rowspan: 2, totalRowText: '共计:'/*, hide: true*/},
+                  {type: 'numbers', fixed: 'left', rowspan: 2},
+                  {
+                    field: 'id',
+                    title: 'ID',
+                    filter: true,
+                    width: 80,
+                    sort: true,
+                    fixed: 'left',
+                    // totalRowText: '平均:',
+                    rowspan: 2
+                  },
+                  {title: '基本信息', colspan: 3, align: 'center'},
+                  {title: '详细信息', colspan: 7, align: 'center'},
+                  {
+                    fixed: 'right',
+                    type: 'toolbar',
+                    field: 'toolbar_move',
+                    title: '',
+                    width: 150,
+                    align: 'center',
+                    toolbar: '#moveBar',
+                    rowspan: 2
+                  },
+                  {
+                    fixed: 'right',
+                    type: 'toolbar',
+                    // hide: true,
+                    field: 'toolbar_common',
+                    title: '操作',
+                    width: 90,
+                    align: 'center',
+                    toolbar: '#barDemo',
+                    rowspan: 2
+                  }
+                ]
+                , [ //表头
+                  {field: 'username', title: '姓名', hideable: false/*, hide: true*/}
+                  , {field: 'sex', title: '性别', width: 90, filter: true, sort: true}
+                  , {field: 'birthday', title: '生日', edit: false, width: 120}
+                  , {field: 'experience', title: '积分', width: 90, sort: true, totalRow: true}
+                  , {field: 'score', title: '评分', edit: true, event: 'editField', width: 90, sort: true, totalRow: true}
+                  , {
+                    field: 'city',
+                    title: '城市',
+                    search: true,
+                    edit: false,
+                    width: 150,
+                    type: 'normal',
+                    templet: fn1('city')
+                  }
+                  , {
+                    field: 'sign',
+                    title: '签名',
+                    width: 200,
+                    edit: true
+                    // templet: function (d) {
+                    //   // return d['sign'];
+                    //   return d[this.field];
+                    // }
+                    // templet: '<div><input type="radio" lay-ignore="" name="sign" value="1">原始效果<input type="radio" name="sign"  title="美化效果" value="2"><input type="radio" name="sign" title="美化效果" value="3"><input type="radio" name="sign" title="美化效果" value="4"></div>'
+                  }
+                  , {field: 'classify', title: '职业', filter: true, width: 100}
+                  , {field: 'like', title: '爱好', width: 240, edit: false, templet: fnLike}
+                  , {field: 'wealth', title: '财富', width: 135, filter: true, sort: true, totalRow: true}
+                ]
+              ]
+            });
+            break;
+          case 'tab_complexHeader':
+            table.init('demo2', {
+              data: [{
+                id: 10001,
+                f2: 2,
+                f3: 3,
+                f4: 4,
+                f5: 5,
+                f6: 6,
+                f7: 7,
+                f8: 8,
+                f9: 9,
+                f10: 10,
+                f11: 11,
+                f12: 12,
+                f13: 13,
+                f14: 14,
+                f15: 15,
+                f16: 16,
+                f17: 17,
+                f18: 18,
+                f19: 19,
+                f20: 20,
+                f21: 21,
+                f22: 22,
+                f23: 23,
+                f24: 24,
+                f25: 25,
+                f26: 26,
+                f27: 27,
+                f28: 28
+              }, {
+                id: 10002,
+                f2: '工程项目名称',
+                f3: '工程量',
+                f4: '单位',
+                f5: '合计1',
+                f6: '备注',
+                f7: '主材',
+                f8: '人工',
+                f9: '机械',
+                f10: '其他',
+                f11: '合计2',
+                f12: '1耗量(kg)',
+                f13: '2耗量(kg)',
+                f14: '3耗量(发)',
+                f15: '4耗量(kg)',
+                f16: '5耗量(kg)',
+                f17: '6耗量(kg)',
+                f18: '7耗量(kg)',
+                f19: '8耗量(m3)',
+                f20: '9耗量(m3)',
+                f21: '10耗量(m3)',
+                f22: '11耗量(m3)',
+                f23: '12耗量(m3)',
+                f24: '13耗量(kg)',
+                f25: '14数量(工时)',
+                f26: '15台时',
+                f27: '16台时',
+                f28: '17台时'
+              }, {
+                id: 10003,
+                f2: '工程项目名称',
+                f3: '工程量',
+                f4: '单位',
+                f5: '合计1',
+                f6: '备注',
+                f7: '主材',
+                f8: '人工',
+                f9: '机械',
+                f10: '其他',
+                f11: '合计2',
+                f12: '1耗量(kg)',
+                f13: '2耗量(kg)',
+                f14: '3耗量(发)',
+                f15: '4耗量(kg)',
+                f16: '5耗量(kg)',
+                f17: '6耗量(kg)',
+                f18: '7耗量(kg)',
+                f19: '8耗量(m3)',
+                f20: '9耗量(m3)',
+                f21: '10耗量(m3)',
+                f22: '11耗量(m3)',
+                f23: '12耗量(m3)',
+                f24: '13耗量(kg)',
+                f25: '14数量(工时)',
+                f26: '15台时',
+                f27: '16台时',
+                f28: '17台时'
+              }],
+              page: {
+                limit: 2
+              },
+              limits: [2, 5, 10]
+            });
+
+            table.render({
+              elem: '#demo3'
+              , loading: true
+              , size: 'sm' //小尺寸的表格
+              // , toolbar: true
+              , data: [{
+                daytablename: '2020',
+                day_da1: 1,
+                day_da2: 2,
+                day_da3: 3,
+                day_da4: 4,
+                day_da5: 5,
+                day_da6: 6,
+                day_da7: 7,
+                day_da8: 8,
+                day_da9: 9,
+                day_da10: 10,
+                day_da11: 11,
+                day_da12: 12,
+                day_da13: 13,
+                day_da14: 14,
+                day_da15: 15,
+                day_da16: 16,
+                day_da17: 17,
+                day_da18: 18,
+                day_da19: 19,
+                day_da20: 20,
+                day_da21: 21,
+                day_da22: 22,
+                day_da23: 23,
+                day_da24: 24,
+                day_da25: 25,
+                day_da26: 26,
+                day_da27: 27,
+                day_da28: 28,
+                day_da29: 29,
+                day_da30: 30
+              }]
+              , cols: [[
+                {type: 'numbers', title: '序号', align: 'center', fixed: 'left', rowspan: 5}
+                , {field: 'daytablename', title: '日期', align: 'center', rowspan: 5}
+                , {title: '0_2', align: 'center'}
+                , {title: '0_3', align: 'center', colspan: 5}
+                , {title: '0_4', align: 'center', colspan: 5}
+                , {type: 'space', title: '0_5', align: 'center', colspan: 32}
+              ], [
+                {title: '1_0', align: 'center', rowspan: 3}
+                , {title: '1_1', align: 'center', rowspan: 3}
+                , {title: '1_2', align: 'center', rowspan: 3}
+                , {title: '1_3', align: 'center', rowspan: 2, colspan: 3}
+                , {title: '1_4', align: 'center', rowspan: 3}
+                , {title: '1_5', align: 'center', rowspan: 3}
+                , {title: '1_6', align: 'center', colspan: 3}
+                , {title: '1_7', align: 'center', colspan: 21}
+                , {title: '1_8', align: 'center', colspan: 10}
+                , {title: '1_9', align: 'center', rowspan: 3}
+              ], [
+                {title: '2_0', align: 'center', rowspan: 2}
+                , {title: '2_1', align: 'center', colspan: 2}
+                , {title: '2_2', align: 'center', rowspan: 2}
+                , {title: '2_3', align: 'center', colspan: 20}
+                , {title: '2_4', align: 'center', rowspan: 2}
+                , {title: '2_5', align: 'center', colspan: 9}
+              ], [
+                {title: '3_0', align: 'center'}
+                , {title: '3_1', align: 'center'}
+                , {title: '3_2', align: 'center'}
+                , {title: '3_3', align: 'center'}
+                , {title: '3_4', align: 'center'}
+                , {title: '3_5', align: 'center'}
+                , {title: '3_6', align: 'center'}
+                , {title: '3_7', align: 'center'}
+                , {title: '3_8', align: 'center'}
+                , {title: '3_9', align: 'center'}
+                , {title: '3_10', align: 'center'}
+                , {title: '3_11', align: 'center'}
+                , {title: '3_12', align: 'center'}
+                , {title: '3_13', align: 'center'}
+                , {title: '3_14', align: 'center'}
+                , {title: '3_15', align: 'center'}
+                , {title: '3_16', align: 'center'}
+                , {title: '3_17', align: 'center'}
+                , {title: '3_18', align: 'center'}
+                , {title: '3_19', align: 'center'}
+                , {title: '3_20', align: 'center'}
+                , {title: '3_21', align: 'center'}
+                , {title: '3_22', align: 'center'}
+                , {title: '3_23', align: 'center'}
+                , {title: '3_24', align: 'center'}
+                , {title: '3_25', align: 'center'}
+                , {title: '3_26', align: 'center'}
+                , {title: '3_27', align: 'center'}
+                , {title: '3_28', align: 'center'}
+                , {title: '3_29', align: 'center'}
+                , {title: '3_30', align: 'center'}
+                , {title: '3_31', align: 'center'}
+                , {title: '3_32', align: 'center'}
+                , {title: '3_33', align: 'center'}
+              ], [
+                {field: 'day_da1', title: '1', align: 'center'}
+                , {field: 'day_da2', title: '2', align: 'center'}
+                , {field: 'day_da3', title: '3', align: 'center'}
+                , {field: 'day_da4', title: '4', align: 'center'}
+                , {field: 'day_da5', title: '5', align: 'center'}
+                , {field: 'day_da6', title: '6', align: 'center'}
+                , {field: 'day_da7', title: '7', align: 'center'}
+                , {field: 'day_da8', title: '8', align: 'center'}
+                , {field: 'day_da9', title: '9', align: 'center'}
+                , {field: 'day_da10', title: '10', align: 'center'}
+                , {field: 'day_da11', title: '11', align: 'center'}
+                , {field: 'day_da12', title: '12', align: 'center'}
+                , {field: 'day_da13', title: '13', align: 'center'}
+                , {field: 'day_da14', title: '14', align: 'center'}
+                , {field: 'day_da15', title: '15', align: 'center'}
+                , {field: 'day_da16', title: '16', align: 'center'}
+                , {field: 'day_da17', title: '17', align: 'center'}
+                , {field: 'day_da18', title: '18', align: 'center'}
+                , {field: 'day_da19', title: '19', align: 'center'}
+                , {field: 'day_da20', title: '20', align: 'center'}
+                , {field: 'day_da21', title: '21', align: 'center'}
+                , {field: 'day_da22', title: '22', align: 'center'}
+                , {field: 'day_da23', title: '23', align: 'center'}
+                , {field: 'day_da24', title: '24', align: 'center'}
+                , {field: 'day_da25', title: '25', align: 'center'}
+                , {field: 'day_da26', title: '26', align: 'center'}
+                , {field: 'day_da27', title: '27', align: 'center'}
+                , {field: 'day_da28', title: '28', align: 'center'}
+                , {field: 'day_da29', title: '29', align: 'center'}
+                , {field: 'day_da30', title: '30', align: 'center'}
+                , {field: 'day_da31', title: '31', align: 'center'}
+                , {field: 'day_da32', title: '32', align: 'center'}
+                , {field: 'day_da33', title: '33', align: 'center'}
+                , {field: 'day_da34', title: '34', align: 'center'}
+                , {field: 'day_da35', title: '35', align: 'center'}
+                , {field: 'day_da36', title: '36', align: 'center'}
+                , {field: 'day_da37', title: '37', align: 'center'}
+                , {field: 'day_da38', title: '38', align: 'center'}
+                , {field: 'day_da39', title: '39', align: 'center'}
+                , {field: 'day_da40', title: '40', align: 'center'}
+                , {field: 'day_da41', title: '41', align: 'center'}
+                , {field: 'day_da42', title: '42', align: 'center'}
+                , {field: 'day_da43', title: '43', align: 'center'}
+              ]
+              ]
+            });
+
+            table.init('demo4', {
+              data: [{
+                id: 1,
+                f2: '区块',
+                f3: '井号',
+                f4: '层位',
+                f41: '投产日期',
+                f51: '月产液',
+                f52: '月产油',
+                f53: '月产水',
+                f54: '含水',
+                f55: '油层中深',
+                f56: '泵挂',
+                f57: '动液面',
+                f58: '沉没度',
+                f59: '冲程',
+                f510: '冲数',
+                f511: '泵径',
+                f512: '流压',
+                f515: '备注',
+                f516: '日均',
+                f517: '日均',
+                f22: '间开制度',
+                f518: '日理论',
+                f519: '泵效',
+                f520: '日历',
+                f521: '生产',
+                f524: '时率',
+                f525: '倒数第二次检泵周期',
+                f526: '倒数第一次检泵周期',
+                f527: '检泵周期',
+                f6: '措施',
+                f7: '测压',
+                f8: '小修',
+                f9: '丛式井作业干扰',
+                f10: '保养',
+                f11: '大修',
+                f12: '其它',
+                f18: '待修',
+                f17: '停电',
+                f16: '小修返工',
+                f15: '机械故障',
+                f14: '出油管线破',
+                f106: '出油管线堵',
+                f107: '集输管线堵',
+                f108: '集输管线破',
+                f109: '憋罐',
+                f13: '其它'
+              }]
+            });
+            break;
+          default:
+            break;
+        }
+      };
+
+      element.on('tab(docDemoTabBrief)', function (data) {
+        var tabActive = $(this);
+        var tabContent = data.elem.children('.layui-tab-content');
+        var tabContentActive = tabContent.children('.layui-tab-item').eq(data.index);
+        if (!tabContentActive.data('done')) {
+          // 如果页面没有初始化内容
+          tabContentActive.data('done', true);
+          initPage(tabActive.attr('lay-id'));
+        } else {
+          layui.each(tabContentActive.find('.layui-table-view'), function (index, item) {
+            // 重新调整表格
+            table.resize(item.getAttribute('lay-id'));
+          })
+        }
+      });
+
+      // 设置激活的tab
+      element.tabChange('docDemoTabBrief', 'tab_main');
     });
 </script>
 </body>

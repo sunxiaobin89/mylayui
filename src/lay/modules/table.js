@@ -258,8 +258,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
     CHECK_TYPE_ORIGINAL = 'original', // 原有的
     CHECK_TYPE_DISABLED = 'disabled', // 不可选的
     FIXED_SCROLL = 'layui-table-fixed-scroll',
-    COLGROUP = 'colGroup', // 列合并标志
-    tableSpacialColType = ['numbers', 'checkbox', 'radio'], // 表格的特殊类型字段// 获得table的config
+    tableSpecialColType = ['numbers', 'checkbox', 'radio'], // 表格的特殊类型字段// 获得table的config
     getConfig = function (tableId) {
       return thisTable.config[tableId] || (tableIns[tableId] && tableIns[tableId].config) || {};
       // return getIns(tableId).config;
@@ -1177,19 +1176,24 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
 
 
       // plug修改，根据配置信息确定是否合并列
-      if (!item2.field && !item2.toolbar && (!item2.colspan || item2.colspan === 1) && (tableSpacialColType.indexOf(item2.type) === -1)) {
-        item2[COLGROUP] = true;
-      } else if (item2[COLGROUP] && !(item2.colspan > 1)) {
+      if (item2.colspan > 1 && item2.field) {
+        // 合并列不应该出现filed
+        delete item2.field;
+      }
+      if (!item2.field && !item2.toolbar && (!item2.colspan || item2.colspan === 1) && (tableSpecialColType.indexOf(item2.type) === -1)) {
+        item2.colGroup = true;
+      } else if (item2.colGroup && !(item2.colspan > 1)) {
         // 如果有乱用colGroup的，明明是一个字段列还给它添加上这个属性的会在这里KO掉，
-        item2[COLGROUP] = false;
+        item2.colGroup = false;
       }
 
       //设置列的父列索引
       //如果是组合列，则捕获对应的子列
-      if (item2[COLGROUP] || item2.colspan > 1) {
+      var indexChild = i1 + (parseInt(item2.rowspan) || 1);
+      // if (item2.colGroup || item2.colspan > 1) {
+      if (item2.colGroup || indexChild < options.cols.length) { // 只要不是最后一层都会有子列
         var childIndex = 0;
         // #### 源码修改 #### 修复复杂表头数据与表头错开的bug
-        var indexChild = i1 + (parseInt(item2.rowspan) || 1);
         layui.each(options.cols[indexChild], function (i22, item22) {
           //如果子列已经被标注为{HAS_PARENT}，或者子列累计 colspan 数等于父列定义的 colspan，则跳出当前子列循环
           if (item22.HAS_PARENT || (childIndex >= 1 && childIndex == (item2.colspan || 1))) return;
@@ -1199,13 +1203,11 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
           childIndex = childIndex + parseInt(item22.colspan > 1 ? item22.colspan : 1);
           initCols(indexChild, options.cols[indexChild], i22, item22);
         });
-        item2[COLGROUP] = true; //标注是组合列
+        // item2.colGroup = true; //标注是组合列
+        item2.colGroup = typeof item2.colGroup === 'boolean' ? item2.colGroup : !(item2.field || item2.toolbar || (tableSpecialColType.indexOf(item2.type) !== -1));
+        item2.isGroup = true; //标注是组合列
       }
-
-      // //根据列类型，定制化参数
-      // that.initOpts(item2);
     };
-
 
     //初始化列参数
     layui.each(options.cols, function (i1, item1) {
@@ -2749,8 +2751,7 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
   // [mod] eachCols遍历规则修改核心之一
   var asyncChild = function (index, cols, i1, item2) {
     //如果是组合列，则捕获对应的子列
-    // if (!item2.CHILD_COLS && item2.colGroup) {
-    if (item2.colGroup) {
+    if (item2.isGroup) {
       var childIndex = 0;
       index++;
       item2.CHILD_COLS = [];
@@ -2811,8 +2812,11 @@ layui.define(['laytpl', 'laypage', 'form', 'util'], function(exports){
           // 如果没有设置width默认成自动分配宽度列
           item.width = item.width || 0;
         }
+        if (!item.colGroup) {
+          typeof callback === 'function' && callback(i, item);
+        }
         if(item.CHILD_COLS) return eachArrs(item.CHILD_COLS);
-        typeof callback === 'function' && callback(i, item);
+        // typeof callback === 'function' && callback(i, item);
       });
     };
     

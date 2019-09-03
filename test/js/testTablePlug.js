@@ -1,6 +1,6 @@
 /**
 
- @Name：testTablePlug tablePlug测试页面引用的组件
+ @Name：mylayui 测试页面引用的组件
  @Author：岁月小偷
  @License：MIT
 

@@ -97,7 +97,7 @@ load('echarts', function () {
 });
 
 
-// load(['form', 'ztree', 'ztree.exhide'], function () { // 与下面的代码等效
+// load(['ztree', 'ztree.exhide'], function () { // 与下面的代码等效
 load(['ztree.exhide'], function () { // ztree.exhide依赖了ztree所以只要load进来ztree.exhide就可以用ztree的基础功能了
   var setting = {
       view: {
@@ -119,6 +119,14 @@ load(['ztree.exhide'], function () { // ztree.exhide依赖了ztree所以只要lo
   })
 });
   </pre>
+
+  <blockquote class="layui-elem-quote">
+    tips:可能到这里小伙伴会有疑问：load的时候想要引入layui的模块可以吗？是否需要分开写比如：layui.use('form').load('ztree');实际是不需要的，load本身也支持像layui.use一样去引入本身就符合layui模块化标准的模块或插件，比如：layui.load(['form', 'ztree'], callback);<br>
+    区别就是本身如果就是layui模块化标准的，就不需要（不应该）用layui.load.config去设置他们的路劲，如果需要指定路径请用layui.extend去处理，所以可以不夸张的说，layui.load可以替代layui.use去使用，当然也是有区别的，就是回调不会传参。<br>
+    <pre class="layui-code" lay-title="layui.load与layui.use区别">
+layui.use(['table'], function(table){table.render({...})})  // 可以正常使用，但是个人不建议这种方式
+layui.load(['table'], function(table){table.render({...})}) // 错误！load不会给回调传参</pre>
+  </blockquote>
 </div>
 
 <script>

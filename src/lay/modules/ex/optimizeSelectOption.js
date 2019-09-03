@@ -25,13 +25,11 @@
     });
   }
 }(function (modelName) {
-  var version = '0.2.0';
+  var version = '0.2.1';
   var $ = layui.$;
   var form = layui.form;
   var layer = layui.layer;
 
-  var filePath = layui.cache.modules.optimizeSelectOption
-    .substr(0, layui.cache.modules.optimizeSelectOption.lastIndexOf('/'));
   // 引入tablePlug.css
   layui.addcss( 'modules/ex/optimizeSelectOption.css?v' + version);
 
@@ -138,7 +136,11 @@
           } else {
             topTemp += parseFloat(dlElem.css('top'));
           }
-          // console.log(topTemp, leftTemp);
+          if (topTemp + dlElem.outerHeight() > window.top.innerHeight && !selectupFlag) {
+            // 出现原始的form表单判断向下弹出，但是最终弹出超出窗口下边界的情形的处理
+            selectupFlag = true;
+            topTemp -= (dlElem.outerHeight() + (2 * parseFloat(dlElem.css('top')) - titleElem.outerHeight()));
+          }
           return {
             top: topTemp,
             left: leftTemp

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>layui在线调试</title>
+  <link rel="stylesheet" href="../src/css/layui.css" media="all">
+</head>
+<body>
+
+<div class="layui-form select_option_to_layer" lay-filter="test_form" style="padding: 20px;">
+  <select lay-filter="city" name="city">
+    <option value="1">北京</option>
+    <option value="2">上海</option>
+    <option value="3">广州</option>
+    <option value="4">深圳</option>
+  </select>
+  <br>
+</div>
+
+<button class="layui-btn" id="btn1">点击继续弹出</button>
+
+
+<script src="../src/layui.js"></script>
+<script>
+
+  layui.config({base: 'js/'})
+    .use(['testTablePlug'], function () {
+      var $ = layui.$;
+      var form = layui.form;
+      $('#btn1').click(function () {
+        layer.open({
+          type: 2,
+          title: '测试下拉效果iframe',
+          shade: false,
+          area: ['200px', '100px'],
+          content: 'testIframe.html?time=' + new Date().getTime(),
+          success: function (layero, index) {
+          }
+        });
+      });
+      // 直接用父窗口的对象变量去赋值无效，因为目前layui.each的逻辑问题
+      // form.val('test_form', window.parent.dataSub||{});
+      // 深拷贝一份就可以
+      form.val('test_form', $.extend({}, window.parent.dataSub||{}));
+      form.on('select(city)', function (data) {
+        console.log('选择了', data);
+      });
+    });
+</script>
+</body>
+</html>
