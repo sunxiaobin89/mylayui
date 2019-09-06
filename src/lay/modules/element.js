@@ -30,6 +30,11 @@ layui.define('jquery', function(exports){
   Element.prototype.on = function(events, callback){
     return layui.onevent.call(this, MOD_NAME, events, callback);
   };
+
+  //移除表单事件监听
+  Element.prototype.off = function(events, callback){
+    return layui.offevent.call(this, MOD_NAME, events, callback);
+  };
   
   //外部Tab新增
   Element.prototype.tabAdd = function(filter, options){

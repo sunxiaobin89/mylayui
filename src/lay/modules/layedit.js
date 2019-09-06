@@ -47,6 +47,11 @@ layui.define(['layer', 'form'], function(exports){
   Edit.prototype.on = function(events, callback){
     return layui.onevent(MOD_NAME, events, callback);
   };
+
+  //移除事件监听
+  Edit.prototype.off = function(events, callback){
+    return layui.offevent(MOD_NAME, events, callback);
+  };
   
   //建立编辑器
   Edit.prototype.build = function(id, settings){

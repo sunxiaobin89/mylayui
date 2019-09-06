@@ -32,6 +32,11 @@ layui.define(['laytpl', 'form'], function(exports){
     ,on: function(events, callback){
       return layui.onevent.call(this, MOD_NAME, events, callback);
     }
+
+    //移除事件监听
+    ,off: function(events, callback){
+      return layui.offevent.call(this, MOD_NAME, events, callback);
+    }
   }
 
   //操作当前实例

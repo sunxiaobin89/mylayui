@@ -70,6 +70,11 @@ layui.define('layer', function(exports){
     return layui.onevent.call(this, MOD_NAME, events, callback);
   };
   
+  //移除表单事件监听
+  Form.prototype.off = function(events, callback){
+    return layui.offevent.call(this, MOD_NAME, events, callback);
+  };
+  
   //初始赋值 [mod]
   Form.prototype.val = function(filter, object){
     var that = this;

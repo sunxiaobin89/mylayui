@@ -510,8 +510,15 @@
     return Layui.event(modName, events, null, callback);
   };
 
+  //解除自定义模块事件
+  Layui.prototype.offevent = function(modName, events, callback){
+    if(typeof modName !== 'string') return this;
+
+    return Layui.event(modName, events, null, callback, true);
+  };
+
   //执行自定义模块事件 [mod]
-  Layui.prototype.event = Layui.event = function(modName, events, params, fn){
+  Layui.prototype.event = Layui.event = function(modName, events, params, fn, off){
     var that = this
     ,result = null
     ,filter = events.match(/\((.*)\)$/)||[] //提取事件过滤器字符结构，如：select(xxx)
@@ -521,8 +528,33 @@
       // result = item && item.call(that, params);
       var res = item && item.call(that, params);
       res !== undefined && (result = res);
+      return result === false; // 如果结果为false就不继续执行其他的事件
       // res === false && result === null && (result = false);
     };
+
+    //解除事件
+    if (off === true) {
+      if (config.event[eventName]) {
+        if(filterName === '{*}'){
+          //解除当前模块的全部事件
+          delete config.event[eventName];
+        } else if (config.event[eventName][filterName]) {
+          if (fn) {
+            //要接触特定的事件
+            layui.each(config.event[eventName][filterName], function (evIndex, evItem) {
+              if (evItem === fn) {
+                config.event[eventName][filterName].splice(evIndex, 1);
+              }
+            })
+          } else {
+            delete config.event[eventName][filterName];
+          }
+        } else {
+          return that;
+        }
+      }
+      return that;
+    }
     
     //添加事件
     if(fn){
@@ -530,6 +562,9 @@
 
       //这里不再对多次事件监听做支持，避免更多麻烦
       //config.event[eventName][filterName] ? config.event[eventName][filterName].push(fn) : 
+      // config.event[eventName][filterName] = [fn];
+      //对无filter做多事件支持
+      (filterName === '' && config.event[eventName][filterName]) ? config.event[eventName][filterName].push(fn) :
       config.event[eventName][filterName] = [fn];
       return this;
     }
@@ -543,7 +578,7 @@
     } else {
       //执行指定事件
       var itemP = config.event[eventName] && config.event[eventName]['']
-        ,itemC = config.event[eventName] && config.event[eventName][filterName];
+        ,itemC = filterName && config.event[eventName] && config.event[eventName][filterName];
       itemP && layui.each(itemP, callback); // 执行父事件
       // 如果父事件中已经返回了false了就不再继续执行子事件
       result !== false && itemC && layui.each(itemC, callback); // 执行子事件
