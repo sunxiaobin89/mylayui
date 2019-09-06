@@ -69,7 +69,7 @@ config.event[eventName][filterName] = [fn];
     </pre>
     <pre class="layui-code" lay-title="JavaScript" lay-encode="true">
 //同事甲完成
-table.on('toolbar(test)', function(obj){
+table.on('toolbar()', function(obj){
   switch(obj.event){
     case 'add':
       layer.msg('添加');
@@ -84,7 +84,7 @@ table.on('toolbar(test)', function(obj){
 });
 
 //同事乙完成
-table.on('toolbar(test)', function(obj){
+table.on('toolbar()', function(obj){
   switch(obj.event){
     case 'query':
       layer.msg('查询');
