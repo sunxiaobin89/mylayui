@@ -46,8 +46,9 @@
 <div class="layui-main site-inline">
   <div class="site-tree">
     <div class="layui-form" style="height: 38px; margin: 10px 13px 0 0;">
-      <select lay-filter="tabVersion">
-        <option value="new">2.5.4</option>
+      <select lay-filter="tabVersion" id="api_version">
+<!--        <option value="2.5.5">2.5.5</option>-->
+        <option value="2.5.4">2.5.4</option>
       </select>
     </div>
     <ul class="layui-tree" lay-filter="api_menu_side"></ul>
@@ -63,5 +64,19 @@
 <script>
   layui.config({base: 'js/'}).use('api', function () {});
 </script>
+<!--<script>-->
+<!--  (function(w, d, s, g, o) {-->
+<!--    var x = document.createElement(s)-->
+<!--      ,s = document.getElementsByTagName(s)[0];-->
+<!--    w[g] = o;-->
+<!--    x.async = true;-->
+<!--    x.charset = 'utf-8';-->
+<!--    x.src = 'https://cdn.xiankefu.com/dist/xiankefu.js';-->
+<!--    s.parentNode.insertBefore(x, s);-->
+<!--  })(window, document, 'script', 'XIANKEFU_GLOBAL', {-->
+<!--    bid: '9f97e0bf26afd88b398a5e2eccd4cb9b'-->
+<!--    ,csid: '14cc59b5995417fecb48d7c3ee03581a'-->
+<!--  });-->
+<!--</script>-->
 </body>
 </html>

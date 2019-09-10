@@ -21,7 +21,7 @@
 
   ,Layui = function(){
     this.v = '2.5.4'; //版本号
-    this.mylayui = this.v + ' mod-0.0.3'; // mylayui版本号
+    this.mylayui = this.v + ' mod-1.0.0'; // mylayui版本号
   }
 
   //获取layui所在目录
@@ -540,7 +540,7 @@
           delete config.event[eventName];
         } else if (config.event[eventName][filterName]) {
           if (fn) {
-            //要接触特定的事件
+            //要解除特定的事件
             layui.each(config.event[eventName][filterName], function (evIndex, evItem) {
               if (evItem === fn) {
                 config.event[eventName][filterName].splice(evIndex, 1);
