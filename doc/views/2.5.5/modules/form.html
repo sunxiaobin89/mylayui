@@ -1,0 +1,182 @@
+<h1 class="site-h1"><i class="layui-icon layui-icon-form"></i> 表单模块文档 - layui.form</h1>
+<blockquote class="layui-elem-quote">
+  针对form组件使用的过程遇到的问题对其进行的几处修改
+</blockquote>
+
+<fieldset class="layui-elem-field layui-field-title">
+  <legend>功能加强</legend>
+</fieldset>
+
+<div class="site-text">
+  <p>1. 让form.render具备更细粒度的渲染能力。</p>
+
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>目前form.render有两个参数：第一个是类型type，支持单独渲染某种类型的，第二个参数是filter，也就是要渲染的是哪些表单里面的节点。</p>
+    <p>所以目前基本上最小的粒度就是渲染某个表单内的某种类型的表单元素，那么如果有一些节点比如下拉他的选项是异步获取的，那么回来之后如何只渲染这个节点而不会影响到这个表单的其他元素，原始的form.render不好处理，有个比较可以实现的方法就是给每个表单元素的容器都加上layui-form并且每个都有自己独特的lay-filter，但是这样是十分不建议的，会出现表单嵌套，而且也是巨麻烦，之前写tablePlug的时候也用过一个处理，就是取巧的修改form.render的源码新增一个第三参数，传入要渲染的jquery对象，内部实现就是给要渲染的对象的父容器临时的加上class:lay-form和属性lay-filter,再调用原始的form.render去渲染，渲染完成之后去掉之前临时添加的class和属性，初步的实现了更细粒度的更新，但是缺点就是如果被渲染的表单元素有其他的兄弟节点，一样会被影响到，所以还是没有完全的达到“指哪打哪”。</p>
+  </blockquote>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>那么mylayui如何实现？</p>
+    <p>目前的策略是：将第一个参数新增一个jquery对象的支持，原始的参数type一般就是字符串，指定渲染某种类型，或者null，渲染全部的类型，目前除了这两种之外新增一种就是可传入一个jquery对象，后面会遍历这个对象，判断节点的类型，找到对应的渲染逻辑逐个渲染，那么这种情况下是不需要第二个参数filter的，因为已经都定位到特定的要渲染的节点了，form的filter加上是没有意义的，当然加上不会出错，只不过这种情况下参数会被无视。</p>
+  </blockquote>
+  <pre class="layui-code" lay-title="html" lay-encode="true">
+// 对某个节点修改之后重新渲染
+$('select#address').html('<option value="Mars">火星</option><option value="Earth">地球</option>');
+form.render($('select#address'));
+// 修改一批特定的节点
+form.render($('.test'))</pre>
+</div>
+
+<div class="site-text">
+  <p>2. 让form.val功能更全面。（取值）</p>
+  <blockquote class="layui-elem-quote ">
+    <i class="layui-icon layui-icon-star-fill"></i>
+    <i class="layui-icon layui-icon-star-fill"></i>
+    <i class="layui-icon layui-icon-star-fill"></i>
+    layui v2.5.5版本的更新关于form带来的一个实用的功能就是让val支持取值。那么mylayui中的这一点修改是否就可以隐居了呢？<br>
+    实则不然，主要体现在目前layui的val的实现会带来几个问题：<br>
+    1、取值和赋值没有完全分开；layui官方文档说明：
+    <blockquote class="layui-elem-quote layui-quote-nm">
+      语法：form.val('filter', object);<br>
+      用于给指定表单集合的元素赋值和取值。如果 object 参数存在，则为赋值；如果 object 参数不存在，则为取值。
+    </blockquote>
+    但是查看他的实现，就知道这句话是有问题的，实际上不管第二个参数是否存在，val都会去取一遍值然后返回，所以文档说的不严谨，那么这个问题实际不是很大的，顶多就是做了一些无用功，比如就是为了赋值，但是赋值成功之后还是会去取一遍值返回。<br>
+    2、取值的时候会渲染表单;可以看到的是在取值的时候还是会去render所有filter的表单，这个在取值的需求上来说更是没有必要的。
+    <img src="res/form.val-2.5.5.png" width="100%">
+    3、如果有多个lay-filter相同的，无法准确得到某一个form的值；比如说有3个form表单的lay-filter都是userForm，那么如果要得到其中的某一个比如第二个，应该怎么写？form.val('userForm')这个是做不到的，因为就像jquery去取值如果找到多个节点，得到的也只能是第一个的值一样，通过filter找到多个节点，他返回的是第一个节点的表单的的值。具体的这个就看新增的一个form.getValue这个方法的实现就能看出来了。
+    <img src="res/form.getValue-2.5.5.png" width="100%">
+    那么如果你要精确的去得到第二个userForm的值，应该是调用form.getValue(null, $('.layui-form[lay-filter="userForm"]').eq(1));所以等于说如果你想取值，更加推荐你使用form.getValue去做，而不是form.val，这样子form.val又有点尴尬了，多了一个getValue看似多了一个选择，但是选择多了也不意味着是件好事。<br>
+    针对上面几个问题：mylayui的对应修改为：
+    <img src="res/form.val-mylayui-2.5.5.png" width="100%">
+    修改之后取值是取值赋值是赋值，不做多余的事；也可以通过form.val($('.layui-form[lay-filter="userForm"]').eq(1))直接取到某个jquery对象内的表单数据。
+  </blockquote>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>目前form.val一般是用来赋值的，虽然layui官网称之为初始赋值，但是个人的看法是这个方法不能称之为初始赋值，初始给人的感觉就是点击重置可以回到这个状态，这样子的赋值才能称之为初始，比如修改一条table的记录，表单初始赋值之后，用户操作了一些信息，之后发现忘了修改了什么了不确定是否真的要提交，想回到原始的填写之前的状态，那么利用form的reset的功能希望回到之前初始的状态，那么form.val是否真的能做到，这个大家自己尝试，所以真的叫做初始赋值是否合适这个就见仁见智了，但是最起码的称之为赋值这个是没什么意义的估计。</p>
+    <p>那么希望像jquery对象一样可以直接$(selector).val()来取值一样的使用form.val()？或者有没有其他办法在不需要点击lay-submit的情况下，不需要经过表单校验，就能够取到数据呢？这里提供一种实现方式，就是改造form.val，将submit的取值逻辑搬到form.val中去做。</p>
+  </blockquote>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>如何使用？</p>
+    <p>实际这个jquery对象的val很想，具备多面手，有参数就是赋值没有参数就是取值，惬意~</p>
+  </blockquote>
+  <pre class="layui-code" lay-title="JavaScript" lay-encode="true">
+util.event('lay-active', {
+  getValue: function(){
+    var elem = $(this);
+    // var data = form.val(elem.next('form')); // 可以是一个jqueyr对象
+    var data = form.val(elem.next('form').attr('lay-filter')); // 也可以是一个lay-filter的值
+    layer.alert('data: ' + JSON.stringify(data));
+  }
+});</pre>
+</div>
+
+<div class="site-text">
+  <p>3. 打通美化之后节点与原始节点的事件</p>
+
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>目前美化的节点包括：下拉、单选、多选（开关），这几个表单原始经过美化之后，原始节点是不可视的，我们看到的那些节点是layui给我们生成的节点，那么用户操作自然的也是在这些美化之后的节点上，layui就提供了一些对应的事件，可以用来监听对应的事件，比如select的事件，radio的事件，checkbox的事件，switch的事件，用layui之前，相信如果是使用jquery的话一般就是用的jquery去监听节点的change事件，但是美化之后实际上在事件上是跟原始节点的事件给断联了</p>
+    <p>之前发过一个帖子：<a href="https://fly.layui.com/jie/30928/" target="_blank">如何保留select里面的change事件又采用layui的美化</a>，利用<a href="https://fly.layui.com/jie/27143/" target="_blank">layui.event的特点</a>，用一个无filter的事件让所有的对应的类型的事件都会进入，然后在事件内用js去触发原始的节点的对应的change事件。理论上基本是解决了断联的问题，但是实际是有缺陷的，比如select的change应该是在值改变了才触发，但是form.on('select')这个事件只要点击了其中的一个选项就会触发并且是先把值修改进原始节点然后再触发我们设置的回调，那么也无法在回调中判断之前的值是什么，是否构成了change，另外一个更加严重的是，layui.event的事件对于同名的最后优先，不想jquery的事件，可以支持对一个节点绑定多次相同类型的事件，点击了会触发各自的监听，layui的event事件同名的情况会覆盖之前的，也就是说通过form.on('select')加的监听，很容易会被后面其他的代码给覆盖掉，虽然开发中也许很少会用到这种方式去添加事件，但是这个缺陷是实实在在的存在着的。</p>
+    <p>mylayui的处理方式，直接从根源修改就可以做到更加合理，以select为例：
+    <pre class="layui-code" lay-title="form.js" >
+//选择 [mod] select选择的时候如果值发生了变化，触发select的change回调
+dds.on('click', function(){
+  var othis = $(this), value = othis.attr('lay-value');
+  var filter = select.attr('lay-filter'); //获取过滤器
+
+  if(othis.hasClass(DISABLED)) return false;
+
+  if(othis.hasClass('layui-select-tips')){
+    input.val('');
+  } else {
+    input.val(othis.text());
+    othis.addClass(THIS);
+  }
+
+  othis.siblings().removeClass(THIS);
+  var valueTemp = select.val(); // 记录修改之前的值
+  select.val(value).removeClass('layui-form-danger');
+  layui.event.call(this, MOD_NAME, 'select('+ filter +')', {
+    elem: select[0]
+    ,value: value
+    ,othis: reElem
+  });
+
+  hideDown(true);
+  if (valueTemp !== value) { // 对比修改前后的值，如果发生了改变
+    select.trigger('change');
+  }
+  return false;
+});</pre>
+    <form class="layui-form" lay-filter="form1" action="">
+      <div class="layui-form-item">
+        <label class="layui-form-label">选择框</label>
+        <div class="layui-input-inline">
+          <select class="test" name="city" lay-verify="required" onchange="alert('我是节点上的事件')">
+            <option value=""></option>
+            <option value="0">北京</option>
+            <option value="1">上海</option>
+            <option value="2">广州</option>
+            <option value="3">深圳</option>
+            <option value="4">杭州</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </blockquote>
+</div>
+
+<div class="site-text">
+  <p>4. 开关新增beforeSwitch监听</p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    顾名思义，beforeSwitch就是为了在操作一个开关的时候可以有回调去判断是否可以打开或者关闭，目前的开关，只要一点击，如果是可以操作的，点击了就切换状态了，如果是disabled的本身就不能操作，点击了也不变化，那么如果一个开关一开始没有设置是否可以操作的，在点击之后想要在状态变化之前判断当前的场景下是否可以操作，那么目前的做法一般是在switch回调中再去判断，如果不行的话还要将当前的开关的状态取反，因为进入switch的时候实际状态已经变了，那么如果不满足的话还得给调整回去，然后重新render一下当前这个节点，这个就需要一个过程，开了又关或者关了又开，体验上来说是不太好的，加入这个监听的初衷就是为了解决这个体验的问题。
+  </blockquote>
+  <form class="layui-form" lay-filter="form2" action="">
+    <div class="layui-form-item">
+      <label class="layui-form-label">开关</label>
+      <div class="layui-input-inline">
+        <input type="checkbox" name="switch" lay-skin="switch" lay-filter="switchDemo">
+      </div>
+      <div class="layui-form-mid layui-word-aux">操作先confirm,确定之后还有随机数概率阻止</div>
+    </div>
+  </form>
+  <pre class="layui-code" lay-title="form.js" >
+// 在beforeSwitch中返回false可以阻止当次操作
+form.on('beforeSwitch(switchDemo)', function (data) {
+  if (Math.random() > 0.5) {
+    layer.msg('随机数大于0.5，取消当前的开关操作!', {anim: 6, time: 1500});
+    return false;
+  }
+});
+
+form.on('beforeSwitch()', function (data) {
+  // 每个开关都会进入的事件，而且如果存在母(父)事件，会先调用，在调用对应的子事件
+  return confirm('确定' + (this.checked ? '关掉' : '打开') + '这个开关');
+});</pre>
+  <blockquote class="layui-elem-quote">
+    做这个修改的时候顺带的优化了layui.event的底层实现逻辑，包括事件的“父子/母子”关系在调用时候的顺序，以及通过返回值去判断是否需要进入“子监听”等细节处理，比较底层的支撑修改，如果有兴趣可以进一步查看<a mylayui-href="base">底层方法</a>，简单的运用就是在beforeSwitch中返回false可以阻止当次操作。
+  </blockquote>
+</div>
+
+<script>
+  layui.use(['code', 'form'], function () {
+    var code = layui.code;
+    var $ = layui.$;
+    var form = layui.form;
+    code();
+    form.render();
+    $('select[name="city"]').change(function () {
+      alert('修改了城市：' + this.value);
+    });
+
+    form.on('beforeSwitch()', function (data) {
+      // 每个开关都会进入的事件，而且如果存在母(父)事件，会先调用，在调用对应的子事件
+      return confirm('确定' + (this.checked ? '关掉' : '打开') + '这个开关');
+    });
+
+    form.on('beforeSwitch(switchDemo)', function (data) {
+      if (Math.random() > 0.5) {
+        layer.msg('随机数大于0.5，取消当前的开关操作!', {anim: 6, time: 1500});
+        return false;
+      }
+    });
+  })
+</script>
+

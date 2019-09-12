@@ -1,7 +1,7 @@
 /*!
 
- @Title: Layui
- @Description：经典模块化前端框架
+ @Title: layui
+ @Description：经典模块化前端 UI 框架
  @Site: www.layui.com
  @Author: 贤心
  @modifier: 岁月小偷
@@ -20,8 +20,8 @@
   }
 
   ,Layui = function(){
-    this.v = '2.5.4'; //版本号
-    this.mylayui = this.v + ' mod-1.0.0'; // mylayui版本号
+    this.v = '2.5.5'; //版本号
+    this.mylayui = this.v + ' mod-0.0.1'; // mylayui版本号
   }
 
   //获取layui所在目录
@@ -182,7 +182,7 @@
       ) + (that.modules[item] || item) + '.js';
       
       url = url.replace(/^\{\/\}/, '');
-
+      
       node.async = true;
       node.charset = 'utf-8';
       node.src = url + function(){
@@ -525,7 +525,6 @@
     ,eventName = (modName + '.'+ events).replace(filter[0], '') //获取事件名称，如：form.select
     ,filterName = filter[1] || '' //获取过滤器名称,，如：xxx
     ,callback = function(_, item){
-      // result = item && item.call(that, params);
       var res = item && item.call(that, params);
       res !== undefined && (result = res);
       return result === false; // 如果结果为false就不继续执行其他的事件
@@ -555,7 +554,7 @@
       }
       return that;
     }
-    
+
     //添加事件
     if(fn){
       config.event[eventName] = config.event[eventName] || {};
@@ -568,7 +567,7 @@
       config.event[eventName][filterName] = [fn];
       return this;
     }
-
+    
     //执行事件回调
     if(filterName === '{*}'){
       //执行当前模块的全部事件
@@ -587,6 +586,6 @@
   };
 
   win.layui = new Layui();
-
+  
 }(window);
 

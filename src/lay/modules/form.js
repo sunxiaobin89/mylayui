@@ -74,17 +74,20 @@ layui.define('layer', function(exports){
   Form.prototype.off = function(events, callback){
     return layui.offevent.call(this, MOD_NAME, events, callback);
   };
-  
-  //初始赋值 [mod]
+
+  //赋值/取值 [mod]
   Form.prototype.val = function(filter, object){
     var that = this;
-    if (object) {
-      var formElem = $(ELEM + '[lay-filter="' + filter +'"]');
+    if (object && typeof filter === 'string') {
       // 赋值
+      var formElem = $(ELEM + '[lay-filter="' + filter +'"]');
+      //遍历
       formElem.each(function(index, item){
-        var itemFrom = $(this);
+        var itemForm = $(this);
+
+        //赋值
         layui.each(object, function(key, value){
-          var itemElem = itemFrom.find('[name="'+ key +'"]')
+          var itemElem = itemForm.find('[name="'+ key +'"]')
             ,type;
 
           //如果对应的表单不存在，则不执行
@@ -107,32 +110,36 @@ layui.define('layer', function(exports){
       });
       form.render(null, filter);
     } else {
-      // 取值
-      formElem = typeof filter === 'string' ? $(ELEM + '[lay-filter="' + filter +'"]') : filter;
-      if (formElem && formElem.length) {
-        var nameIndex = {} //数组 name 索引
-          ,field = {}
-          ,fieldElem = formElem.first().find('input,select,textarea') //获取所有表单域
-
-        layui.each(fieldElem, function(_, item){
-          item.name = (item.name || '').replace(/^\s*|\s*&/, '');
-
-          if(!item.name) return;
-
-          //用于支持数组 name
-          if(/^.*\[\]$/.test(item.name)){
-            var key = item.name.match(/^(.*)\[\]$/g)[0];
-            nameIndex[key] = nameIndex[key] | 0;
-            item.name = item.name.replace(/^(.*)\[\]$/, '$1['+ (nameIndex[key]++) +']');
-          }
-
-          if(/^checkbox|radio$/.test(item.type) && !item.checked) return;
-          field[item.name] = item.value;
-        });
-
-        return field;
-      }
+      //返回值
+      return typeof filter === 'string' ? that.getValue(filter) : that.getValue(null, filter) ;
     }
+  };
+  
+  //取值
+  Form.prototype.getValue = function(filter, itemForm){
+    itemForm = itemForm || $(ELEM + '[lay-filter="' + filter +'"]').eq(0);
+        
+    var nameIndex = {} //数组 name 索引
+    ,field = {}
+    ,fieldElem = itemForm.find('input,select,textarea') //获取所有表单域
+    
+    layui.each(fieldElem, function(_, item){
+      item.name = (item.name || '').replace(/^\s*|\s*&/, '');
+      
+      if(!item.name) return;
+      
+      //用于支持数组 name
+      if(/^.*\[\]$/.test(item.name)){
+        var key = item.name.match(/^(.*)\[\]$/g)[0];
+        nameIndex[key] = nameIndex[key] | 0;
+        item.name = item.name.replace(/^(.*)\[\]$/, '$1['+ (nameIndex[key]++) +']');
+      }
+      
+      if(/^checkbox|radio$/.test(item.type) && !item.checked) return;      
+      field[item.name] = item.value;
+    });
+    
+    return field;
   };
   
   //表单控件渲染 [mod] 让form.render支持单节点渲染
@@ -503,7 +510,7 @@ layui.define('layer', function(exports){
                 return;
               }
             }
-            
+
             check[0].checked ? (
               check[0].checked = false
               ,reElem.removeClass(RE_CLASS[1]).find('em').text(text[1])
@@ -581,7 +588,7 @@ layui.define('layer', function(exports){
               next.removeClass(CLASS+'ed');
               next.find('.layui-icon').removeClass(ANIM).html(ICON[1]);
             });
-
+            
             radio[0].checked = true;
             reElem.addClass(CLASS+'ed');
             reElem.find('.layui-icon').addClass(ANIM).html(ICON[0]);
@@ -651,13 +658,16 @@ layui.define('layer', function(exports){
     return that;
   };
   
-  //表单提交校验 [mod]
+  //表单提交校验
   var submit = function(){
-    var button = $(this), verify = form.config.verify, stop = null
-    ,DANGER = 'layui-form-danger', field = {} ,elem = button.closest(ELEM) //只取到最近的.layui-form
-    
+    var stop = null //验证不通过状态
+    ,verify = form.config.verify //验证规则
+    ,DANGER = 'layui-form-danger' //警示样式
+    ,field = {}  //字段集合
+    ,button = $(this) //当前触发的按钮
+    ,elem = button.parents(ELEM) //当前所在表单域
     ,verifyElem = elem.find('*[lay-verify]') //获取需要校验的元素
-    ,formElem = button.parents('form')[0] //获取当前所在的form元素，如果存在的话
+    ,formElem = button.parents('form')[0] //获取当前所在的 form 元素，如果存在的话
     ,filter = button.attr('lay-filter'); //获取过滤器
    
     
@@ -668,7 +678,9 @@ layui.define('layer', function(exports){
       ,verType = othis.attr('lay-verType') //提示方式
       ,value = othis.val();
       
-      othis.removeClass(DANGER);
+      othis.removeClass(DANGER); //移除警示样式
+      
+      //遍历元素绑定的验证规则
       layui.each(vers, function(_, thisVer){
         var isTrue //是否命中校验
         ,errorText = '' //错误提示文本
@@ -717,10 +729,11 @@ layui.define('layer', function(exports){
     });
     
     if(stop) return false;
-
-    field = form.val(elem);
-
-    //获取字段
+    
+    //获取当前表单值
+    field = form.getValue(null, elem);
+ 
+    //返回字段
     return layui.event.call(this, MOD_NAME, 'submit('+ filter +')', {
       elem: this
       ,form: formElem

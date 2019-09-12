@@ -28,7 +28,9 @@ layui.define(['element', 'code', 'layer', 'form'], function (exports) {
   });
 
   $('[lay-filter="api_menu_side"]').load('views/'+version+'/menuSide.html', function (ret, msg, xhr) {
-    $(this).find('a[mylayui-href="'+(router.path.length ? router.path[router.path.length-1] : 'main')+'"]').first().click();
+    var activeItem = $(this).find('a[mylayui-href="'+(router.path.length ? router.path[router.path.length-1] : 'main')+'"]');
+    activeItem = activeItem.length ? activeItem : $(this).find('a[mylayui-href="main"]');
+    activeItem.first().click();
   });
 
 
@@ -66,6 +68,12 @@ layui.define(['element', 'code', 'layer', 'form'], function (exports) {
       $('[lay-filter="api_menu_side"]').find('a[mylayui-href="'+href+'"]').parent('li').addClass('layui-this');
       // elemA.parent('li').addClass('layui-this').siblings('li').removeClass('layui-this');
     });
+  });
+
+  // 监听版本切换
+  form.on('select(api_version)', function (obj) {
+    document.location.hash = '#/' + obj.value;
+    document.location.reload();
   });
 
   exports('api', {});
