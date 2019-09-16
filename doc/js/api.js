@@ -70,6 +70,16 @@ layui.define(['element', 'code', 'layer', 'form'], function (exports) {
     });
   });
 
+  //
+  $(document).on('click', '.site-tree-mobile', function (event) {
+    layui.stope(event);
+    $('body').addClass('site-mobile');
+  }).on('click', function (event) {
+    $('body').removeClass('site-mobile');
+  });
+
+
+
   // 监听版本切换
   form.on('select(api_version)', function (obj) {
     document.location.hash = '#/' + obj.value;
