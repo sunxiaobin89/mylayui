@@ -1,0 +1,103 @@
+<h1 class="site-h1"><i class="layui-icon layui-icon-upload-circle"></i>图片/文件上传 - layui.upload</h1>
+<blockquote class="layui-elem-quote">
+  针对upload组件使用的过程遇到的问题对其进行的几处修改
+</blockquote>
+
+<fieldset class="layui-elem-field layui-field-title">
+  <legend>功能加强</legend>
+</fieldset>
+
+<div class="site-text">
+  <p>1. 让before回调具备拦截请求提交的功能。</p>
+  <pre class="layui-code" lay-title="JavaScript">
+//提交上传
+,send = function(){
+  //选择文件的回调
+  if(type === 'choose' || options.auto){
+    options.choose && options.choose(args);
+    if(type === 'choose'){
+      return;
+    }
+  }
+
+  //上传前的回调 [mod] 让before回调具备拦截文件提交请求发出的能力
+  if (options.before && options.before(args) === false) {return;}
+
+  //IE兼容处理
+  if(device.ie){
+    return device.ie > 9 ? ajaxSend() : iframeSend();
+  }
+
+  ajaxSend();
+}
+  </pre>
+  原始的before回调只是在请求提交之前可以做一些工作，但是如果在请求之前发现还不够满足条件提交，无法拦截，修改之后就可以通过在before回调中return false;来拦截。
+  <pre class="layui-code" lay-title="JavaScript">
+upload.render({
+  elem: '#upload1',
+  before: function(obj){
+    if (不满足提交的情况下) {
+      return false;
+    }
+    layer.load(); //上传loading
+  }
+});
+  </pre>
+</div>
+
+<fieldset class="layui-elem-field layui-field-title">
+  <legend>bug修复</legend>
+</fieldset>
+
+<div class="site-text">
+  <p>1. 对同一个节点多次render之后选择文件后无法触发choose也无法提交。</p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>upload支持同时render多个节点，如果elem写的不够细致，很容易会把其他不需要的节点也重新渲染一遍，另外一种情况是本意就是想要重新渲染它更新config，目前bug的现象是render一个已经render过的节点，会直接导致后面在选择文件之后无法触发choose也无法提交的情况。</p>
+    <p>关于这个bug的修复其实有两种思路： 一种是不允许重复render，就像原始的laydate一样，只要渲染过的节点后面再次渲染不会有任何影响，那么这个就会丢失通过重新render一个节点来修改config的可能性，当然layui2.5.0新增了一个upload.reload来更新节点的upload配置；另外一种思路就是找出失效的原因，个人理解upload的原意是想支持通过render重新渲染的，具体看代码的实现可知，也可以从render完毕之后再次使用可知，render进去的修改是起作用的，但是关键的问题是选中之后没有办法提交，最后锁定的问题所在是： </p>
+    <pre class="layui-code" lay-title="upload.js">
+//手动触发上传
+options.bindAction.off('upload.action').on('upload.action', function(){
+  that.upload();
+});
+
+//防止事件重复绑定
+if(options.elem.data('haveEvents')) return;
+
+that.elemFile.on('change', function(){
+  $(this).trigger('upload.change');
+});
+
+options.elem.on('click', function(){
+  if(that.isFile()) return;
+  $(this).trigger('upload.start');
+});
+    </pre>
+    elemFile在render的时候会删除然后重新构建，但是在添加事件的部分走在这块的时候，前面的"防止事件重复绑定"对于已经render过的节点就return了，导致后面新生成的节点没有change事件，进而没有进去后面的choose回调、也没有提交请求。修复如下：
+    <pre class="layui-code" lay-title="upload.js">
+//手动触发上传
+options.bindAction.off('upload.action').on('upload.action', function(){
+  that.upload();
+});
+
+// [mod] 修复upload.render如果elem找到的节点之前已经被render过，再次render之后选择文件无法触发change事件以及后续的请求提交的bug
+that.elemFile.off('change').on('change', function(){
+  $(this).trigger('upload.change');
+});
+
+//防止事件重复绑定
+if(options.elem.data('haveEvents')) return;
+
+options.elem.on('click', function(){
+  if(that.isFile()) return;
+  $(this).trigger('upload.start');
+});
+    </pre>
+  </blockquote>
+</div>
+
+<script>
+  layui.use('code', function () {
+    var code = layui.code;
+    code();
+  })
+</script>

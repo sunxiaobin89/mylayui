@@ -16,13 +16,18 @@ hr{margin: 30px 0;}
 <body>
 
 <div class="layui-upload">
-  <button type="button" class="layui-btn" id="test1">上传图片</button>
+  <button type="button" class="layui-btn" id="test1" name="123">上传图片</button>
   
   <div class="layui-upload-list">
     <img class="layui-upload-img" src="" id="demo1">
     <p id="demoText"></p>
   </div>
 </div>
+
+<div class="layui-progress layui-progress-big" lay-showPercent="yes"  lay-filter="demo">
+  <div class="layui-progress-bar" lay-percent=""></div>
+</div>
+
 
 <hr>
 
@@ -82,14 +87,15 @@ hr{margin: 30px 0;}
 
 <script src="../src/layui.js"></script>
 <script>
-layui.use('upload', function(){
+layui.use(['upload', 'element'], function(){
   var $ = layui.jquery
-  ,upload = layui.upload;
+  ,upload = layui.upload
+  ,element = layui.element;
 
   var uploadInst = upload.render({
     elem: '#test1'
-    ,url: 'http://httpbin.org/image'
-    ,size: 2000 //限制文件大小，单位 KB
+    ,url: 'http://httpbin.org/post'
+    //,size: 2000 //限制文件大小，单位 KB
     //,accept: 'file'
     ,method: 'get'
     ,fileAccept: 'image/*'
@@ -116,6 +122,7 @@ layui.use('upload', function(){
         return layer.msg('上传失败');
       }
       //上传成功
+      console.log(res);
     }
     ,error: function(){
       this.item.html('重选上传');
@@ -126,6 +133,12 @@ layui.use('upload', function(){
       demoText.find('.demo-reload').on('click', function(){
         uploadInst.upload();
       });
+      
+      element.progress('demo', '0%');
+    }
+    ,progress: function(n, index, e){
+      console.log(n + '%', index, e); //获取进度百分比
+      element.progress('demo', n + '%'); //可配合 layui 进度条元素使用
     }
   });
   
@@ -134,7 +147,7 @@ layui.use('upload', function(){
     name:'avatar'
     ,accept: 'images' //只允许上传图片
     ,acceptMime: 'image/*' //只筛选图片
-    ,size: 2
+    //,size: 2
   });
   
   upload.render({
@@ -279,6 +292,7 @@ layui.use('upload', function(){
     ,choose: function(obj){   
       var that = this;
       obj.preview(function(index, file){
+        console.log(file.name)
         obj.resetFile(index, file, '123.jpg');
       });
     }
@@ -300,7 +314,7 @@ layui.use('upload', function(){
   
   upload.render({
     elem: '#test9'
-    ,url: ''
+    ,url: 'http://httpbin.org/post'
     ,done: function(res){
       console.log(res);
     }

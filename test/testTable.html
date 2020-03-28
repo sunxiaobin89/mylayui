@@ -71,6 +71,7 @@
         <ul class="layui-tab-title">
           <li lay-id="tab_main">综合功能测试</li>
           <li lay-id="tab_complexHeader">复杂表头</li>
+          <li lay-id="tab_ranksConversion">行列转换</li>
         </ul>
         <div class="layui-tab-content">
           <div class="layui-tab-item">
@@ -93,12 +94,14 @@
             <fieldset class="layui-elem-field layui-field-title">
               <legend>复杂的复杂表头</legend>
             </fieldset>
-            <table class="layui-table" id="demo2" lay-data="{cellMinWidth: 130, height:360, limit:2, page:true}" lay-filter="demo2">
+            <table class="layui-table" id="demo2" lay-data="{cellMinWidth: 130, height:360, limit:2, page:true}"
+                   lay-filter="demo2">
               <thead>
               <tr>
                 <th lay-data="{type:'checkbox', field:'checkbox', fixed: true}" rowspan="4"></th>
                 <th lay-data="{align:'center',field:'id', fixed: true, colGroup: true, width: 70}" rowspan="4">序号</th>
-                <th lay-data="{align:'center',field:'f2', fixed: true, colGroup: true, width: 114}" rowspan="4">工程项目名称</th>
+                <th lay-data="{align:'center',field:'f2', fixed: true, colGroup: true, width: 114}" rowspan="4">工程项目名称
+                </th>
                 <th lay-data="{align:'center',field:'f3', fixed: true, colGroup: true, width: 80}" rowspan="4">工程量</th>
                 <th lay-data="{align:'center',field:'f4', fixed: true, width: 60}" rowspan="4">单位</th>
                 <th lay-data="{align:'center', fixed: true}" colspan="5" rowspan="2">自营项目价格(元)</th>
@@ -316,6 +319,9 @@
               </tr>
               </thead>
             </table>
+          </div>
+          <div class="layui-tab-item">
+            <table id="demo_ranksConversion" lay-filter="test"></table>
           </div>
         </div>
       </div>
@@ -986,6 +992,46 @@
                 f109: '憋罐',
                 f13: '其它'
               }]
+            });
+            break;
+          case 'tab_ranksConversion':
+            table.render({
+              elem: '#demo_ranksConversion',
+              reversal: true,
+              toolbar: '<div><div style="text-align: center;"><h3>公司指标</h3></div></div>',
+              defaultToolbar: [],
+              cols: [
+                [
+                  {title: '公司', field: 'dataTime', rowspan: 2},
+                  {title: '浙江', colspan: 3},
+                  {title: '山东'},
+                  {
+                    title: '国内统计', rowspan: 2, field: 't1', templet: function (d) {
+                      return d.hz + d.nb + d.wz + d.jn;
+                    }
+                  },
+                  {title: '国外', colspan: 2},
+                  {
+                    title: '国外统计', rowspan: 2, field: 't1', templet: function (d) {
+                      return d.c1 + d.c2;
+                    }
+                  },
+                  {title: '说明', rowspan: 2}
+                ],
+                [
+                  {title: '杭州', field: 'hz'},
+                  {title: '宁波', field: 'nb'},
+                  {title: '温州', field: 'wz'},
+                  {title: '济南', field: 'jn'},
+                  {title: '国家1', field: 'c1'},
+                  {title: '国家2', field: 'c2'}
+                ]
+              ],
+              data: [
+                {dataTime: '1月', hz: 1, nb: 4, wz: 7, jn: 10, c1: 1, c2: 4},
+                {dataTime: '2月', hz: 2, nb: 5, wz: 8, jn: 11, c1: 2, c2: 5},
+                {dataTime: '3月', hz: 3, nb: 6, wz: 9, jn: 12, c1: 3, c2: 6}
+              ]
             });
             break;
           default:

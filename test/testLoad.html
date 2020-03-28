@@ -42,75 +42,80 @@
 <script>
   layui.config({base: 'js/'})
     .use(['load', 'common'], function () {
-    var load = layui.load;
-    load.config({
-      echarts: {
-        path: '{/}https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min',
-        then: function () {
-          // then 回调非必须的，一般用来引入一些对应的css或者用来返回layui[modelName] = 被引入的插件的某些特殊的变量可以在then回调返回相关的值
-          return window.echarts;
-        }
-      },
-      ztree: {
-        // path: '{/}https://cdn.bootcss.com/zTree.v3/3.5.30/js/jquery.ztree.all',
-        path: 'ztree/js/jquery.ztree.all.min',
-        then: function () {
-          layui.link('js/ztree/css/zTreeStyle/zTreeStyle.css', null, 'ztree');
-          // layui.link('ztree/css/zTreeStyle/zTreeStyle.css', null, 'ztree');
-        }
-      },
-      'ztree.exhide': {
-        path: 'ztree/js/jquery.ztree.exhide.min',
-        extend: ['ztree']
-      },
-      fuzzysearch: {
-        path: 'ztree/fuzzysearch'
-      }
-    });
-
-    load('echarts', function () {
-      var echarts = layui.echarts;
-      console.log('echarts.version', echarts.version);
-      // 引入echarts之后实际会有一个全局变量echarts，后面基本echarts怎么用就怎么用，没啥分别，
-      // 如果在then回调里面返回了对应的变量给了layui.echarts了也可以使用layui.echarts去替换全局变量echarts使用，看个人喜好。
-      var chartIns = echarts.init(document.getElementById('chart1'));
-      chartIns.setOption({
-        xAxis: {
-          type: 'category',
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      var load = layui.load;
+      load.config({
+        echarts: {
+          path: '{/}https://cdn.bootcss.com/echarts/4.2.1-rc1/echarts.min',
+          then: function () {
+            debugger;
+            // then 回调非必须的，一般用来引入一些对应的css或者用来返回layui[modelName] = 被引入的插件的某些特殊的变量可以在then回调返回相关的值
+            return window.echarts;
+          }
         },
-        yAxis: {
-          type: 'value'
+        ztree: {
+          // path: '{/}https://cdn.bootcss.com/zTree.v3/3.5.30/js/jquery.ztree.all',
+          path: 'ztree/js/jquery.ztree.all.min',
+          then: function () {
+            layui.link('js/ztree/css/zTreeStyle/zTreeStyle.css', null, 'ztree');
+            // layui.link('ztree/css/zTreeStyle/zTreeStyle.css', null, 'ztree');
+          }
         },
-        series: [{
-          data: [820, 932, 901, 934, 1290, 1330, 1320],
-          type: 'line'
-        }]
+        'ztree.exhide': {
+          path: 'ztree/js/jquery.ztree.exhide.min',
+          extend: ['ztree']
+        },
+        fuzzysearch: {
+          path: 'ztree/fuzzysearch'
+        }
       });
-    });
 
-    // load(['ztree', 'ztree.exhide'], function () { // 与下面的代码等效
-    load(['ztree.exhide'], function () { // ztree.exhide依赖了ztree所以只要load进来ztree.exhide就可以用ztree的基础功能了
-      var setting = {
-          view: {
-            selectedMulti: false
-          }
-        },
-        zTreeNodes = [
-          {
-            "name": "网站导航", open: true, children: [
-              {"name": "google", "url": "http://g.cn", "target": "_blank"},
-              {"name": "baidu", "url": "http://baidu.com", "target": "_blank"},
-              {"name": "sina", "url": "http://www.sina.com.cn", "target": "_blank"}
-            ]
-          }
-        ];
-      var zTreeObj = $.fn.zTree.init($("#tree"), setting, zTreeNodes);
-      load('fuzzysearch', function () {
-        fuzzySearch('tree', '#search', null, true); //初始化模糊搜索方法
+      load('echarts', function () {
+        var echarts = layui.echarts;
+        console.log('echarts.version', echarts.version, 111);
+        // 引入echarts之后实际会有一个全局变量echarts，后面基本echarts怎么用就怎么用，没啥分别，
+        // 如果在then回调里面返回了对应的变量给了layui.echarts了也可以使用layui.echarts去替换全局变量echarts使用，看个人喜好。
+        var chartIns = echarts.init(document.getElementById('chart1'));
+        chartIns.setOption({
+          xAxis: {
+            type: 'category',
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          },
+          yAxis: {
+            type: 'value'
+          },
+          series: [{
+            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            type: 'line'
+          }]
+        });
+      });
+      load('echarts', function () {
+        var echarts = layui.echarts;
+        console.log('echarts.version', echarts.version, 222);
+      })
+
+      // load(['ztree', 'ztree.exhide'], function () { // 与下面的代码等效
+      load(['ztree.exhide'], function () { // ztree.exhide依赖了ztree所以只要load进来ztree.exhide就可以用ztree的基础功能了
+        var setting = {
+            view: {
+              selectedMulti: false
+            }
+          },
+          zTreeNodes = [
+            {
+              "name": "网站导航", open: true, children: [
+                {"name": "google", "url": "http://g.cn", "target": "_blank"},
+                {"name": "baidu", "url": "http://baidu.com", "target": "_blank"},
+                {"name": "sina", "url": "http://www.sina.com.cn", "target": "_blank"}
+              ]
+            }
+          ];
+        var zTreeObj = $.fn.zTree.init($("#tree"), setting, zTreeNodes);
+        load('fuzzysearch', function () {
+          fuzzySearch('tree', '#search', null, true); //初始化模糊搜索方法
+        })
       })
     })
-  })
 </script>
 
 </body>

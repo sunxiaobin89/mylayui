@@ -1,0 +1,46 @@
+<h1 class="site-h1">开始使用 - 入门指南</h1>
+<blockquote class="layui-elem-quote">
+  <blockquote class="layui-elem-quote">
+    layui（谐音：类UI) 是一款采用自身模块规范编写的前端 UI 框架，遵循原生 HTML/CSS/JS 的书写与组织形式，门槛极低，拿来即用。其外在极简，却又不失饱满的内在，体积轻盈，组件丰盈，从核心代码到 API
+    的每一处细节都经过精心雕琢，非常适合界面的快速开发。layui 首个版本发布于2016年金秋，她区别于那些基于 MVVM 底层的 UI
+    框架，却并非逆道而行，而是信奉返璞归真之道。准确地说，她更多是为服务端程序员量身定做，你无需涉足各种前端工具的复杂配置，只需面对浏览器本身，让一切你所需要的元素与交互，从这里信手拈来。
+  </blockquote>
+  摘自layui官网介绍
+</blockquote>
+
+<blockquote class="layui-elem-quote layui-quote-nm">
+  面向layui的使用者，加入自己使用过程中遇到的问题处理以及项目实战中沉淀下来的内容，力求功能更加丰富，更加实用易用。
+</blockquote>
+
+<fieldset class="layui-elem-field layui-field-title site-title">
+  <legend><a name="get">获得 mylayui</a></legend>
+</fieldset>
+
+<div class="site-text">
+  <p>Git 仓库下载</p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    你也可以通过 <a href="https://github.com/sunxiaobin89/mylayui" target="_blank">GitHub</a> 或 <a href="https://gitee.com/sentsin/layui" target="_blank">码云</a> 得到 layui 的完整开发包，以便于你进行二次开发，以及打包发布到生产环境上使用的版本。
+    <br><br>
+    <iframe src="//ghbtns.com/github-btn.html?user=sunxiaobin89&amp;repo=mylayui&amp;type=watch&amp;count=true&amp;size=small" allowtransparency="true" frameborder="0" scrolling="0" width="100px" height="30px"></iframe>
+    <iframe src="//ghbtns.com/github-btn.html?user=sunxiaobin89&amp;repo=mylayui&amp;type=fork&amp;count=true&amp;size=small" allowtransparency="true" frameborder="0" scrolling="0" width="100px" height="30px"></iframe>
+    <br>
+    <a href='https://gitee.com/sun_zoro/mylayui' target="_blank"><img src='https://gitee.com/sun_zoro/mylayui/badge/star.svg?theme=dark' alt='star'></img></a>
+    <a href='https://gitee.com/sun_zoro/mylayui' target="_blank" style="margin-left: 25px"><img src='https://gitee.com/sun_zoro/mylayui/badge/fork.svg?theme=dark' alt='fork'></img></a>
+  </blockquote>
+</div>
+
+<fieldset class="layui-elem-field layui-field-title site-title">
+  <legend><a name="get">关于打包发布版</a></legend>
+</fieldset>
+
+<div class="site-text">
+  为了开发更加方便，git上不直接提供dist或者release版本的文件，大家如果想要用到生产环境上希望用压缩混淆的文件的话，可以clone本项目，然后在根目录，也就是package.json所在的目录下:
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    1. $: npm install <br>
+    2. $: gulp <br>
+    3. $: gulp all <br>
+    4. $: gulp layer <br>
+  </blockquote>
+  执行npm install将需要的资源准备好，注意：如果install之后有提示说部分版本跟全局的版本有出入的时候，不用去理他，不要去fix它，不然有可能会出现打包失败的情况，gulp版本不一样了对应的命令可能就会出问题，当然如果你非常熟悉这些打包的工具，可以根据错误信息对配置文件进行修改；再执行gulp就可以打包出release的文件，执行gulp all可以打包出dist，还有可以打包出独立组件的其他的命令自行查看根目录下的gulpfile.js看下里面的配置一般就知道，举例：gulp layer就是打包独立layer的。
+</div>
+

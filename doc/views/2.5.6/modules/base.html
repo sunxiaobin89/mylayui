@@ -1,0 +1,272 @@
+<style>
+  #messageLog .layui-field-title {
+    margin: 10px 0;
+  }
+  #messageLog .layui-elem-field legend {
+    font-size: 14px;
+    text-align: center;
+  }
+</style>
+<h1 class="site-h1"> 底层方法 </h1>
+<blockquote class="layui-elem-quote">
+  底层方法往往是大家不太看重的，但是也正是这些基础的方法支撑起了layui的其他的模块组件，所以多了解一些有利无弊。
+</blockquote>
+
+<fieldset class="layui-elem-field layui-field-title">
+  <legend>layui.onevent、layui.event</legend>
+</fieldset>
+
+<div class="site-text">
+  <p>layui.onevent和layui.event这两个方法，算是layui的组件交互的核心之一，平时我们写的form.on,
+    table.on这些监听实际都是layui.onevent的封装，用户操作了对应的就是利用layui.event去触发我们设置的监听。layui的官方文档没有对这两个方法过多的介绍，所以有兴趣的可以直接看源码还有看使用到他们的地方是如何用的，基本上就能了解个大概。</p>
+  <p><b>1、onevent的时候有filter和没有filter的区别</b></p>
+  <pre class="layui-code" lay-title="JavaScript" lay-encode="true">
+table.on('tool', function(){ // 跟table.on('tool()')效果一样
+  // 这个监听所有的表格点击tbody中的lay-event节点都会触发
+  do something;
+});
+table.on('tool(test1)', function(){
+  // 这个监听只有lay-filter="test1"的表格点击tbody中的lay-event节点才会触发
+  do something;
+});</pre>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    没有写filter的事件，在触发的时候都会触发，那么我们通常可以用来处理一些共通的任务，所以之前的发过的一个帖子“<a href="https://fly.layui.com/jie/27143/" target="_blank">探索
+    layui 的 onevent 和 event</a>”里面将其命名为“母事件”，而带filter的相关监听称之为“子事件”，为了方面，下文沿用这种命名。
+  </blockquote>
+  <p><b>2、onevent同名的时候就近原则</b></p>
+  <pre class="layui-code" lay-title="JavaScript" lay-encode="true">
+table.on('tool(test1)', function(){
+  do something1;
+});
+table.on('tool(test1)', function(){
+  // 后执行的监听会覆盖之前的事件
+  do something2;
+});</pre>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    这个跟jquery的事件监听不一样，jquery多次执行的话会多次绑定，那么这个就是在开发中一个注意的点，要小心跟别人写的监听给冲突了，子事件实际还好，母事件的问题会更加严重，这个算是layui的事件一个比较不足的地方，不过从源码上可以看出来，实际设计之初也是考虑做多次绑定的支持的，不过估计是在实际应用中发现由于开发人员的认识与使用问题，导致反而出很多问题，所以才干脆简单处理，直接覆盖，避免更多的麻烦，但是个人认为，多次绑定事件这个在某些场合下是有必要的，后面会再次介绍这个。
+  </blockquote>
+  <p><b>3、event触发的时候母事件和子事件的触发的顺序是什么</b></p>
+  <p>
+    既然称之为母事件子事件，那么实际在一些场景中是希望母事件也就是没有带filter的事件先触发的，然后再是子事件，那么原始的layui的事件实际是没办法确保这件事的，因为它在触发的时候是去遍历已经添加的一个事件集合，它是一个对象，对象的遍历顺序就无法保证了，这个不是说谁先绑定就先触发谁。</p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    至此，关于event的第一个修改出现了，就是将他们的调用有序化，如果触发事件的时候发现有母事件以及子事件，那么母事件会先触发。
+  </blockquote>
+  <p><b>4、关于事件的返回</b></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    关于event的第二个修改，就是让它可以自由的返回数据，原先顶多能返回false，修改之后可以返回任意需要的，而且对return false赋予更多的意义，体现在存在母事件以及子事件的时候，如果母事件返回了false，将不继续调用子事件，这个在某些场景下是比较有用的，如果用不着也没什么影响，主要就是注意一点：母事件不要随意return false。
+  </blockquote>
+  <p><b>5、关于事件的多次绑定</b></p>
+  <p>类似jquery的事件绑定，实际开发中针对同一个节点有多个相同类型的事件（change、click之类的）各自处理业务需求，这些是很常见的，那么layui的event实际也会遇到这种需求。</p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>举个例子：同事甲写了table.on('toolbar', callback)处理通用的工具栏中的一些功能，比如新增功能，同事乙也想要处理一些通用的功能，比如查询，也是想用table.on('toolbar', callback)去处理，那么目前的设定来说就会出问题了，会出现相互争抢事件的情况，只要table.on('toolbar')一执行，之前其他人定义的就被覆盖了。如果是同事之间其实还好，沟通一下合并一下，然后把代码放在一个公用的js里面，但是如果是一些第三方插件什么利用了这个去做一些处理，然后我们的功能代码里面也需要用到这些事件，那么问题就比较明显了，如果不熟悉他的内部实现逻辑，有可能就把它的事件给覆盖掉了，导致功能异常且不容易排查，所以个人认为事件的多次绑定还是有必要支持的。</p>
+    <p>从layui源码上可以看出来，本来就是考虑且已经做了多事件支持的，不过后面估计是因为开发人员使用的时候状况频出才给掐掉的，所以要实现多事件实际很简单，将其一行注释解开就完事了。</p>
+    <img src="res/layui.event.png" width="100%">
+    <p>但是如何减少上面提到的“负面状况”这个才是关键。一般来说也不是所有的事件都需要多次绑定，比如带filter的，也就是子事件，一般来说都是专事专办，这种情况下是基本比较少出现说多人会写多次监听的，除非开发人员的习惯，比如filter都叫demo，test啥的，这些很“demo”的命名方式请停留在测试的时候，如果开发中也都是这么叫，特别是单页面系统多人开发中的话，那么这个锅组件是不背的。一般来说母事件才比较有需要多监听的需求，就像上面举的toolbar的例子。</p>
+    <pre class="layui-code" lay-title="layui.js" lay-encode="true">
+//对无filter做多事件支持
+(filterName === '' && config.event[eventName][filterName]) ? config.event[eventName][filterName].push(fn) :
+config.event[eventName][filterName] = [fn];
+    </pre>
+    <pre class="layui-code" lay-title="JavaScript" lay-encode="true">
+//同事甲完成
+table.on('toolbar()', function(obj){
+  switch(obj.event){
+    case 'add':
+      layer.msg('添加');
+    break;
+    case 'delete':
+      layer.msg('删除');
+    break;
+    case 'update':
+      layer.msg('编辑');
+    break;
+  };
+});
+
+//同事乙完成
+table.on('toolbar()', function(obj){
+  switch(obj.event){
+    case 'query':
+      layer.msg('查询');
+    break;
+  };
+});</pre>
+  </blockquote>
+
+  <p><b>6、关于事件的移除</b></p>
+  <p>有绑定自然也有需要移除的时候，新增layui.offevent</p>
+  <pre class="layui-code" lay-title="JavaScript" lay-encode="true">
+layui.offevent("message", "send({*})"); // 移除所有message.send的相关事件
+layui.offevent("message", "send");      // 移除所有message.send的母事件
+layui.offevent("message", "send", fn);  // 移除layui.onevent("message", "send", fn)事件，不会影响其他同类母事件
+layui.offevent("message", "send(A)");   // 移除layui.onevent("message", "send(A)", fn)</pre>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    关于{*}这个filter，他是一个特殊的filter，开发中不要使用它，实际他是用来触发所有相同的modName中所有同类的events,也就是会触发同类的所有母事件以及子事件，以layui.event('message', 'send({*})', data);为例:
+    <pre class="layui-code" lay-title="JavaScript" lay-encode="true">
+layui.onevent("message", "send", fn);       // 会触发
+layui.onevent("message", "send()", fn);     // 会触发
+layui.onevent("message", "send(A)", fn);    // 会触发
+layui.onevent("message", "send(B)", fn);    // 会触发
+layui.onevent("message", "send(C)", fn);    // 会触发
+layui.onevent("message", "send(D)", fn);    // 会触发
+layui.onevent("message", "send(...)", fn);  // 会触发</pre>
+    <p>有这种需求的场景是比较少的，但是也不是没有，所以如果不是真的需要这种效果就不要以{*}为filter；所以沿用这种规则，offevent的时候也可以支持{*}来解除所有的同类的onevent；另外一个就是比较好理解的待filter的事件，解除的话实际直接delete掉即可；复杂一点的就是新增了多事件绑定的母事件的移除，这个时候加上对应的第三个参数，表示要移除特定的监听，如果没有带就是移除所有的同类母事件，这一点上跟jquery的off是一样的效果，所以只要熟悉jquery基本上是很好理解的。</p>
+  </blockquote>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    那么这个layui.offevent，form.on、table.on的事件呢？实际上面也提到了，他们都是layui.onevent加上一层糖衣，那么移除的方法也就是依葫芦画瓢。以form.on为例
+    <pre class="layui-code" lay-title="form.js" lay-encode="true">
+//表单事件监听
+Form.prototype.on = function(events, callback){
+  return layui.onevent.call(this, MOD_NAME, events, callback);
+};
+
+//移除表单事件监听
+Form.prototype.off = function(events, callback){
+  return layui.offevent.call(this, MOD_NAME, events, callback);
+};</pre>
+    <pre class="layui-code" lay-title="JavaScript" lay-encode="true">
+form.on('switch(switchLog)', function (obj) {
+  alert((this.checked ? '打开': '关闭') + '了开关');
+});
+// 移除前面添加的事件测试
+form.off('switch(switchLog)');</pre>
+  </blockquote>
+</div>
+<fieldset class="layui-elem-field">
+  <legend>关于layui的onevent、offevent和event的测试例子</legend>
+  <div class="layui-field-box">
+    <div style="margin: 10px;">
+      <div class="layui-inline">
+        <label class="layui-form-label">小明:</label>
+        <div class="layui-input-inline">
+          <input name="phone" autocomplete="off" class="layui-input" style="width: 240px;">
+        </div>
+      </div>
+      <button class="layui-btn" message-event="sendMessageA">发送</button>
+    </div>
+    <div style="margin: 10px;">
+      <div class="layui-inline">
+        <label class="layui-form-label">小红:</label>
+        <div class="layui-input-inline">
+          <input name="phone" autocomplete="off" class="layui-input" style="width: 240px;">
+        </div>
+      </div>
+      <button class="layui-btn" message-event="sendMessageB">发送</button>
+    </div>
+    <div style="margin: 10px;">
+      <div class="layui-inline">
+        <label class="layui-form-label">系统时间</label>
+        <button class="layui-btn" lay-data="{align: 'center'}" message-event="sendMessageS">发送</button>
+      </div>
+    </div>
+    <div id="messageView" style="width: 480px; height: 300px;border: 1px solid #1E9FFF;margin-left: 120px;padding: 10px;overflow: auto;"></div>
+    <div class="layui-form" style="margin: 10px;">
+      <div class="layui-inline">
+        <label class="layui-form-label">是否记日志</label>
+        <div class="layui-input-inline">
+          <input type="checkbox" lay-skin="switch" lay-filter="switchLog" message-event="switchLog" checked>
+        </div>
+      </div>
+    </div>
+    <div id="messageLog" style="width: 480px; height: 200px;margin-left: 120px;padding: 10px;overflow: auto;background-color: #2b2b2b;color: #A9B7C6;"></div>
+  </div>
+</fieldset>
+
+<script>
+  layui.use(['code', 'util', 'form'], function () {
+    var code = layui.code;
+    var util = layui.util;
+    var form = layui.form;
+    form.render();
+    var $ = layui.$;
+    code();
+
+    util.event('message-event', {
+      sendMessageA: function () {
+        // alert('触发了事件1');
+        layui.event("message", "send(A)", {
+          align: 'left',
+          user: '小明',
+          to: '小红',
+          msg: $(this).prev().find('input').val()
+        });
+        $(this).prev().find('input').val('');
+      },
+      sendMessageB: function () {
+        layui.event("message", "send(B)", {
+          align: 'right',
+          user: '小红',
+          to: '小明',
+          msg: $(this).prev().find('input').val()
+        });
+        $(this).prev().find('input').val('');
+      },
+      sendMessageS: function () {
+        layui.event("message", "send", {
+          align: 'center'
+        });
+      }
+    });
+
+    // 母事件，所有message.send(*)都会触发这个
+    layui.onevent("message", "send", function (params) {
+      var divElem = $('#messageView');
+      divElem.append('<div style="text-align: ' + (params.align || 'center') + ';">' + util.toDateString(null, 'yyyy-MM-dd HH:mm:ss') + '</div>');
+      var timer = setTimeout(function () {
+        if (timer) {
+          clearTimeout(timer);
+        }
+        divElem.scrollTop(divElem[0].scrollHeight)
+      }, 50);
+      // return false; // 母事件返回false的话会导致排在后面的其他母事件以及相关的子事件不被调用，所以要慎用
+    });
+
+    // 子事件A
+    layui.onevent("message", "send(A)", function (params) {
+      var divElem = $('#messageView');
+      divElem.append('<div style="margin: 6px 0;text-align: left;">' + (params.msg || '<span style="color: #1E9FFF">没有输入,只是想你了一下</span>') + '</div>')
+    });
+
+    // 子事件B
+    layui.onevent("message", "send(B)", function (params) {
+      var divElem = $('#messageView');
+      divElem.append('<div style="margin: 6px 0;text-align: right;color: pink;">' + (params.msg || '<span style="color: #1E9FFF">没有输入,只是想你了一下</span>') + '</div>')
+    });
+
+    // 消息日志
+    var messageLog = function(params) {
+      var logMeg = [
+        '$:',
+        params.to ? (params.user + ' 给 ' + params.to + ' 发送了一条新消息') : '系统信息',
+        '<span style="float: right;">',
+        util.toDateString(),
+        '</span>'
+      ];
+      $('#messageLog').append('<p>'+logMeg.join('')+'</p>').scrollTop($('#messageLog').get(0).scrollHeight);
+    };
+
+    util.event('message-event', {
+      switchLog: function () {
+        // 监听是否记日志变化，新增或者解除信息日志的事件监听
+        $('#messageLog').append('<fieldset class="layui-elem-field layui-field-title">\n' +
+          '  <legend>'+ (this.checked ? '开始': '停止') + '记录日志</legend>\n' +
+          '</fieldset>').scrollTop($('#messageLog').get(0).scrollHeight);
+        layui[this.checked ? 'onevent': 'offevent']("message", "send", messageLog);
+      }
+    }, 'change');
+
+    // 初始化触发记日志的事件
+    $('input:checkbox[lay-filter="switchLog"]').trigger('change');
+
+    // layui.offevent("message", "send"); // 取消所有的母事件
+    // layui.offevent("message", "send({*})"); // 取消所有message.send的相关事件
+
+    form.on('switch(switchLog)', function (obj) {
+      alert((this.checked ? '打开': '关闭') + '了开关');
+    });
+    // 移除前面添加的事件测试
+    form.off('switch(switchLog)');
+
+  })
+</script>
+

@@ -219,7 +219,7 @@ layui.use(['form', 'layedit', 'laydate'], function(){
   });
   
   //初始赋值
-  form.val('first', {
+  var thisValue = form.val('first', {
     'title': '测试'
     ,'phone': 11111111111
     ,'email': 'xu@sentsin.com'
@@ -232,6 +232,7 @@ layui.use(['form', 'layedit', 'laydate'], function(){
     ,'desc': 'form 是我们非常看重的一块'
     ,xxxxxxxxx: 123
   });
+  console.log(thisValue);
 
   
   //事件监听
@@ -272,41 +273,24 @@ layui.use(['form', 'layedit', 'laydate'], function(){
 
 </script>
 
-
-<form id="test">
+<form id="test1" action="" target="_blank">
   <input type="radio" value="girl" disabled>
   <input type="checkbox" name="love[a]">
   <input type="checkbox" name="love[b]">
   <input value="1">
+  <input name="as">
+  <input name="=" value="2">
   <select name="quiz">
     <option value="">请选择问题</option>
     <option disabled value="你工作的第一个城市">你工作的第一个城市</option>
     <option value="你的工号">你的工号</option>
     <option value="你最喜欢的老师">你最喜欢的老师</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
     <option value="你的工号" selected>你的工号</option>
     <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
-    <option value="你的工号">你的工号</option>
   </select>
-  <button>Go</button>
+  <button type="submit">原始表单，测试提交</button>
 </form>
+
 <script>
 layui.use('jquery', function(){
   var $ = layui.jquery;
@@ -316,8 +300,9 @@ layui.use('jquery', function(){
   $('#test').on('submit', function(){
      return false
   });
-  $('#test').on('submit', function(){
-     return true
+  $('#test1').on('submit', function(obj){
+    //console.log(obj.field)
+     //return false;
   });
 });
 </script>

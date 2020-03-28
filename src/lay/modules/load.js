@@ -8,7 +8,7 @@
 layui.define(['jquery'], function (exports) {
   "use strict";
   var modelName = 'load';
-  var version = '0.0.2';
+  var version = '0.1.0';
   // 适配一些常见的需要依赖jquery的第三方库
   window.$ = window.jQuery = window.jQuery || layui.$;
 
@@ -22,10 +22,10 @@ layui.define(['jquery'], function (exports) {
   };
   config.option = {};
 
-  // 根据配置信息做一些准备工作，主要完成模块的layui.extend和layui.define
+  // 根据配置信息做一些准备工作，主要完成模块的layui.extend
   var ready = function (modelOne) {
     var option = config.option[modelOne];
-    if (option && !layui.cache.status[modelOne]) {
+    if (option && !layui.modules[modelOne]) {
       option.extend = option.extend ? (option.extend.constructor === Array ? option.extend : [option.extend]) : [];
       layui.each(option.extend, function (index) {
         ready(option.extend[index]);
@@ -37,29 +37,6 @@ layui.define(['jquery'], function (exports) {
         // 设置路径
         layui.extend(extend);
       }
-      // 添加为非异步加载
-      // layui.cache.notAsync[modelOne] = true;
-
-      // 定义成layui的模块 [mod] 换了一种实现的方式，不再define里面设置依赖，而是将组件的信息解析成一个use队列
-      // layui.define(option.extend || [], function (exports) {
-      layui.define(function (exports) {
-        exports(modelOne, {});
-      });
-    }
-  };
-
-  var then = function (modelOne) {
-    var option = config.option[modelOne];
-
-    if (option && !option.ready) {
-      // layui.each(option.extend, function (index) {
-      //   then(option.extend[index]);
-      // });
-
-      // 可以在then回调中返回layui[modelName] 对应的值
-      layui[modelOne] = typeof option.then === 'function' ? option.then() : layui[modelOne];
-
-      option.ready = true;
     }
   };
 
@@ -95,16 +72,30 @@ layui.define(['jquery'], function (exports) {
 
     // 初始化use
     var listTemp = uniArr(getModelList(name));
-    // console.log('user list:', listTemp);
     layui.use(listTemp, function () {
       var that = this;
-      layui.each(listTemp, function (index, modelOne) {
-        // 执行then回调
-        then(modelOne);
-      });
-
       typeof done === 'function' && done.call(that);
     });
+
+    var listTempClone = $.extend([], listTemp);
+    var timer = setInterval(function () {
+      if (!listTempClone.length) {
+        clearInterval(timer);
+      } else {
+        var modeOne = listTempClone[0];
+
+        if (layui.cache.status[modeOne]) { // define过
+          listTempClone.splice(0, 1);
+        } else if (layui.cache.scriptLoaded[modeOne]) { // 未define过但是已经加载完毕
+          var options = config.option[modeOne];
+          if (options) {
+            layui.define(function (exports) {
+              exports(modeOne, typeof options.then === 'function' ? options.then() : null)
+            });
+          }
+        }
+      }
+    }, 4);
 
     return layui;
   };

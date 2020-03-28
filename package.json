@@ -1,9 +1,9 @@
 {
   "name": "layui-src",
   "realname": "layui",
-  "version": "2.5.4",
+  "version": "2.5.6",
   "independents": {
-    "layim": "3.9.0"
+    "layim": "3.9.1"
   },
   "description": "Classic modular front-end component library",
   "main": "dist/layui.js",
@@ -16,11 +16,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/sunxiaobin89/mylayui.git"
+    "url": "git+ssh://git@github.com/sentsin/layui.git"
   },
   "author": [
-    "sentsin <xu@sentsin.com>",
-    "sunxiaobin <>"
+    "sentsin <xu@sentsin.com>"
   ],
   "homepage": "https://www.layui.com",
   "devDependencies": {
@@ -48,19 +47,16 @@
     "sinon-chai": "^2.13.0"
   },
   "bugs": {
-    "url": "https://github.com/sunxiaobin89/mylayui/issues"
+    "url": "https://github.com/sentsin/layui/issues"
   },
   "directories": {
     "doc": "doc",
     "example": "examples",
     "test": "test"
   },
-  "dependencies": {
-    "npm": "^6.4.1"
-  },
+  "dependencies": {},
   "keywords": [
     "layui",
-    "mylayui",
     "ui",
     "JavaScript Framework",
     "toolkit",
