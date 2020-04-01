@@ -30,7 +30,7 @@ var argv = require('minimist')(process.argv.slice(2), {
 ]
 
 //模块
-,mods = 'laytpl,laypage,laydate,jquery,layer,element,upload,slider,colorpicker,form,tree,transfer,table,carousel,rate,util,flow,layedit,code,load'
+,mods = 'laytpl,laypage,laydate,jquery,layer,element,upload,slider,colorpicker,form,tree,transfer,table,carousel,rate,util,flow,layedit,code,load,optimizeSelectOption,tablePlug'
 
 //发行版本目录
 ,releaseDir = './release/zip/layui-v' + pkg.version
