@@ -15,7 +15,7 @@ layui.define(['table'], function (exports) {
   // var filePath = pathTemp.substr(0, pathTemp.lastIndexOf('/'));
   var filePath = pathTemp.substr(0, pathTemp.lastIndexOf('/'));
   // 引入tablePlug.css
-  layui.addcss( 'modules/ex/tablePlug.css?v' + version);
+  layui.addcss('modules/ex/tablePlug.css?v' + version);
   // 引入图标文件
   // layui.link(filePath + '/icon/iconfont.css?v' + version);
 
@@ -30,28 +30,10 @@ layui.define(['table'], function (exports) {
   var tableCheck = table.check;
   var getIns = table.getIns;
 
-
-  // 异步地将独立功能《优化layui的select的选项设置》引入
-  // layui.extend({optimizeSelectOption: '{/}' + filePath + '/optimizeSelectOption/optimizeSelectOption'}).use('optimizeSelectOption');
-
-  var layuiVersion = '2.5.4' // 基于2.5.4开发的
-    // 检测是否满足智能重载的条件 检测是否修改了源码将构造出还有thisTable透漏出来
-    // , checkSmartReloadCodition = (function () {
-    //   if (layui.device().ie && parseInt(layui.device().ie) < 9) {
-    //     console.warn('tablePlug插件暂时不支持ie9以下的ie浏览器，如果需要支持可自行调试，一般就是一些数组的方法ie8没有还有一个重要的就是window.parent这些支持不好，在getPosition的时候会死循环，如果有这方面相关的经验有处理方法请分享给俺，谢谢。')
-    //   }
-    //   if (table.Class) {
-    //     // console.info('欢迎使用tablePlug插件，使用过程中有任何问题或者有什么建议都可以到码云上新建issues', 'https://gitee.com/sun_zoro/layuiTablePlug');
-    //     return true;
-    //   } else {
-    //     console.error('如果要使用该插件（tablePlug），参照readme.md的说明修改layui的table模块的代码，目前该组件是基于layui-V' + layuiVersion, 'https://gitee.com/sun_zoro/layuiTablePlug');
-    //     return false;
-    //   }
-    // })()
-    , tablePlug = {
+  var
+    tablePlug = {
       version: version // tablePlug的版本后面提交的时候会更新也好知道使用的是不是同一个版本
     }
-    , tableSpacialColType = ['numbers', 'checkbox', 'radio'] // 表格的特殊类型字段
     , LayuiTableColFilter = [
       '<span class="layui-table-filter layui-inline">',
       '<span class="layui-tablePlug-icon layui-tablePlug-icon-filter"></span>',
@@ -62,7 +44,7 @@ layui.define(['table'], function (exports) {
       // 判断一个变量是不是数组
       return Object.prototype.toString.call(obj) === '[object Array]';
     }
-    , ELEM_CLICK = 'layui-table-click'
+    , ELEM_CLICK = 'layui-table-click';
 
 
   // 对table的全局config进行深拷贝继承
@@ -111,48 +93,24 @@ layui.define(['table'], function (exports) {
     };
   }
 
-  /* 2.5.4已经换成一个会动的加载图标了，所以这个逻辑可以去掉 目前它的位置是在body表格中间的还可以接受暂时不处理 */
-  // 修改原始table的loading的逻辑
-  // var loading = table.Class.prototype.loading;
-  // table.Class.prototype.loading = function (hide) {
-  //   var that = this;
-  //   loading.call(that, hide);
-  //   if (!hide && that.layInit) {
-  //     that.layInit.remove();
-  //     // 添加一个动画
-  //     that.layInit.addClass('layui-anim layui-anim-rotate layui-anim-loop');
-  //     if (!that.layMain.height()) {
-  //       // 如果当前没有内容，添加一个空的div让它有显示的地方
-  //       that.layBox.append($('<div class="' + LOADING + '" style="height: 56px;"></div>'));
-  //     }
-  //     var offsetHeight = 0;
-  //     if (that.layMain.height() - that.layMain.prop('clientHeight') > 0) {
-  //       // 如果出现滚动条，要减去滚动条的宽度
-  //       offsetHeight = that.getScrollWidth();
-  //     }
-  //     var thHeightTemp = that.elem.hasClass('vertical') ? 0 : that.layHeader.height();
-  //     that.layInit.height(that.layBox.height() - thHeightTemp - offsetHeight).css('marginTop', thHeightTemp + 'px');
-  //     that.layBox.append(that.layInit);
-  //   }
-  // };
-
   // 目前新增了一个errorView处理异常或者没有数据的时候的显示问题，对应的initTable中的一些逻辑是否还有必要待定 todo
   // 初始化表格的内容
-  table.Class.prototype.initTable = function () {
-    var that = this;
-    var options = that.config;
-
-    that.layFixed.find('tbody').html('');
-    that.layFixed.addClass(HIDE);
-    that.layTotal.addClass(HIDE);
-    that.layPage.addClass(HIDE);
-
-    that.layMain.find('tbody').html('');
-    that.layMain.find('.' + NONE).remove();
-
-    that.layHeader.find('input[name="layTableCheckbox"]').prop('checked', false);
-    that.renderForm('checkbox');
-  };
+  // table.Class.prototype.initTable = function () {
+  //   debugger;
+  //   var that = this;
+  //   var options = that.config;
+  //
+  //   that.layFixed.find('tbody').html('');
+  //   that.layFixed.addClass(HIDE);
+  //   that.layTotal.addClass(HIDE);
+  //   that.layPage.addClass(HIDE);
+  //
+  //   that.layMain.find('tbody').html('');
+  //   that.layMain.find('.' + NONE).remove();
+  //
+  //   that.layHeader.find('input[name="layTableCheckbox"]').prop('checked', false);
+  //   that.renderForm('checkbox');
+  // };
 
   $(window).resize(function () {
     layer.close(filterLayerIndex);
@@ -276,107 +234,46 @@ layui.define(['table'], function (exports) {
     }, that.config.cols);
   };
 
-  // 调整表格实例resize的逻辑如果表格是反转了需要重新更新一下反转的效果
-  // var tableResize = table.Class.prototype.resize;
-  // if (!tableResize.modifiedByTablePlug) {
-  //   table.Class.prototype.resize = function () {
-  //     var that = this;
-  //     var ret = tableResize.call(that);
-  //     that.config.reversal === true && that.reverse();
-  //     return ret;
+
+  // 让被美化的复选框支持原始节点的change事件 // 已经让form.js实现了这个功能
+  // form.on('checkbox', function (data) {
+  //   $(data.elem).change();
+  // });
+
+  // 表格筛选列的状态记录的封装 已在table.js里面实现
+  // var colFilterRecord = (function () {
+  //   var recodeStoreName = 'tablePlug_col_filter_record';
+  //   var getStoreType = function (recordType) {
+  //     return recordType === 'local' ? 'data' : 'sessionData';
   //   };
-  //   table.Class.prototype.resize.modifiedByTablePlug = true;
-  // }
-
-  // // 监听所有的表格中的type:'checkbox'注意不要在自己的代码里面也写这个同名的监听，不然会被覆盖，
-  // table.on('checkbox', function (obj) {
-  //
-  //   var tableView = $(this).closest('.layui-table-view');
-  //   // lay-id是2.4.4版本新增的绑定到节点上的当前table实例的id,经过plug的改造render将旧版本把这个id也绑定到视图的div上了。
-  //   var tableId = tableView.attr('lay-id');
-  //   var config = getConfig(tableId);
-  //   if (tableCheck.check(tableId)) {
-  //     var _checked = obj.checked;
-  //     var _data = obj.data;
-  //     var _type = obj.type;
-  //
-  //     var primaryKey = getPrimaryKey(config);
-  //
-  //     if (_type === 'one') {
-  //       updateCheckStatus(tableId, _data[primaryKey], _checked);
-  //     } else if (_type === 'all') {
-  //       // 全选或者取消全不选
-  //       var renderFlag = false;
-  //       layui.each(layui.table.cache[tableId], function (index, data) {
-  //         var disableFlag = updateCheckStatus(tableId, data[primaryKey], _checked);
-  //         if (disableFlag === false) {
-  //           renderFlag = true;
-  //           // 因为原始的table操作了不可选的复选框需要纠正一下状态
-  //           var checkedTemp = tableCheck.getChecked(tableId).indexOf(data[primaryKey]) !== -1;
-  //           tableView.find('.layui-table-body')
-  //             .find('tr[data-index="' + index + '"]')
-  //             .find('input[name="layTableCheckbox"]').prop('checked', checkedTemp);
-  //           data[table.config.checkName] = checkedTemp;
-  //         }
+  //   return {
+  //     // 记录
+  //     set: function (tableId, key, checked, recordType) {
+  //       if (!tableId || !key) {
+  //         return;
+  //       }
+  //       // 默认用sessionStore
+  //       var storeType = getStoreType(recordType);
+  //       var dataTemp = this.get(tableId, recordType);
+  //       dataTemp[key] = !checked;
+  //       layui[storeType](recodeStoreName, {
+  //         key: tableId,
+  //         value: dataTemp
+  //       })
+  //     },
+  //     get: function (tableId, recordType) {
+  //       return layui[getStoreType(recordType)](recodeStoreName)[tableId] || {};
+  //     },
+  //     clear: function (tableId) {
+  //       $.each(['data', 'sessionData'], function (index, type) {
+  //         layui[type](recodeStoreName, {
+  //           key: tableId,
+  //           remove: true
+  //         });
   //       });
-  //       // renderFlag && getIns(tableId).renderForm('checkbox');
-  //       renderFlag && form.render('checkbox', tableView.attr('lay-filter'));
   //     }
-  //   }
-  // });
-
-  // // 单选状态记忆
-  // table.on('radio()', function (obj) {
-  //   var tableView = obj.tr.closest('.layui-table-view');
-  //   var tableId = tableView.attr('lay-id');
-  //   var config = getConfig(tableId);
-  //   if (tableCheck.check(tableId)) {
-  //     var _checked = obj.checked;
-  //     var _data = obj.data;
-  //     var primaryKey = getPrimaryKey(config);
-  //     updateCheckStatus(tableId, _data[primaryKey], _checked, true);
-  //   }
-  // });
-
-  // 让被美化的复选框支持原始节点的change事件
-  form.on('checkbox', function (data) {
-    $(data.elem).change();
-  });
-
-  // 表格筛选列的状态记录的封装
-  var colFilterRecord = (function () {
-    var recodeStoreName = 'tablePlug_col_filter_record';
-    var getStoreType = function (recordType) {
-      return recordType === 'local' ? 'data' : 'sessionData';
-    };
-    return {
-      // 记录
-      set: function (tableId, key, checked, recordType) {
-        if (!tableId || !key) {
-          return;
-        }
-        // 默认用sessionStore
-        var storeType = getStoreType(recordType);
-        var dataTemp = this.get(tableId, recordType);
-        dataTemp[key] = !checked;
-        layui[storeType](recodeStoreName, {
-          key: tableId,
-          value: dataTemp
-        })
-      },
-      get: function (tableId, recordType) {
-        return layui[getStoreType(recordType)](recodeStoreName)[tableId] || {};
-      },
-      clear: function (tableId) {
-        $.each(['data', 'sessionData'], function (index, type) {
-          layui[type](recodeStoreName, {
-            key: tableId,
-            remove: true
-          });
-        });
-      }
-    };
-  })();
+  //   };
+  // })();
 
   // // 监听表格筛选的点
   // $(document).on('change', 'input[lay-filter="LAY_TABLE_TOOL_COLS"]', function (event) {
@@ -393,28 +290,6 @@ layui.define(['table'], function (exports) {
   //     colFilterRecord.clear(tableId)
   //   }
   // });
-
-  // // 缓存当前操作的是哪个表格的哪个tr的哪个td
-  // $(document).off('mousedown', '.layui-table-grid-down')
-  //   .on('mousedown', '.layui-table-grid-down', function (event) {
-  //     // 记录操作的td的jquery对象
-  //     table._tableTdCurr = $(this).closest('td');
-  //   });
-
-  // // 给弹出的详情里面的按钮添加监听级联的触发原始table的按钮的点击事件
-  // $(document).off('click', '.layui-table-tips-main [lay-event]')
-  //   .on('click', '.layui-table-tips-main [lay-event]', function (event) {
-  //     var elem = $(this);
-  //     var tableTrCurr = table._tableTdCurr;
-  //     if (!tableTrCurr) {
-  //       return;
-  //     }
-  //     var layerIndex = elem.closest('.layui-table-tips').attr('times');
-  //     // 关闭当前的这个显示更多的tip
-  //     layer.close(layerIndex);
-  //     // 找到记录的当前操作的那个按钮
-  //     table._tableTdCurr.find('[lay-event="' + elem.attr('lay-event') + '"]').first().click();
-  //   });
 
   /*// 监听统一的toolbar一般用来处理通用的 todo 后续将逻辑转义到table.js里面去做
   table.on('toolbar()', function (obj) {
@@ -644,6 +519,7 @@ layui.define(['table'], function (exports) {
           if (!isArray(data)) {
             data = [data];
           }
+          data = $.extend(true, [], data);
           var primaryKey = table.getPrimaryKey(options);
           layui.each(data, function (index, _data) {
             if (primaryKey) {
@@ -654,7 +530,7 @@ layui.define(['table'], function (exports) {
                 _data[primaryKey] = 'idTemp_' + new Date().getTime() + '_' + Math.round(Math.random() * 1000000)
               }
             }
-            options.data.push(_data)
+            options.data.push(_data);
           });
           table.reload(tableId);
         }
@@ -680,12 +556,13 @@ layui.define(['table'], function (exports) {
       var options = tableObj.config;
       var optionsTemp = {};
       var countTemp = tableObj.count || (options.page ? options.page.count : options.data.length);
-      var primaryKey = getPrimaryKey(options);
+      var primaryKey = table.getPrimaryKey(options);
       if (options.url) {
         if (options.page) {
           if (isArray(data)) {
             countTemp -= data.length;
           } else {
+            data = [data];
             countTemp -= 1;
           }
           optionsTemp.page = {};
@@ -764,7 +641,7 @@ layui.define(['table'], function (exports) {
     // , CHECK_TYPE_REMOVED: CHECK_TYPE_REMOVED
     // , CHECK_TYPE_ORIGINAL: CHECK_TYPE_ORIGINAL
     tableCheck: tableCheck
-    , colFilterRecord: colFilterRecord  // 表格字段筛选记忆功能的封装
+    // , colFilterRecord: colFilterRecord  // 表格字段筛选记忆功能的封装
     , getConfig: table.getConfig  // 表格复选列的方法封装
     // , getIns: function (tableId) { // 获得某个表格render返回的实例的封装
     //   // return tableIns[tableId]; // todo

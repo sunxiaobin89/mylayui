@@ -5,7 +5,7 @@
   <meta name="viewport"
         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
   <title>table功能测试(mylayui)</title>
-  <link rel="stylesheet" href="../src/css/layui.css" media="all">
+  <link rel="stylesheet" href="../src/css/layui.css?v=123" media="all">
   <link rel="stylesheet" href="js/formSelects/formSelects-v4.css" media="all">
   <!--  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">-->
   <!--  <script src="//code.jquery.com/jquery-1.12.4.js"></script>-->
@@ -94,14 +94,12 @@
             <fieldset class="layui-elem-field layui-field-title">
               <legend>复杂的复杂表头</legend>
             </fieldset>
-            <table class="layui-table" id="demo2" lay-data="{cellMinWidth: 130, height:360, limit:2, page:true}"
-                   lay-filter="demo2">
+            <table class="layui-table" id="demo2" lay-data="{cellMinWidth: 130, height:360, limit:2, page:true}" lay-filter="demo2">
               <thead>
               <tr>
                 <th lay-data="{type:'checkbox', field:'checkbox', fixed: true}" rowspan="4"></th>
                 <th lay-data="{align:'center',field:'id', fixed: true, colGroup: true, width: 70}" rowspan="4">序号</th>
-                <th lay-data="{align:'center',field:'f2', fixed: true, colGroup: true, width: 114}" rowspan="4">工程项目名称
-                </th>
+                <th lay-data="{align:'center',field:'f2', fixed: true, colGroup: true, width: 114}" rowspan="4">工程项目名称</th>
                 <th lay-data="{align:'center',field:'f3', fixed: true, colGroup: true, width: 80}" rowspan="4">工程量</th>
                 <th lay-data="{align:'center',field:'f4', fixed: true, width: 60}" rowspan="4">单位</th>
                 <th lay-data="{align:'center', fixed: true}" colspan="5" rowspan="2">自营项目价格(元)</th>
@@ -551,7 +549,7 @@
               , height: 720
               , size: 'lg'
               , url: 'json/data11.json' //数据接口
-              // , data: [{}]
+              // , data: []
               , title: '用户表'
               , even: true
               , page: {} //开启分页
