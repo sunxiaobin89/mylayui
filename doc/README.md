@@ -3,4 +3,4 @@
 * 除IE6、7外，所有浏览器均支持
 
 # 在线文档
-[http://www.layui.com/doc/](http://www.layui.com/doc/)
+[https://gitee.com/layui](https://gitee.com/layui)

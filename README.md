@@ -9,13 +9,13 @@
 <script src="mylayui/layui.js"></script>
 ```
 
-通过script引入到项目中，剩下的基本使用方式跟layui的基本无异，所以mylayui是面向layui的使用人员，或者刚接触layui对其有兴趣的开发人员。所以要熟悉layui才能用好这个mylayui，[文档](https://sun_zoro.gitee.io/mylayui/doc/api.html)
+通过script引入到项目中，剩下的基本使用方式跟layui的基本无异，所以mylayui是面向layui的使用人员，或者刚接触layui对其有兴趣的开发人员。所以要熟悉layui才能用好这个mylayui，[文档](https://sunxiaobin89.github.io/mylayui/doc/api.html)
 也在积极的开发中，都是一个人手动码，加上语言组织能力有限，进度估计比较慢，有错误的地方请不吝指正。
 
 
-## [阅读文档](https://sun_zoro.gitee.io/mylayui/doc/api.html)
+## [阅读文档](https://sunxiaobin89.github.io/mylayui/doc/api.html)
 
-文档地址[https://sun_zoro.gitee.io/mylayui/doc/api.html](https://sun_zoro.gitee.io/mylayui/doc/api.html)
+文档地址[https://sunxiaobin89.github.io/mylayui/doc/api.html](https://sunxiaobin89.github.io/mylayui/doc/api.html)
 内含demo。注意的一点是mylayui的文档中只会列出跟layui不同的一些地方，基础的文档请自行到[layui官方网站](https://www.layui.com/doc/) 查阅，本文档不再赘述。
 关于layui官方网站下线，可以关注[https://gitee.com/layui](https://gitee.com/layui),
 也可以从一些热心用户备份的镜像在线文档站点查看layui文档，如：[https://layui.site/](https://layui.site/)
