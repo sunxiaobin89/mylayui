@@ -30,7 +30,7 @@ table.on('tool(test1)', function(){
   do something;
 });</pre>
   <blockquote class="layui-elem-quote layui-quote-nm">
-    没有写filter的事件，在触发的时候都会触发，那么我们通常可以用来处理一些共通的任务，所以之前的发过的一个帖子“<a href="https://fly.layui.com/jie/27143/" target="_blank">探索
+    没有写filter的事件，在触发的时候都会触发，那么我们通常可以用来处理一些共通的任务，所以之前的发过的一个帖子“<a doc-href="https://fly.layui.com/jie/27143/" target="_blank">探索
     layui 的 onevent 和 event</a>”里面将其命名为“母事件”，而带filter的相关监听称之为“子事件”，为了方面，下文沿用这种命名。
   </blockquote>
   <p><b>2、onevent同名的时候就近原则</b></p>
@@ -110,7 +110,7 @@ layui.onevent("message", "send(B)", fn);    // 会触发
 layui.onevent("message", "send(C)", fn);    // 会触发
 layui.onevent("message", "send(D)", fn);    // 会触发
 layui.onevent("message", "send(...)", fn);  // 会触发</pre>
-    <p>有这种需求的场景是比较少的，但是也不是没有，所以如果不是真的需要这种效果就不要以{*}为filter；所以沿用这种规则，offevent的时候也可以支持{*}来解除所有的同类的onevent；另外一个就是比较好理解的待filter的事件，解除的话实际直接delete掉即可；复杂一点的就是新增了多事件绑定的母事件的移除，这个时候加上对应的第三个参数，表示要移除特定的监听，如果没有带就是移除所有的同类母事件，这一点上跟jquery的off是一样的效果，所以只要熟悉jquery基本上是很好理解的。</p>
+    <p>有这种需求的场景是比较少的，但是也不是没有，所以如果不是真的需要这种效果就不要以{*}为filter；所以沿用这种规则，offevent的时候也可以支持{*}来解除所有的同类的onevent；另外一个就是比较好理解的带filter的事件，解除的话实际直接delete掉即可；复杂一点的就是新增了多事件绑定的母事件的移除，这个时候加上对应的第三个参数，表示要移除特定的监听，如果没有带就是移除所有的同类母事件，这一点上跟jquery的off是一样的效果，所以只要熟悉jquery基本上是很好理解的。</p>
   </blockquote>
   <blockquote class="layui-elem-quote layui-quote-nm">
     那么这个layui.offevent，form.on、table.on的事件呢？实际上面也提到了，他们都是layui.onevent加上一层糖衣，那么移除的方法也就是依葫芦画瓢。以form.on为例

@@ -101,11 +101,12 @@ tr.layui-tablePlug-data-temp {
 }
 
 .layui-table-fixed-r.layui-table-fixed-scroll:hover {
+  /*right: -1px !important;*/
   right: 0 !important;
 }
 
 .layui-table-fixed-l.layui-table-fixed-scroll:hover {
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* 让固定列区域在鼠标移入的时候支持滚动 - 结束 */

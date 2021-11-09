@@ -64,87 +64,87 @@
 <script>
   layui.config({base: 'js/'})
     .use(['upload', 'form', 'common'], function () {
-    var $ = layui.$;
-    var layer = layui.layer;
-    var upload = layui.upload;
-    var form = layui.form;
+      var $ = layui.$;
+      var layer = layui.layer;
+      var upload = layui.upload;
+      var form = layui.form;
 
-    //普通图片上传
-    var uploadInst = upload.render({
-      elem: '#test1'
-      , url: '/upload/'
-      // , url: 'json/data.json'
-      , before: function (obj) {
-        var that = this;
-        //预读本地文件示例，不支持ie8
-        obj.preview(function (index, file, result) {
-          $('#demo1').prop('src', result); //图片链接（base64）
-        });
-        if (!that.confirm) {
-          layer.confirm('图片提交之后将不可撤回，您是否确认要提交？', function (index) {
-            // 询问通过，将询问状态设置成true
-            layer.close(index);
-            that.confirm = true;
-            uploadInst.upload();
-          }, function () {
-            that.confirm = false;
-            var demoText = $('#demoText');
-            demoText.html('<span style="color: #ffa372;">图片未提交</span> <a class="layui-btn layui-btn-xs demo-reload">提交</a>');
-            demoText.find('.demo-reload').on('click', function () {
-              uploadInst.upload();
-            });
+      //普通图片上传
+      var uploadInst = upload.render({
+        elem: '#test1'
+        , url: '/upload/'
+        // , url: 'json/data.json'
+        , before: function (obj) {
+          var that = this;
+          //预读本地文件示例，不支持ie8
+          obj.preview(function (index, file, result) {
+            $('#demo1').prop('src', result); //图片链接（base64）
           });
-          // layer.confirm 它不是阻塞的，如果要询问，必须阻止本次提交，后面再确认之后可以再次触发提交请求
-          return false;
+          if (!that.confirm) {
+            layer.confirm('图片提交之后将不可撤回，您是否确认要提交？', function (index) {
+              // 询问通过，将询问状态设置成true
+              layer.close(index);
+              that.confirm = true;
+              uploadInst.upload();
+            }, function () {
+              that.confirm = false;
+              var demoText = $('#demoText');
+              demoText.html('<span style="color: #ffa372;">图片未提交</span> <a class="layui-btn layui-btn-xs demo-reload">提交</a>');
+              demoText.find('.demo-reload').on('click', function () {
+                uploadInst.upload();
+              });
+            });
+            // layer.confirm 它不是阻塞的，如果要询问，必须阻止本次提交，后面再确认之后可以再次触发提交请求
+            return false;
+          }
         }
-      }
-      , done: function (res) {
-        //如果上传失败
-        if (res.code > 0) {
-          layer.msg('上传失败');
-        } else {
-          layer.msg('上传成功');
+        , done: function (res) {
+          //如果上传失败
+          if (res.code > 0) {
+            layer.msg('上传失败');
+          } else {
+            layer.msg('上传成功');
+          }
+          //上传成功
         }
-        //上传成功
-      }
-      , error: function () {
-        //演示失败状态，并实现重传
-        var demoText = $('#demoText');
-        demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
-        demoText.find('.demo-reload').on('click', function () {
-          uploadInst.upload();
-        });
-      }
-    });
+        , error: function () {
+          //演示失败状态，并实现重传
+          var demoText = $('#demoText');
+          demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+          demoText.find('.demo-reload').on('click', function () {
+            uploadInst.upload();
+          });
+        }
+      });
 
-    // 初始化render
-    upload.render({
-      elem: '#test2'
-      , url: '/upload/file'
-      , accept: 'file' //普通文件
-      , exts: 'zip|rar|7z' //只允许上传压缩文件
-    });
-
-    // 监听类型切换重新render
-    form.on('select(fileType)', function (obj) {
-      var options = {
-        file: {
-          accept: 'file', //普通文件
-          exts: 'zip|rar|7z' //只允许上传压缩文件
-        },
-        images: {
-          accept: 'images'
-        },
-        audio: {
-          accept: 'audio'
-        }
-      };
-      upload.render($.extend({
+      // 初始化render
+      var uploadIns = upload.render({
         elem: '#test2'
-        , url: '/upload/' + obj.value
-      }, options[obj.value] || {}));
-    });
-  })
+        , url: '/upload/file'
+        , accept: 'file' //普通文件
+        // , exts: 'zip|rar|7z' //只允许上传压缩文件
+      });
+
+      // 监听类型切换重新render
+      form.on('select(fileType)', function (obj) {
+        var options = {
+          file: {
+            accept: 'file', //普通文件
+            exts: 'zip|rar|7z' //只允许上传压缩文件
+          },
+          images: {
+            accept: 'images'
+          },
+          audio: {
+            accept: 'audio'
+          }
+        };
+        upload.render($.extend({
+          elem: '#test2'
+          , url: '/upload/' + obj.value
+        }, options[obj.value] || {}));
+      });
+    })
 </script>
 </body>
 </html>

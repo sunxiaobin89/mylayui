@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>laydatePro</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="../src/css/layui.css" media="all">
+  <!--  <link rel="stylesheet" href="laydatePro.css" media="all">-->
+  <style>
+    body {
+      background-color: #f8f8f8;
+    }
+
+    .layui-form-label {
+      width: 86px;
+    }
+
+    .layui-input-block {
+      margin-left: 116px;
+    }
+
+    .laydate-theme-calendar .layui-laydate-main {
+      width: 472px;
+    }
+
+    .laydate-theme-calendar .layui-laydate-content th,
+    .laydate-theme-calendar .layui-laydate-content td {
+      width: 65px;
+      height: 38px;
+    }
+
+    .laydate-theme-calendar .layui-laydate-content td:hover {
+      /*border: 1px solid #ffb27a;*/
+    }
+
+    .laydate-theme-calendar .laydate-day-mark::after {
+      display: none;
+    }
+
+    .laydate-theme-calendar .laydate-day-mark {
+      line-height: 38px;
+    }
+
+    .laydate-theme-calendar .laydate-day-mark .layui-icon {
+      position: absolute;
+      top: 8px;
+      right: 3px;
+      line-height: 0;
+      font-size: 12px;
+      color: #FFB800;
+      /*left: auto;*/
+    }
+
+    .layui-laydate-footer span[laydate-calendar-time] {
+      font-size: 14px;
+    }
+
+    .laydate-theme-range_single.layui-laydate-range {
+      width: 274px
+    }
+
+    .laydate-theme-range_single.layui-laydate-range .layui-laydate-main.laydate-main-list-1 {
+      display: none;
+    }
+
+    .laydate-theme-range_single.layui-laydate-range .layui-laydate-main.laydate-main-list-0 .layui-laydate-header i {
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+<div class="layui-container">
+  <div class="layui-row layui-col-space10">
+    <div class="layui-col-lg7 layui-col-md12 layui-form" id="tools">
+      <div>
+        <div class="layui-form" style="margin-top: 10px;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">选择时间1</label>
+            <div class="layui-input-inline">
+              <input type="text" class="layui-input laydate-test" data-type="date" autocomplete="off" lay-data="">
+            </div>
+            <label class="layui-form-label">选择时间2</label>
+            <div class="layui-input-inline">
+              <input type="text" class="layui-input laydate-test" data-type="date" autocomplete="off"
+                     lay-data="{type: 'year', format: 'yyyy年'}">
+            </div>
+
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">选择时间3</label>
+            <div class="layui-input-inline">
+              <input type="text" class="layui-input laydate-test" autocomplete="off" data-type="date"
+                     style="width: 240px" lay-data="{range: true,type: 'datetime'}">
+            </div>
+          </div>
+        </div>
+        <div class="layui-btn-container" style="margin-left: 116px;">
+          <button class="layui-btn layui-btn-warm" lay-even="renderLaydate1">尝试通过class去render多个节点</button>
+        </div>
+        <hr>
+
+        <div class="layui-form" style="margin-top: 10px;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">选择时间4</label>
+            <div class="layui-input-inline">
+              <input type="text" id="date4" class="layui-input laydate-test4" data-type="date" autocomplete="off"
+                     lay-data="">
+            </div>
+            <input type="radio" name="renderLaydate2Type" value="date" title="日期" checked="checked">
+            <input type="radio" name="renderLaydate2Type" value="datetime" title="日期时间">
+            <input type="radio" name="renderLaydate2Type" value="time" title="时间">
+          </div>
+        </div>
+        <div class="layui-btn-container" style="margin-left: 116px;">
+          <button class="layui-btn layui-btn-warm" lay-even="renderLaydate2">改变类型</button>
+        </div>
+        <hr>
+
+        <div class="layui-form" style="margin-top: 10px;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">选择时间5</label>
+            <div class="layui-input-inline">
+              <input type="text" id="date5" class="layui-input" data-type="date" autocomplete="off"
+                     lay-data="">
+            </div>
+          </div>
+        </div>
+        <div class="layui-btn-container" style="margin-left: 116px;">
+          <button class="layui-btn layui-btn-warm" lay-even="renderLaydate3">提供一些可选时间让用户可以快速选择（time）</button>
+        </div>
+        <hr>
+
+        <div class="layui-form" style="margin-top: 10px;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">月份</label>
+            <div class="layui-input-inline">
+              <input type="text" class="layui-input laydate-quickConfirm" data-type="date" autocomplete="off"
+                     lay-data="{type: 'month'}">
+            </div>
+            <label class="layui-form-label">快速确认</label>
+            <div class="layui-input-inline">
+              <input type="text" class="layui-input laydate-quickConfirm" data-type="date" autocomplete="off"
+                     lay-data="{type: 'month', quickConfirm: true}">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">年份</label>
+            <div class="layui-input-inline">
+              <input type="text" class="layui-input laydate-quickConfirm" data-type="date" autocomplete="off"
+                     lay-data="{type: 'year'}">
+            </div>
+            <label class="layui-form-label">快速确认</label>
+            <div class="layui-input-inline">
+              <input type="text" class="layui-input laydate-quickConfirm" data-type="date" autocomplete="off"
+                     lay-data="{type: 'year', quickConfirm: true}">
+            </div>
+          </div>
+        </div>
+        <div class="layui-btn-container" style="margin-left: 116px;">
+          <button class="layui-btn layui-btn-warm" lay-even="renderLaydate4">点击月份/年份之后快速确认</button>
+        </div>
+        <hr>
+
+        <div class="layui-form" style="margin-top: 10px;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">选择时间6</label>
+            <div class="layui-input-inline">
+              <input type="text" class="layui-input laydate-simpleModel" data-type="date" autocomplete="off"
+                     lay-data="{}">
+            </div>
+            <label class="layui-form-label">选择时间7</label>
+            <div class="layui-input-inline">
+              <input type="text" class="layui-input laydate-simpleModel" data-type="date" autocomplete="off"
+                     lay-data="{format: 'HH'}">
+            </div>
+          </div>
+        </div>
+        <div class="layui-btn-container" style="margin-left: 116px;">
+          <button class="layui-btn" lay-even="renderLaydate5">不完整的time</button>
+        </div>
+        <hr>
+
+        <div class="layui-form" style="margin-top: 10px;">
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">原始时间范围</label>
+              <div class="layui-input-inline">
+                <input type="text" class="layui-input" id="date6" name="dateRange" style="width: 300px"
+                       placeholder="时间范围">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="layui-btn-container" style="margin-left: 116px;">
+          <button class="layui-btn layui-btn-warm" lay-even="renderLaydate01">默认的range效果</button>
+        </div>
+
+        <div class="layui-form" style="margin-top: 10px;">
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">分裂时间范围</label>
+              <div class="layui-input-inline">
+                <input type="text" class="layui-input" name="myDateRange" style="width: 300px" placeholder="时间范围">
+              </div>
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">分裂时间范围</label>
+              <div class="layui-input-inline">
+                <input type="text" class="layui-input" name="myDateRange"
+                       lay-data="{range: true, type: 'month', value: ''}" style="width: 300px" placeholder="时间范围">
+              </div>
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">分裂时间范围</label>
+              <div class="layui-input-inline">
+                <input type="text" class="layui-input" name="myDateRange"
+                       lay-data="{range: true, type: 'time', value: '', format: 'HH:mm:ss', simpleModel: true}"
+                       value=" - 18:00:00" style="width: 300px"
+                       placeholder="时间范围">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="layui-btn-container" style="margin-left: 116px;">
+          <button class="layui-btn layui-btn-warm" lay-even="renderLaydate02">分裂式range</button>
+        </div>
+        <hr>
+
+      </div>
+      <hr>
+
+      <div class="layui-form" style="margin-top: 10px;">
+        <div class="layui-form-item">
+          <div class="layui-inline">
+            <label class="layui-form-label">日期范围</label>
+            <div class="layui-input-inline">
+              <input type="text" class="layui-input" name="dateRange2" style="width: 300px" placeholder="日期范围">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="layui-btn-container" style="margin-left: 116px;">
+        <button class="layui-btn layui-btn-warm" lay-even="renderLaydate6">日期范围快速选择</button>
+      </div>
+      <hr>
+
+
+      <div class="layui-form" style="margin-top: 10px;">
+        <div class="layui-form-item">
+          <label class="layui-form-label">季度</label>
+          <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="renderLaydate7" autocomplete="off" lay-data="{}">
+          </div>
+        </div>
+      </div>
+      <div class="layui-btn-container" style="margin-left: 116px;">
+        <button class="layui-btn" lay-even="renderLaydate7">季度</button>
+      </div>
+      <hr>
+
+
+      <div class="layui-form" style="margin-top: 10px;">
+        <div class="layui-form-item">
+          <label class="layui-form-label">选择日期</label>
+          <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="renderLaydate8" autocomplete="off" lay-data="{}">
+          </div>
+        </div>
+      </div>
+      <div class="layui-btn-container" style="margin-left: 116px;">
+        <button class="layui-btn" lay-even="renderLaydate8">周一作为一周的第一天</button>
+        <button class="layui-btn layui-btn-warm" lay-even="renderLaydate9">以今天的星期作为一周的第一天</button>
+      </div>
+      <hr>
+
+
+      <div class="layui-form" style="margin-top: 10px;">
+        <div class="layui-form-item">
+          <label class="layui-form-label">选择日期</label>
+          <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="renderLaydateCircleMark" autocomplete="off" lay-data="{}">
+          </div>
+        </div>
+      </div>
+      <div class="layui-btn-container" style="margin-left: 116px;">
+        <button class="layui-btn layui-btn-warm" lay-even="renderLaydateCircleMark">圆圈标注</button>
+      </div>
+      <hr>
+
+
+      <div class="layui-form" style="margin-top: 10px;">
+        <div class="layui-form-item">
+          <div class="layui-block">
+            <label class="layui-form-label">选择日期</label>
+            <div class="layui-input-block">
+              <textarea class="layui-textarea laydate-test-area" rows="5" readonly></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="layui-btn-container" style="margin-left: 116px;">
+        <button class="layui-btn" lay-even="renderLaydate10">多选</span></button>
+        <button class="layui-btn layui-btn-warm" lay-even="destroy10">laydate销毁</button>
+      </div>
+      <hr>
+
+
+      <div class="layui-form" style="margin-top: 10px;">
+        <div class="layui-form-item">
+          <label class="layui-form-label">选择日期</label>
+          <div class="layui-input-inline">
+            <input type="text" class="layui-input" id="renderLaydate11" autocomplete="off" lay-data="{}">
+          </div>
+        </div>
+      </div>
+      <div class="layui-btn-container" style="margin-left: 116px;">
+        <button class="layui-btn" lay-even="renderLaydate11">全面板的日期</button>
+      </div>
+      <hr>
+
+    </div>
+    <div class="layui-col-lg5 layui-col-md12 layui-hide-md layui-show-lg-inline-block" style="height: 100%">
+      <pre class="layui-code" id="test_code_view" lay-skin="notepad" lay-title=""></pre>
+    </div>
+  </div>
+</div>
+<script src="../src/layui.js" charset="utf-8"></script>
+<script>
+  layui.use(['laydatePro', 'code', 'util', 'form', 'table'], function () {
+    var $ = layui.$,
+      laydate = layui.laydate,
+      util = layui.util,
+      form = layui.form,
+      table = layui.table,
+      laydatePro = layui.laydatePro;
+    var active = {
+      resetValue: function () {
+        $('[data-type="date"]').val('');
+      },
+      renderLaydate1: function () {
+        laydate.render({
+          elem: '.laydate-test',
+        });
+      },
+      renderLaydate2: function () {
+        laydate.render({
+          elem: '#date4',
+          type: $('[name="renderLaydate2Type"]:checked').val(),
+        });
+      },
+      renderLaydate3: function () {
+        laydate.render({
+          elem: '#date5',
+          type: 'time',
+          quickSelect: ['00:00:00', '00:30:00', '01:30:00', '02:00:00', '02:30:00', '03:30:00', '23:30:00'],
+          done: function (value, date) {
+            console.log(value);
+          }
+        });
+      },
+      renderLaydate4: function () {
+        laydate.render({
+          elem: '.laydate-quickConfirm',
+        });
+      },
+      renderLaydate5: function () {
+        laydate.render({
+          elem: '.laydate-simpleModel',
+          type: 'time',
+          simpleModel: true,
+          format: 'mm分ss秒'
+        });
+      },
+      renderLaydate6: function () {
+        var now = new Date();
+        $('.laydate-test').attr('lay-data', null);
+        laydate.render({
+          elem: '[name="dateRange2"]',
+          type: 'datetime', // 新增两个类型的支持 range的时候的date和datetime
+          range: '~',
+          quickConfirm: true, // 是否选择之后快速确定
+          quickSelect: [
+            'today',  // 这个是个内部的支持的，可以简化设置
+            'lastDays-7', // 过去7天
+            'lastDays-30', // 过去30天
+            'yesterday', // 昨天
+            'lastMonth', // 上个月
+            'thisMonth', // 这个月
+            {
+              title: '昨、今、明',
+              value: function () {
+                var date1 = new Date();
+                var date2 = new Date();
+                date1.setDate(date1.getDate() - 1);
+                date2.setDate(date2.getDate() + 1);
+                return [date1, date2];
+              }()
+            }, {
+              title: '自定义',
+              value: function () {
+                var date1 = new Date();
+                var date2 = new Date();
+                date1.setDate(date1.getDate() - 1);
+                date1.setHours(12, 30, 0, 0);
+                // date2.setDate(date2.getDate() + 1);
+                date2.setHours(12, 30, 0, 0);
+                return [date1, date2];
+              }()
+            } // value是一个区间的范围
+          ],
+          done: function (value, date) {
+            console.log(value);
+          }
+        });
+      },
+      renderLaydate7: function () {
+        // 季度
+        laydate.render({
+          elem: '#renderLaydate7',
+          type: 'quarter',
+        });
+      },
+      renderLaydate8: function () {
+        // 周一作为每周的第一天
+        laydate.render({
+          elem: '#renderLaydate8',
+          type: 'datetime',
+          weekStart: 1
+          // weekStart 的可选配置的值，设置成其他的都会强制转化成默认周日开始
+          // weekStart: [0-6]
+          // weekStart: ['日', '一', '二', '三', '四', '五', '六']
+          // weekStart: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+        });
+      },
+      renderLaydateCircleMark: function () {
+        // 周一作为每周的第一天
+        laydate.render({
+          elem: '#renderLaydateCircleMark',
+          circleMark: true,
+          theme: '#ff00ff',
+          type: 'datetime',
+        });
+      },
+      renderLaydate9: function () {
+        // 以今天的星期作为一周的第一天
+        laydate.render({
+          elem: '#renderLaydate8',
+          weekStart: new Date().getDay()
+        });
+      },
+      renderLaydate10: function () {
+        // 多选
+        laydate.render({
+          elem: '.laydate-test-area',
+          // trigger: 'dblclick',
+          trigger: 'click',
+          // 测试的value故意弄了一些错误的格式的，插件会将他们消除，只保留符合格式的，实际使用见谅注意不要胡来
+          value: '2019-11-11, 2019-11-08,2019-11-22,   ,2019-02-01,2019-02-02,2019-02-08, 2019/12/12,',
+          multiple: ',',
+        });
+      },
+      renderLaydate11: function () {
+        laydate.render({
+          elem: '#renderLaydate11',
+          type: 'datetime',
+          fullPanel: true,
+          min: new Date().getTime()
+        });
+      },
+      destroy10: function () {
+        // 销毁一个laydate
+        laydatePro.destroy('.laydate-test-area');
+      },
+      renderLaydate01: function () {
+        laydate.render({
+          // elem: '[name="dateRange"]',
+          elem: '#date6',
+          // type: 'datetime',
+          range: '~',
+          // range: '到',
+          // value: '2018-11-05 到 2018-11-28',
+          // min: 0,
+          ready: function () {
+            var key = $(this.elem[0]).attr('lay-key');
+            var insTemp = laydatePro.getInstance(key);
+            if (insTemp.config.autoWeek) {
+              $('#layui-laydate' + key).on('click', '.layui-laydate-content td:not(.laydate-disabled)', function () {
+                var tds = $(this).parent().find('td:not(.laydate-disabled)');
+                insTemp.choose($(this));
+                insTemp.choose(tds.first());
+                insTemp.choose(tds.last());
+              });
+            }
+          }
+        });
+      },
+      renderLaydate02: function () {
+        laydate.render({
+          elem: '[name="myDateRange"]',
+          // type: 'month',
+          type: 'datetime',
+          range: '~',
+          quickConfirm: true,
+          value: '2018-09-01 00:00:00 ~ 2018-10-10 12:30:00',
+          rangeType: 'divide' // 分裂式的时间范围选择
+        });
+      }
+    };
+
+
+    layui.code();
+
+    $('#tools .layui-btn').click(function () {
+      var btnElem = $(this),
+        even = btnElem.attr('lay-even');
+      even !== 'resetValue' && btnElem.addClass('layui-btn-danger').siblings('.layui-btn').removeClass('layui-btn-danger');
+      if (even && typeof active[even] === 'function') {
+        active[even].call(this);
+        if (even !== 'resetValue') {
+          $('#test_code_view').html(active[even].toString().replace(/      /g, ''));
+          layui.code();
+        }
+      }
+    });
+
+    laydate.set({
+      trigger: 'click'
+    });
+
+    $('[name="renderLaydate2Type"]').change(function (event) {
+      var elem = $(this);
+      elem.closest('.layui-form').next().find('.layui-btn').click();
+    })
+  });
+</script>
+</body>
+</html>

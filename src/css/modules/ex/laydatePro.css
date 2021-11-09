@@ -1,0 +1,111 @@
+/**
+
+ @Name : laydatePro使用到的样式
+ @Author: 岁月小偷
+ @Site：https://gitee.com/sun_zoro/laydatePro
+ @License：MIT
+
+ */
+.laydate-time-select table tr:hover {
+  background-color: transparent;
+}
+
+.laydate-time-select table tr td,
+.layui-laydate .laydate-quickselect-panel ul li {
+  cursor: pointer;
+}
+
+.laydate-time-select table tr td.layui-this,
+.layui-laydate .laydate-quickselect-panel ul li.layui-this {
+  background-color: #009688 !important;
+  color: #ffffff !important;;
+}
+
+.laydate-time-select table tr td:hover,
+.layui-laydate .laydate-quickselect-panel ul li:hover {
+  background-color: #eaeaea;
+  color: #333;
+}
+
+div.layui-input-inline[width100] {
+  width: 100px;
+}
+
+.layui-laydate {
+  overflow: hidden;
+}
+
+.layui-laydate .laydate-quickselect-panel {
+  position: absolute;
+  background: #c1edfb;
+  height: calc(100% - 46px);
+  width: 120px;
+  left: -120px;
+  padding: 10px;
+  z-index: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.layui-laydate .laydate-quickselect-panel ul li {
+  padding: 6px;
+  cursor: pointer;
+}
+
+.layui-laydate .laydate-footer-btns-primary {
+  display: inline-block;
+  right: auto;
+  top: auto;
+}
+
+
+.laydate-theme-circle .layui-laydate-content td div {
+  height: 28px;
+  line-height: 28px;
+}
+
+.laydate-theme-circle .layui-laydate-content td {
+  padding: 1px 4px;
+}
+
+.laydate-theme-circle td.layui-this div {
+  background-color: #009688 !important;
+  color: #fff !important;
+  border-radius: 50%;
+}
+
+.laydate-theme-circle table .layui-this {
+  background-color: transparent !important;
+}
+
+.laydate-theme-circle .layui-laydate-content td:hover {
+  background-color: transparent;
+}
+
+.laydate-theme-circle .layui-laydate-content td div:hover {
+  background-color: #eaeaea;
+  border-radius: 50%;
+}
+
+.laydate-theme-fullpanel .layui-laydate-main {
+  width: 526px;
+}
+
+.laydate-theme-fullpanel .layui-laydate-list {
+  width: 252px;
+  left: 272px;
+}
+
+.laydate-theme-fullpanel .laydate-set-ym span {
+  display: none;
+}
+
+.laydate-theme-fullpanel .laydate-time-show .layui-laydate-header .layui-icon,
+.laydate-theme-fullpanel .laydate-time-show .laydate-set-ym span[lay-type="year"],
+.laydate-theme-fullpanel .laydate-time-show .laydate-set-ym span[lay-type="month"] {
+  display: inline-block !important;
+}
+
+.laydate-theme-fullpanel .laydate-btns-time{
+  display: none;
+}

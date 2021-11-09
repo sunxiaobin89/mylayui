@@ -68,6 +68,13 @@ layui.define(['element', 'code', 'layer', 'form'], function (exports) {
       $('[lay-filter="api_menu_side"]').find('a[mylayui-href="'+href+'"]').parent('li').addClass('layui-this');
       // elemA.parent('li').addClass('layui-this').siblings('li').removeClass('layui-this');
     });
+  }).on('click', '*[doc-href]', function (event) {
+    var elemA = $(this);
+    var hrefTemp = elemA.attr('doc-href'), href = elemA.attr('href');
+    if (!hrefTemp || href) {
+      return;
+    }
+    elemA.attr('href', hrefTemp).click();
   });
 
   //

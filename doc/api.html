@@ -11,7 +11,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="format-detection" content="telephone=no">
 
-  <link rel="stylesheet" href="../src/css/layui.css" media="all">
+  <link rel="stylesheet" href="../src/css/layui.css?v=2.6.8" media="all">
+<!--  <link rel="stylesheet" href="../dist/css/layui.css?v=2.6.8" media="all">-->
 <!--  <link rel="stylesheet" href="css/global.css" media="all">-->
 <!--  <link rel="stylesheet" href="css/main.css" media="all">-->
 </head>
@@ -47,6 +48,7 @@
   <div class="site-tree">
     <div class="layui-form" style="height: 38px; margin: 10px 13px 0 0;">
       <select lay-filter="api_version" id="api_version">
+        <option value="2.6.8">2.6.8</option>
         <option value="2.5.6">2.5.6</option>
         <option value="2.5.5">2.5.5</option>
         <option value="2.5.4">2.5.4</option>
@@ -58,26 +60,13 @@
   <div class="site-content" id="app_api"></div>
 </div>
 <div class="site-tree-mobile layui-hide">
-  <i class="layui-icon"></i>
+  <i class="layui-icon"></i>
 </div>
 <div class="site-mobile-shade"></div>
-<script src="../src/layui.js" charset="utf-8"></script>
+<script src="../src/layui.js?v=2.6.8" charset="utf-8"></script>
+<!--<script src="../dist/layui.js?v=2.6.8" charset="utf-8"></script>-->
 <script>
   layui.config({base: 'js/'}).use('api', function () {});
 </script>
-<!--<script>-->
-<!--  (function(w, d, s, g, o) {-->
-<!--    var x = document.createElement(s)-->
-<!--      ,s = document.getElementsByTagName(s)[0];-->
-<!--    w[g] = o;-->
-<!--    x.async = true;-->
-<!--    x.charset = 'utf-8';-->
-<!--    x.src = 'https://cdn.xiankefu.com/dist/xiankefu.js';-->
-<!--    s.parentNode.insertBefore(x, s);-->
-<!--  })(window, document, 'script', 'XIANKEFU_GLOBAL', {-->
-<!--    bid: '9f97e0bf26afd88b398a5e2eccd4cb9b'-->
-<!--    ,csid: '14cc59b5995417fecb48d7c3ee03581a'-->
-<!--  });-->
-<!--</script>-->
 </body>
 </html>

@@ -3,7 +3,7 @@
   使用layui有一段时间的小伙伴一般都会有一个疑虑，就是怎么引入第三放的插件，特别是那些不是写成layui模块化格式的插件，比如echarts，ztree等，
   通常的做法就是通过script引到页面中，那么如果也希望像layui一样模块化的引入，希望用layui.use去延迟加载一些模块的话，
   原始的插件因为里面没有按照layui的标准声明成layui模块，那么是不能直接use的，所以一般来说可以给改造一下，让它实现了layui.define，
-  格式详见：<a href="https://www.layui.com/doc/base/modules.html" target="_blank" style="color: lightblue;">模块规范</a>。
+  格式详见：<a doc-href="https://www.layui.com/doc/base/modules.html" target="_blank" style="color: lightblue;">模块规范</a>。
   但是如果能不修改他的代码的前提下去use，那就更加的方便更加优雅了。
 </blockquote>
 
@@ -53,7 +53,7 @@ load.config({
       有几个关键配置：
       <ul>
         <li><b><i>path</i></b>:String<em>指定插件文件所在的路劲信息，配置规则跟layui.extend中的规则一致，
-          详见：<a href="https://www.layui.com/doc/base/modules.html#extend" target="_blank" style="color: lightblue;">扩展一个
+          详见：<a doc-href="https://www.layui.com/doc/base/modules.html#extend" target="_blank" style="color: lightblue;">扩展一个
             layui 模块</a>，简单的总结一下就是{/}开头的就是指定不相对layui的base的路径，可以是一个项目中的资源，也可以是一个远程的路径，不以{/}开头的就是相对layui的base的路径，在引入的时候会加上.js的后缀，所以路径设置到文件名称即可不要加上后缀</em>
         </li>
         <li><b><i>extend</i></b>:String/Array<em>设置插件的依赖（前置插件）</em></li>

@@ -1,0 +1,22 @@
+<h1 class="site-h1"><i class="layui-icon layui-icon-date"></i>日期和时间组件文档 - layui.laydate</h1>
+<blockquote class="layui-elem-quote">
+  注意： 目前2.6.0+版本的laydate已经升级到5.3.1，但是mylayui目前
+  仍然针对以前5.0.9的laydate进行修改。主要原因是2.6.0+针对laydate的修改最主要的体现在时间范围采用左右面板独立选择
+  的方式，目前个人认为之前的方式体验会更好一些，两种模式都是常见的，贤心也提过收到不少反馈，后续2.7版本还会有调整，
+  所以目前还是以5.0.9为基础进行调整，如果关于反馈需要新模式的范围选择，会优先调整加多一个开关设置来支持两种方式。<br>
+  另外的，针对laydate的修改只将关键的构造器对外暴露，所有的附加功能修改都放到<a api-url=""></a>laydatePro中处理，后续2.7版本之后会舍弃这种方式
+  采用直接针对laydate.js进行修改。
+</blockquote>
+
+<pre class="layui-code" lay-title="javascript">
+...
+// 对外暴露 mod for laydatePro
+laydate.Class = Class;
+...</pre>
+
+<script>
+  layui.use('code', function () {
+    var code = layui.code;
+    code();
+  })
+</script>

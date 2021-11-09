@@ -1,11 +1,8 @@
 {
-  "name": "layui-src",
+  "name": "layui",
   "realname": "layui",
-  "version": "2.5.6",
-  "independents": {
-    "layim": "3.9.1"
-  },
-  "description": "Classic modular front-end component library",
+  "version": "2.6.8",
+  "description": "Classic modular Front-End UI library",
   "main": "dist/layui.js",
   "license": "MIT",
   "scripts": {
@@ -16,21 +13,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/sentsin/layui.git"
+    "url": "git+ssh://git@github.com:sunxiaobin89/mylayui.git"
   },
   "author": [
-    "sentsin <xu@sentsin.com>"
+    "sunxiaobin <https://github.com/sunxiaobin89>"
   ],
-  "homepage": "https://www.layui.com",
+  "homepage": "https://github.com/sunxiaobin89/mylayui",
   "devDependencies": {
     "chai": "^4.1.1",
     "del": "^2.2.2",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0 ",
+    "gulp-footer": "^2.0.2",
     "gulp-header": "^1.8.8",
     "gulp-if": "^2.0.1",
     "gulp-minify-css": "^1.2.4",
     "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.6.1",
     "gulp-uglify": "^1.5.4",
     "gulp-zip": "^4.0.0",
     "karma": "^1.5.0",
@@ -47,16 +46,16 @@
     "sinon-chai": "^2.13.0"
   },
   "bugs": {
-    "url": "https://github.com/sentsin/layui/issues"
+    "url": "https://github.com/sunxiaobin89/mylayui/issues"
   },
   "directories": {
     "doc": "doc",
     "example": "examples",
     "test": "test"
   },
-  "dependencies": {},
   "keywords": [
     "layui",
+    "mylayui",
     "ui",
     "JavaScript Framework",
     "toolkit",

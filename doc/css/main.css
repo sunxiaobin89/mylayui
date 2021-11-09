@@ -27,3 +27,11 @@
 [lay-filter="api_menu_side"] li a {
   cursor: pointer;
 }
+
+.mylayui-doc-unused {
+  text-decoration: line-through;
+}
+
+[doc-href] {
+  cursor: pointer;
+}

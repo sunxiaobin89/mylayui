@@ -48,18 +48,9 @@
       background-color: #bbfefe;
     }
 
-    /* 贤客服样式 -- 开始 */
-    .XIANKEFU-bar {
-      z-index: 101;
+    [doc-href] {
+      cursor: pointer;
     }
-
-    @media screen and (max-width: 1440px) {
-      .XIANKEFU-bar span {
-        display: none;
-      }
-    }
-
-    /* 贤客服样式 -- 结束 */
   </style>
 </head>
 <!--<body class="layui-container">-->
@@ -611,8 +602,8 @@
                     }
                   })
                 });
-              },
-              parseData: function (ret) {
+              }
+              , parseData: function (ret) {
                 return {
                   code: ret.code,
                   msg: ret.msg,
@@ -839,7 +830,7 @@
                 , {title: '0_2', align: 'center'}
                 , {title: '0_3', align: 'center', colspan: 5}
                 , {title: '0_4', align: 'center', colspan: 5}
-                , {type: 'space', title: '0_5', align: 'center', colspan: 32}
+                , {/*type: 'space', */title: '0_5', align: 'center', colspan: 32}
               ], [
                 {title: '1_0', align: 'center', rowspan: 3}
                 , {title: '1_1', align: 'center', rowspan: 3}

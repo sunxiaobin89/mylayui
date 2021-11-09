@@ -27,5 +27,14 @@ layui.define(['util'], function (exports) {
       '</a>');
   }
 
+  $(document).on('click', '*[doc-href]', function (event) {
+    var elemA = $(this);
+    var hrefTemp = elemA.attr('doc-href'), href = elemA.attr('href');
+    if (!hrefTemp || href) {
+      return;
+    }
+    elemA.attr('href', hrefTemp).click();
+  });
+
   exports('common', {});
 });

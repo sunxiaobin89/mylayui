@@ -1,0 +1,200 @@
+<h1 class="site-h1"><i class="layui-icon layui-icon-table"></i> table 数据表格文档 - layui.table</h1>
+<blockquote class="layui-elem-quote">
+  table无疑是项目开发中，特别中后台页面使用最多的组件之一，需求一般来说也是最多样最复杂的，对于table的建设，会保持一直在路上的状态。
+</blockquote>
+
+<!--<fieldset class="layui-elem-field layui-field-title">
+  <legend>功能加强</legend>
+</fieldset>-->
+
+<div class="site-text">
+  <p>1、让reload更轻量提升体验。</p>
+  <blockquote class="layui-elem-quote">
+    reload的职能就是将属性update到当前实例的配置上，重新渲染。<br>
+    采用黑名单的方式，将reload区分为需要整体重载和只重载数据两种模式。
+    目前reload的参数中出现一下属性就会导致需要整体重载：<br>
+    'id', 'elem', 'cols', 'width', 'height'<br>
+    <blockquote class="layui-elem-quote layui-quote-nm">
+      使用：跟原来的使用没有特别的区别，只需要在参数上注意不要在不必要的时候传入一些“黑名单”内的参数即可。也考虑过是否加入
+      一个新的方法跟原始的reload区分开，新方法只处理数据刷新，从<a doc-href="https://gitee.com/sentsin/layui/issues/I43H27">layui 2.7.+</a>可能会加入一个table.reloadData
+      但是我的个人看法是一个reload能搞定的话就没必要再多加方法专项处理，这样对历史代码可以无缝衔接；当然有新的方法会更加清晰，
+      各有好处见仁见智。
+    </blockquote>
+  </blockquote>
+
+  <p>2、新增表头单列合并的支持</p>
+  <blockquote class="layui-elem-quote">
+    原生对table是否是合并列的判断标准是colspan大于等于2，会把如下图所示的很多合并列都当成数据列。
+    <img src="res/table-header-1.png" width="100%">
+  </blockquote>
+
+  <p>3、修复表头与对应的数据列对不上的问题。</p>
+  <blockquote class="layui-elem-quote">
+    原生对table对于字段的数据遍历逻辑中对于找到合并列的子列数据算法有一些问题，最终导致表头和数据项对不上的问题。
+    <img src="res/table-header-2.gif" width="100%">
+    <hr>
+    <img src="res/table-header-2.png" width="100%">
+  </blockquote>
+
+  <p>4、新增表格选择框跨页状态记录。</p>
+  <blockquote class="layui-elem-quote layui-ul-level">
+    <ul>
+      <li>
+        通过table.check可以处理一些需求<br>
+        table.check
+        <ul style="">
+          <li>
+            init: (tableId, data, primaryKey) 初始化表格tableId的默认选中记录data,
+            主键标识primaryKey一般设置在table的config上
+          </li>
+          <li>
+            reset: (tableId) 重置表格记录的选中状态；如果表格视图已经存在，
+            一般需要搭配tablePlug.update(tableId)重新刷新当前页的数据（不会重新请求数据）
+          </li>
+          <li>
+            disabled: (tableId, data) 设置部分数据不能操作，
+          </li>
+          <li>
+            set: (tableId, type, data) 设置表格选择中对应类型的数据，
+            <ul style="">
+              <li>
+                type: 类型，包含
+                'original': table.check.CHECK_TYPE_ORIGINAL 原有的；
+                'disabled': table.check.CHECK_TYPE_DISABLED 不可操作的；
+                'additional': table.check.CHECK_TYPE_ADDITIONAL 新增的；
+                'removed': table.check.CHECK_TYPE_REMOVED 删除的；
+              </li>
+            </ul>
+          </li>
+          <li>
+            get: (tableId, type) 获取表格选择中对应类型的数据。可以传入特定type获得对应的数据，也可以不传type获取所有状态的数据。
+            <ul style="">
+              <li>
+                table.check.get(tableId, table.check.CHECK_TYPE_ADDITIONAL) // 获得新增选中的记录
+              </li>
+              <li>
+                table.check.get(tableId, table.check.CHECK_TYPE_REMOVED) // 获得取消选中的记录
+              </li>
+              <li>
+                table.check.get(tableId) // 获得所有状态的记录
+              </li>
+            </ul>
+          </li>
+          <li>
+            update: (tableId, id, checkedStatus, isRadio) 更新数据项的状态，一般不需要用到，已经在table.js中做了选择的事件监听，
+            在操作选择框的时候就已经调用了更新的方法了。
+          </li>
+          <li>
+            getChecked: (tableId) 获得当前选中的，不区分原始状态。
+          </li>
+        </ul>
+      </li>
+      <li>
+        也可以通过render的时候设置对应的属性开启跨页记录和部分不可选记录的功能<br>
+        <pre class="layui-code" lay-title="javascript">
+table.render({
+  checkStatus: { // 开启跨页状态记录
+    default: [] // 初始已经选中的记录
+  },
+  checkDisabled: {
+    enabled: true,
+    data: [10000, 10001, 10002, 10003, 10004, 10005, 10009] // 不可操作的记录
+  }
+})</pre>
+      </li>
+    </ul>
+  </blockquote>
+
+  <p>5、固定列支持鼠标悬浮滚动。</p>
+  <div class="layui-row layui-col-space10">
+    <div class="layui-col-xs6">
+      <img src="res/table-fixed-scroll1.gif" width="100%">
+    </div>
+    <div class="layui-col-xs6">
+      <img src="res/table-fixed-scroll2.gif" width="100%">
+    </div>
+  </div>
+
+  <p>6、行列转换。</p>
+  <blockquote class="layui-elem-quote">
+    可以通过render的时候设置是否行列转换
+    <pre class="layui-code" lay-title="javascript">
+table.render({
+  reversal: true
+});</pre>
+    也可以通过table.reverse进行动态切换
+    <pre class="layui-code" lay-title="javascript">
+table.reverse(tableId, reversal, tableIns);
+  tableId: 表格id,
+  reversal: true/false, 可以指定特定的相对于render的时候是否反转，也可以不指定状态对当前的状态进行切换
+  tableIns: 指定特定的表格实例，tableId和tableIns都不传值的情况下将调整所有的表格实例，非必要情况下不要这么用</pre>
+  </blockquote>
+
+  <p>7、定时刷新。</p>
+  <blockquote class="layui-elem-quote">
+    table.refresh(tableId, time); // 每隔time毫秒刷新表格，time为false的时候关闭定时刷新。<br>
+    一般用于需要定时刷新的没有很多操作的信息表格。
+  </blockquote>
+
+  <p>8、分页新增多语言支持。</p>
+  <blockquote class="layui-elem-quote">
+    设置table的pageLanguage
+    <pre class="layui-code" lay-title="javascript">
+// 自定义table的page组件中的多语言支持
+tablePlug.set({
+  pageLanguageText: {
+    en: {
+      jumpTo: 'jump to', // 到第
+      page: 'page', // 页
+      go: 'go', // 确定
+      total: 'total', // 共
+      unit: '', // 条（单位，一般也可以不填）
+      optionText: 'limit each page' // 条/页
+    }
+    // 定义中文简写的, (如果需要的话，建议不改，按照原来的就行)
+    // 'zh-CN': {
+    //
+    // }
+    // 比如定义中文繁体
+    // 'zh-TW': {
+    //
+    // }
+  }
+});
+// 在render的时候设定对应的语言
+table.render({
+  // pageLanguage: 'zh-TW' // 需要自己定义对应的文本
+  // pageLanguage: 'en' // tablePlug里面已经定义了，如果觉得不满意可以用tablePlug.set去更新默认的配置
+  // pageLanguage: true // 无效的设置方式，只支持字符串或者对象的
+  // 也可以针对某个表格有特殊的配置如下面对象的设置方法,但是如果没有必要单独的自定义建议使用直接赋值成语言名称的字符串形式
+  pageLanguage: {
+    lan: 'en',
+    // 可自定义text,lan为en的情况下
+    text: {
+      // jumpTo: 'jump to', // 到第
+      // page: 'page', // 页
+      // go: 'go', // 确定
+      // total: 'total', // 共
+      unit: 'item' // 条（单位，一般也可以不填）
+      // optionText: 'limit each page' // 条/页
+    }
+  }
+})</pre>
+  </blockquote>
+</div>
+
+<style>
+  .layui-ul-level ul ul {
+    margin-left: 16px;
+  }
+</style>
+
+<script>
+  layui.use(['code', 'form'], function () {
+    var code = layui.code;
+    var $ = layui.$;
+    var form = layui.form;
+    code();
+  })
+</script>
+

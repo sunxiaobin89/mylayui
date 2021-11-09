@@ -1,0 +1,48 @@
+<h1 class="site-h1"><i class="layui-icon layui-icon-util"></i>工具集文档 - layui.util</h1>
+<blockquote class="layui-elem-quote">
+  针对工具集组件util使用的过程遇到的问题对其进行的几处修改
+</blockquote>
+
+<fieldset class="layui-elem-field layui-field-title">
+  <legend>bug修复</legend>
+</fieldset>
+
+<div class="site-text">
+  <p><span class="mylayui-doc-unused">1. 修复多次执行util.event的时候事件出现多次绑定的问题</span> [新版本已修复]</p>
+</div>
+
+<fieldset class="layui-elem-field layui-field-title">
+  <legend>功能加强</legend>
+</fieldset>
+
+<div class="site-text">
+  <p><span>1. toDateString方法添加更多的类型支持</span></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>
+      原始的util.toDateString只支持yyyy|MM|dd|HH|mm|ss替换，很难覆盖常见的一些时间字符串。
+    </p>
+    <ul>
+      <li>yyyy | 年</li>
+      <li>YYYY | 同yyyy</li>
+      <li>MM | 月 两位数月份 如：02月</li>
+      <li>M | 月份不补齐 如：2月、11月</li>
+      <li>dd | 日 </li>
+      <li>d | 日 不补齐</li>
+      <li>HH | 时 24小时制</li>
+      <li>H | 时 24小时制 不补齐</li>
+      <li>hh | 时 12小时制</li>
+      <li>H | 时 12小时制 不补齐</li>
+      <li>mm | 分 </li>
+      <li>m | 分 不补齐</li>
+      <li>ss | 秒 </li>
+      <li>s | 秒 不补齐</li>
+    </ul>
+  </blockquote>
+</div>
+
+<script>
+  layui.use('code', function () {
+    var code = layui.code;
+    code();
+  })
+</script>

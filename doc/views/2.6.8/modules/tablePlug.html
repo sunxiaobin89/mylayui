@@ -1,0 +1,33 @@
+<h1 class="site-h1"><i class="layui-icon layui-icon-table"></i> table 数据表格增强组件 - layui.tablePlug</h1>
+<blockquote class="layui-elem-quote">
+  tablePlug模块是由另外一个以前开发的开源小工具
+  <a doc-href="https://gitee.com/sun_zoro/layuiTablePlug" style="color: forestgreen;">layuiTablePlug</a>，
+  其中大部分功能已经在table中实现，部分增强功能保留在tablePlug中。
+</blockquote>
+
+<!--<fieldset class="layui-elem-field layui-field-title">
+  <legend>功能加强</legend>
+</fieldset>-->
+
+<div class="site-text">
+  <p>1. 对table的全局config进行深拷贝继承。</p>
+  <blockquote class="layui-elem-quote">
+    tablePlug.set(config);<br>
+    table.set也可以做到设置table的默认config配置信息，但是原始的方法用到的是非深拷贝，部分场景下使用不方便。
+  </blockquote>
+
+
+</div>
+
+<style>
+</style>
+
+<script>
+  layui.use(['code', 'form'], function () {
+    var code = layui.code;
+    var $ = layui.$;
+    var form = layui.form;
+    code();
+  })
+</script>
+

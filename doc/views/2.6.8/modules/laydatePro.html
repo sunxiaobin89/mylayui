@@ -1,0 +1,237 @@
+<h1 class="site-h1"><i class="layui-icon layui-icon-date"></i>日期和时间组件文档 - layui.laydatePro</h1>
+<blockquote class="layui-elem-quote">
+  注意：这个模块主要的功能是处理laydate存在的一些问题以及一些扩展，所以本质上还是采用laydate.render去渲染，layui.laydatePro只提供了一些附加的方法。
+</blockquote>
+
+<fieldset class="layui-elem-field layui-field-title">
+  <legend>功能加强</legend>
+</fieldset>
+
+<div class="site-text">
+  <p><span>1. 支持一次性render多个节点</span></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>
+      layui官方的laydate并不能同时渲染多个节点，结果只有第一个被找到的节点生效，一般需要用到渲染同一类节点的情况下，需要自己遍历然后逐个渲染，对此，
+      laydatePro进行一定的优化，可以渲染所有找到的elem。那么原先laydate.render他会返回一个对象信息，同时渲染多个节点返回的对象是第一个找到的
+      节点对应的laydate实例，其他的节点可以通过laydatePro.getInstance去获取，只要能找到对应的节点就能准确的拿到其对应的实例，后面会详细介绍。<br>
+      同时可以通过在节点上设置lay-data的方式来设置config
+    </p>
+  </blockquote>
+
+  <p><span>2. 支持render一个已经render过的节点</span></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>
+      实际场景中经常会遇到需要修改已经渲染过的节点的对应一些属性配置，目前laydate并没有类似table模块那样提供对应的reload，如果想通过修改
+      render返回的实例信息，那么会遇到不少问题，比如返回的config与render实际上并不是对应的，laydate内部经过init之后将render的配置信息做了
+      一些处理，后续逻辑会以处理过后的属性为准，所以导致在修改属性的时候比较折腾，举个例子，两个联动的日期选择相互改变对方的最大最小值，
+      可以发现实例中的min和max并不是render的时候设置的方式，所以也就不能按照render的时候的思维方式来改变。<br>
+      如果希望通过render重新渲染该节点，那么会遇到"闪退"的问题，经过laydatePro的加工，就可以随时根据需要去重新render了
+    <pre class="layui-code" lay-title="javascript">
+laydate.render({
+  elem: '#date1',
+  type: 'date',
+  min: 1
+});
+laydate.render({
+  elem: '#date1',
+  type: 'datetime'
+});</pre>
+    注意：重新渲染不是reload，所以不会继承旧实例的属性。
+    </p>
+  </blockquote>
+
+  <p><span>3. time提供实现快速选择时间的功能（quickSelect）</span></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>
+      时间选择器中添加一些特殊常用的值方便快速操作
+    <pre class="layui-code" lay-title="javascript">
+laydate.render({
+  elem: '#date5',
+  type: 'time',
+  quickSelect: ['00:00:00', '00:30:00', '01:30:00', '02:00:00', '02:30:00', '03:30:00', '23:30:00'],
+  done: function (value, date) {
+    console.log(value);
+  }
+});</pre>
+    </p>
+  </blockquote>
+
+  <p><span>4. 纯月份年份点击直接确定（quickConfirm）</span></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>
+      通过quickConfirm来决定年份选择和月份选择的时候是否在点击了对应的值就默认确定选择，可以根据应用场景和实际需求确定是否需要quickConfirm<br>
+      原生的layui 2.6.0之前年/月选择上点击了对应的值不会默认确认，之后的版本就默认确认、关闭面板，转变有点大，所以暂时保留quickConfirm来决定是否
+      选择就之后确认，后续版本根据实际项目使用情况和反馈进行调整。
+    <pre class="layui-code" lay-title="javascript">
+laydate.render({
+  elem: '#date5',
+  type: 'time',
+  quickSelect: ['00:00:00', '00:30:00', '01:30:00', '02:00:00', '02:30:00', '03:30:00', '23:30:00'],
+  done: function (value, date) {
+    console.log(value);
+  }
+});</pre>
+    </p>
+  </blockquote>
+
+  <p><span>5. 不完整的时分秒选择（simpleModel & format）</span></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>
+      部分场景下只需要用到时分，或者只需要独立的时、分、秒，原生的laydate设置了format之后可以在选择之后保留对应格式的值，但是面板上会有多余的选择项。
+    <pre class="layui-code" lay-title="javascript">
+laydate.render({
+  elem: '.laydate-simpleModel',
+  type: 'time',
+  simpleModel: true,
+  format: 'mm分ss秒'
+});</pre>
+    </p>
+  </blockquote>
+
+  <p><span>6. 分裂式时间范围选择。（rangeType & range）</span></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>
+      将时间范围选择一分为二可以独立设置开始和结束时间，可以在一些场景下方便选择，和开区间的支持。
+    <pre class="layui-code" lay-title="javascript">
+laydate.render({
+  elem: '.laydate-simpleModel',
+  type: 'time',
+  simpleModel: true,
+  format: 'mm分ss秒'
+});</pre>
+    </p>
+  </blockquote>
+
+  <p><span>7. 新增快速选择的两种场景支持。（range & quickSelect）</span></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>
+      类似time中的quickSelect，在日期和日期时间的范围选择的场景中添加一个可以配置常用的范围快速选择面板。
+    <pre class="layui-code" lay-title="javascript">
+laydate.render({
+  elem: '[name="dateRange2"]',
+  type: 'datetime', // 新增两个类型的支持 range的时候的date和datetime
+  range: '~',
+  quickConfirm: true, // 是否选择之后快速确定
+  quickSelect: [
+    'today',  // 这个是个内部的支持的，可以简化设置
+    'lastDays-7', // 过去7天
+    'lastDays-30', // 过去30天
+    'yesterday', // 昨天
+    'lastMonth', // 上个月
+    'thisMonth', // 这个月
+    {
+      title: '昨、今、明',
+      value: function () {
+        var date1 = new Date();
+        var date2 = new Date();
+        date1.setDate(date1.getDate() - 1);
+        date2.setDate(date2.getDate() + 1);
+        return [date1, date2];
+      }()
+    }, {
+      title: '自定义',
+      value: function () {
+        var date1 = new Date();
+        var date2 = new Date();
+        date1.setDate(date1.getDate() - 1);
+        date1.setHours(12, 30, 0, 0);
+        // date2.setDate(date2.getDate() + 1);
+        date2.setHours(12, 30, 0, 0);
+        return [date1, date2];
+      }()
+    } // value是一个区间范围
+  ],
+  done: function (value, date) {
+    console.log(value);
+  }
+});</pre>
+    quickSelect配置为可选项，插件本身提供的选项有：今天(today)、过去7天(lastDays-7)、过去30天(lastDays-30)、昨天(yesterday)、
+    上个月(lastMonth)、这个月(thisMonth)，可以根据需要挑选组合；
+    也可以自定义自己需要的范围，{title: '显示的文本', value: [开始时间, 结束时间]}</p>
+  </blockquote>
+
+  <p><span>8. 季度选择。（type: 'quarter'）</span></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>
+      对月份选择进行改造，新增一个季度的选择器。
+    <pre class="layui-code" lay-title="javascript">
+laydate.render({
+  elem: '#renderLaydate7',
+  type: 'quarter',
+});</pre></p>
+  </blockquote>
+
+  <p><span>9. 自定义一周的开始（weekStart）</span></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>
+      默认周日为一周第一天(weekStart: 0)，实际场景中会遇到需要用周一为第一天的情况，为了更加后续更加自由使用，
+      不限制只有周日或者周一为第一天，可以根据自己需要定义weekStart: 0~6, 对应周日到周六，
+      为了可读性更好一些，weekStart除了0～6之外也可以设置成日-六，或者英文简写，详见下面的示例代码。
+    <pre class="layui-code" lay-title="javascript">
+laydate.render({
+  elem: '#renderLaydate8',
+  weekStart: 1
+  // weekStart 的可选配置的值，设置成其他的都会强制转化成默认周日开始
+  // weekStart: [0-6]
+  // weekStart: ['日', '一', '二', '三', '四', '五', '六']
+  // weekStart: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+});</pre></p>
+  </blockquote>
+
+  <p><span>10. 新增圆圈选中标记（circleMark）</span></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>
+    <pre class="layui-code" lay-title="javascript">
+laydate.render({
+  elem: '#renderLaydate8',
+  weekStart: 1
+  // weekStart 的可选配置的值，设置成其他的都会强制转化成默认周日开始
+  // weekStart: [0-6]
+  // weekStart: ['日', '一', '二', '三', '四', '五', '六']
+  // weekStart: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+});</pre></p>
+  </blockquote>
+
+  <p><span>11. 日期选择多选（multiple）</span></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>
+      通过multiple设置多选的值连接方式。
+    <pre class="layui-code" lay-title="javascript">
+laydate.render({
+  elem: '.laydate-test-area',
+  trigger: 'click',
+  value: '2019-11-11,2019-11-08,2019-11-22,2019-02-01,2019-02-02,2019-02-08,2019-12-12',
+  multiple: ',',
+});</pre></p>
+  </blockquote>
+
+  <p><span>12. 销毁laydate实例（laydatePro.destory）</span></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>
+      在一些情况下需要将已经渲染过的节点不再需要日期选择，这个时候就可以利用laydatePro.destory(dom对象)去处理。
+    <pre class="layui-code" lay-title="javascript">
+laydatePro.destroy('.laydate-test-area');
+laydatePro.destroy(document.getElementById(divId));</pre></p>
+  </blockquote>
+
+  <p><span>13. datetime全面板（fullPanel）</span></p>
+  <blockquote class="layui-elem-quote layui-quote-nm">
+    <p>
+      在web端窗口比较大的情况下可以利用全面板的方式更加便捷直观的设置datetime。
+    <pre class="layui-code" lay-title="javascript">
+laydate.render({
+  elem: '#renderLaydate11',
+  type: 'datetime',
+  fullPanel: true,
+});</pre></p>
+  </blockquote>
+
+
+</div>
+
+<script>
+  layui.use('code', function () {
+    var code = layui.code;
+    code();
+  })
+</script>
