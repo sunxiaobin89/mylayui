@@ -53,7 +53,7 @@ util.event('lay-active', {
 
   <blockquote class="layui-elem-quote layui-quote-nm">
     <p>目前美化的节点包括：下拉、单选、多选（开关），这几个表单原始经过美化之后，原始节点是不可视的，我们看到的那些节点是layui给我们生成的节点，那么用户操作自然的也是在这些美化之后的节点上，layui就提供了一些对应的事件，可以用来监听对应的事件，比如select的事件，radio的事件，checkbox的事件，switch的事件，用layui之前，相信如果是使用jquery的话一般就是用的jquery去监听节点的change事件，但是美化之后实际上在事件上是跟原始节点的事件给断联了</p>
-    <p>之前发过一个帖子：<a doc-href="https://fly.layui.com/jie/30928/" target="_blank">如何保留select里面的change事件又采用layui的美化</a>，利用<a doc-href="https://fly.layui.com/jie/27143/" target="_blank">layui.event的特点</a>，用一个无filter的事件让所有的对应的类型的事件都会进入，然后在事件内用js去触发原始的节点的对应的change事件。理论上基本是解决了断联的问题，但是实际是有缺陷的，比如select的change应该是在值改变了才触发，但是form.on('select')这个事件只要点击了其中的一个选项就会触发并且是先把值修改进原始节点然后再触发我们设置的回调，那么也无法在回调中判断之前的值是什么，是否构成了change，另外一个更加严重的是，layui.event的事件对于同名的最后优先，不想jquery的事件，可以支持对一个节点绑定多次相同类型的事件，点击了会触发各自的监听，layui的event事件同名的情况会覆盖之前的，也就是说通过form.on('select')加的监听，很容易会被后面其他的代码给覆盖掉，虽然开发中也许很少会用到这种方式去添加事件，但是这个缺陷是实实在在的存在着的。</p>
+    <p>之前发过一个帖子：<a doc-href="https://dev.layuion.com/jie/30928/" target="_blank">如何保留select里面的change事件又采用layui的美化</a>，利用<a doc-href="https://dev.layuion.com/jie/27143/" target="_blank">layui.event的特点</a>，用一个无filter的事件让所有的对应的类型的事件都会进入，然后在事件内用js去触发原始的节点的对应的change事件。理论上基本是解决了断联的问题，但是实际是有缺陷的，比如select的change应该是在值改变了才触发，但是form.on('select')这个事件只要点击了其中的一个选项就会触发并且是先把值修改进原始节点然后再触发我们设置的回调，那么也无法在回调中判断之前的值是什么，是否构成了change，另外一个更加严重的是，layui.event的事件对于同名的最后优先，不想jquery的事件，可以支持对一个节点绑定多次相同类型的事件，点击了会触发各自的监听，layui的event事件同名的情况会覆盖之前的，也就是说通过form.on('select')加的监听，很容易会被后面其他的代码给覆盖掉，虽然开发中也许很少会用到这种方式去添加事件，但是这个缺陷是实实在在的存在着的。</p>
     <p>mylayui的处理方式，直接从根源修改就可以做到更加合理，以select为例：
     <pre class="layui-code" lay-title="form.js" >
 //选择 [mod] select选择的时候如果值发生了变化，触发select的change回调

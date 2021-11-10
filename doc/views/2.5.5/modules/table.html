@@ -25,8 +25,8 @@
   <blockquote class="layui-elem-quote">
     之前关于这个如何更优雅的reload的处理，有过两个帖子：
     <ul>
-      <li><a doc-href="https://fly.layui.com/jie/33664/" target="_blank">table 如何更优雅的 reload</a></li>
-      <li><a doc-href="https://fly.layui.com/jie/43423/" target="_blank">table 如何更优雅的 reload（第二版）</a></li>
+      <li><a doc-href="https://dev.layuion.com/jie/33664/" target="_blank">table 如何更优雅的 reload</a></li>
+      <li><a doc-href="https://dev.layuion.com/jie/43423/" target="_blank">table 如何更优雅的 reload（第二版）</a></li>
     </ul>
     有兴趣的小伙伴可以看看，里面大概的体现了解决这个问题的思路过程以及遇到的问题，早期的做法其实跟2.5.0的做法一样就是新增一个第三参数来决定是重载还是重新请求数据，随即就考虑如何更加方便地使用，力求更新之后不需要修改之前的逻辑代码就能够生效，就采用了在reload内部里面通过查询白名单的形式，只要调用reload的时候带的config里面的key都在白名单中，那么就认为是一次轻量级的reload，只重新请求数据不重载，继续优化将请求参数白名单制改成重载参数黑名单制，这个修改就可以避免自定义属性加入要频繁的将参数名注册到白名单中且易遗漏出错的风险。
   </blockquote>

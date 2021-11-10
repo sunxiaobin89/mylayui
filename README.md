@@ -16,8 +16,8 @@
 ## [阅读文档](https://sunxiaobin89.github.io/mylayui/doc/api.html)
 
 文档地址[https://sunxiaobin89.github.io/mylayui/doc/api.html](https://sunxiaobin89.github.io/mylayui/doc/api.html)
-内含demo。注意的一点是mylayui的文档中只会列出跟layui不同的一些地方，基础的文档请自行到[layui官方网站](https://www.layui.com/doc/) 查阅，本文档不再赘述。
-关于layui官方网站下线，可以关注[https://gitee.com/layui](https://gitee.com/layui),
+内含demo。注意的一点是mylayui的文档中只会列出跟layui不同的一些地方，基础的文档请自行到[layui官方文档](https://www.layuion.com/doc/) 查阅，本文档不再赘述。
+关于layui官方网站(layui.com)下线，可以关注[https://gitee.com/layui](https://gitee.com/layui) , [https://www.layuion.com](https://www.layuion.com)
 也可以从一些热心用户备份的镜像在线文档站点查看layui文档，如：[https://layui.site/](https://layui.site/)
 
 ## 关于压缩混淆k
